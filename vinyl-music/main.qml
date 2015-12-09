@@ -12,20 +12,24 @@ ApplicationWindow {
         id: setSeekTimer
         interval: 100; running: false; repeat: false
         onTriggered: {
-            seeker.maximumValue = parseInt(playMusic.duration)
+            if(playMusic.source.indexOf(".m3u") >= -1){
+                songPlaying.text = playMusic.source
+            }else{
+                seeker.maximumValue = parseInt(playMusic.duration)
 
-            if(playMusic.metaData.albumArtist){
-                var artist = playMusic.metaData.albumArtist + ' - '
-            }else{
-                var artist = 'Unknown Artist'
+                if(playMusic.metaData.albumArtist){
+                    var artist = playMusic.metaData.albumArtist + ' - '
+                }else{
+                    var artist = 'Unknown Artist'
+                }
+                if(playMusic.metaData.title){
+                    var title = playMusic.metaData.title
+                }else{
+                    folderModel.folder = Global.currentFolder
+                    var title = folderModel.get(Global.songId, 'fileName')
+                }
+                songPlaying.text = artist + ' - ' + title
             }
-            if(playMusic.metaData.title){
-                var title = playMusic.metaData.title
-            }else{
-                folderModel.folder = Global.currentFolder
-                var title = folderModel.get(Global.songId, 'fileName')
-            }
-            songPlaying.text = artist + ' - ' + title
         }
     }
     Timer {
@@ -43,20 +47,25 @@ ApplicationWindow {
         id: myTimer
              interval: 100; running: false; repeat: false
              onTriggered: {
-                 if(playMusic.metaData.albumArtist){
-                     var artist = playMusic.metaData.albumArtist + ' - '
-                 }else{
-                     var artist = ''
-                 }
-                 if(playMusic.metaData.title){
-                     var title = playMusic.metaData.title
-                 }else{
-                     folderModel.folder = Global.currentFolder
-                     var title = folderModel.get(Global.songId, 'fileName')
-                 }
+                 if(playMusic.source.indexOf(".m3u") >= -1){
 
-                 page.title = artist + title
-                 demo.title = title
+                 }else{
+
+                     if(playMusic.metaData.albumArtist){
+                         var artist = playMusic.metaData.albumArtist + ' - '
+                     }else{
+                         var artist = ''
+                     }
+                     if(playMusic.metaData.title){
+                         var title = playMusic.metaData.title
+                     }else{
+                         folderModel.folder = Global.currentFolder
+                         var title = folderModel.get(Global.songId, 'fileName')
+                     }
+
+                     page.title = artist + title
+                     demo.title = title
+                 }
          }
     }
 
@@ -149,6 +158,14 @@ ApplicationWindow {
     }
 
     FolderListModel {
+        id: streamFolder
+        folder: "file:///home/" // Placeholder
+        nameFilters: [ "*.mp3", "*.wav", "*.ogg", "*.m3u" ]
+        showDotAndDotDot: false
+        showFiles: true
+    }
+
+    FolderListModel {
         id: albumFolder
         folder: "file:///home/" //Same as above
     }
@@ -168,6 +185,7 @@ ApplicationWindow {
 
                 folderModel.folder = response
                 albumFolder.folder = response
+                streamFolder.folder = response + '/streams'
             })
 
 
@@ -188,7 +206,7 @@ ApplicationWindow {
 
 
     property var sidebar: [
-            "All Music", "Albums", "Artists"
+            "All Music", "Albums", "Artists", "Streams", "Settings"
     ]
 
     property var basicComponents: [
@@ -349,8 +367,8 @@ ApplicationWindow {
                 hoverAnimation: true
                 onTriggered: {
                     console.log("Settings")
-                    setSource("SettingsDemo.qml")
-                    selectedComponent = "Settings"
+                    demo.selectedComponent = "Settings"
+                    example.source = Qt.resolvedUrl("qrc:/SettingsDemo.qml")
                 }
             },
 
@@ -373,13 +391,7 @@ ApplicationWindow {
             Action {
                 iconName: "image/color_lens"
                 name: "Colors"
-                onTriggered: {
-                    console.log("Settings")
-                    example.source = Qt.resolvedUrl("SettingsDemo.qml")
-
-                     demo.selectedComponent = "Settings"
-
-                } //colorPicker.show()
+                onTriggered: colorPicker.show()
             }
         ]
 

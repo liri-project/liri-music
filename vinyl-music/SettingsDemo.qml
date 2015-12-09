@@ -15,47 +15,62 @@ Item {
         Column {
             anchors.fill: parent
 
-            ListItem.Subheader {
-                text: "Section Subheader"
-            }
-
-            ListItem.Standard {
-                text: "Standard list item"
-            }
-
             ListItem.Subtitled {
-                text: "Subtitled list item"
-                subText: "With some subtext!"
-            }
-
-            ListItem.Subtitled {
-                text: "Subtitled list item"
-                subText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec eleifend arcu, eu convallis nisi."
-                valueText: "2h ago"
-
-                maximumLineCount: 3
-            }
-
-            ListItem.Subtitled {
-                text: "Subtitled list item"
-                subText: "With some subtext, icon, and secondary item!"
-                secondaryItem: Switch {
-                    id: enablingSwitch
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                onClicked: enablingSwitch.checked = !enablingSwitch.checked
+                text: "Theme"
+                subText: "Select color theme"
+                onClicked: colorPicker.show()
 
                 action: Icon {
                     anchors.centerIn: parent
-                    name: "device/access_alarm"
+                    name: "image/color_lens"
                     size: Units.dp(32)
                 }
             }
 
-            ListItem.SimpleMenu {
-                text: "Subtitled list item"
-                model: ["A", "B and some long text that should not clip", "C"]
+            ListItem.Subtitled {
+                text: "Music Folders"
+                subText: "Add/Remove music folders"
+
+                onClicked: colorPicker.show()
+
+                action: Icon {
+                    anchors.centerIn: parent
+                    name: "content/sort"
+                    size: Units.dp(32)
+                }
+            }
+
+            ListItem.Subtitled {
+                text: "Online Streams"
+                subText: "Manage online streams"
+
+                onClicked: {
+                    playMusic.source = 'file:///home/nick/Downloads/tronic.ogg.m3u'
+                    playMusic.play()
+                }
+
+                action: Icon {
+                    anchors.centerIn: parent
+                    name: "social/public"
+                    size: Units.dp(32)
+                }
+            }
+
+            ListItem.Subtitled {
+                text: "Shuffle Music"
+                subText: "Randomize your song order"
+                secondaryItem: Switch {
+                    id: shuffleSwitch
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                onClicked: shuffleSwitch.checked = !shuffleSwitch.checked
+
+                action: Icon {
+                    anchors.centerIn: parent
+                    name: "av/shuffle"
+                    size: Units.dp(32)
+                }
             }
         }
     }

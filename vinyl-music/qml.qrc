@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/qml/">
+    <qresource prefix="/qml">
         <file>main.qml</file>
         <file>MainForm.ui.qml</file>
         <file>audio.py</file>
@@ -14,5 +14,6 @@
         <file>AlbumsDemo.qml</file>
         <file>test.py</file>
         <file>AllMusicDemo.qml</file>
+        <file>StreamsDemo.qml</file>
     </qresource>
 </RCC>
