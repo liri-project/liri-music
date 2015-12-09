@@ -15,10 +15,5 @@ Material Music is still very early in development, however, if you'd like to giv
 qml ./main.qml
 
 ### Screenshots
-Latest version
-![Image of Material Music 1]
-(https://github.com/nickgermaine/material-music/blob/master/images/screen2.png)
-
-Version 0.00.1
 ![Image of Material Music]
 (https://github.com/nickgermaine/material-music/blob/master/images/screen1.png)
