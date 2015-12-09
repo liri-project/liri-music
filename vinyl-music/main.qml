@@ -160,7 +160,7 @@ ApplicationWindow {
     FolderListModel {
         id: streamFolder
         folder: "file:///home/" // Placeholder
-        nameFilters: [ "*.mp3", "*.wav", "*.ogg", "*.m3u" ]
+        nameFilters: [ "*.mp3", "*.wav", "*.ogg", "*.m3u", "*.pls" ]
         showDotAndDotDot: false
         showFiles: true
     }
