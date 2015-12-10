@@ -34,9 +34,14 @@ Item {
                 action: Image {
 
                     source: {
+
                         var thisName = model.fileName
                         var thisExt = model.fileName.split('.')
                         if(!thisExt[1]){
+                            Global.currentFolder = folderModel.folder
+                            albumFolder.folder = Global.currentFolder
+                            folderGetImage.folder = albumFolder.folder + model.fileName
+                            console.log("This image is: ", Global.currentFolder +'/'+ folderGetImage.get(0, 'fileName'))
                             return Qt.resolvedUrl(albumFolder.folder + '/' + model.fileName + "/AlbumArtSmall.jpg")
                         }else{
                             return Qt.resolvedUrl(folderModel.folder + "/AlbumArtSmall.jpg")
@@ -51,7 +56,6 @@ Item {
                    id: itemMouseArea
                    anchors.fill: parent
                    onClicked: {
-
                        var thisName = model.fileName
                        var thisExt = model.fileName.split('.')
                        if(!thisExt[1]){
@@ -61,6 +65,8 @@ Item {
                            //demo.showError("isNotDir", thisName, "Close", true)
                            Global.songId = model.index
                            Global.currentFolder = folderModel.folder
+                           albumFolder.folder = Global.currentFolder
+                           console.log('Album Folder: ', Global.currentFolder + '/' + albumFolder.get(0, 'fileName'))
 
                            playMusic.source = folderModel.folder + '/' + model.fileName
                            playMusic.play()

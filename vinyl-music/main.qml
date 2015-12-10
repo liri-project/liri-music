@@ -4,29 +4,26 @@ import Material.ListItems 0.1 as ListItem
 import QtMultimedia 5.5
 import Qt.labs.folderlistmodel 2.1
 import "musicId.js" as Global
-import io.thp.pyotherside 1.4
 import QtQuick.Layouts 1.1
 
 ApplicationWindow {
     Timer {
         id: setSeekTimer
-        interval: 100; running: false; repeat: false
+        interval: 500; running: false; repeat: false
         onTriggered: {
-
-                seeker.maximumValue = parseInt(playMusic.duration)
-
-                if(playMusic.metaData.albumArtist){
-                    var artist = playMusic.metaData.albumArtist + ' '
-                }else{
-                    var artist = 'Unknown Artist'
-                }
-                if(playMusic.metaData.title){
-                    var title = playMusic.metaData.title
-                }else{
-                    folderModel.folder = Global.currentFolder
-                    var title = folderModel.get(Global.songId, 'fileName')
-                }
-                songPlaying.text = artist + ' - ' + title
+            seeker.maximumValue = parseInt(playMusic.duration)
+            if(playMusic.metaData.albumTitle){
+                var artist = playMusic.metaData.albumTitle
+            }else{
+                var artist = 'Unknown Album'
+            }
+            if(playMusic.metaData.title){
+                var title = playMusic.metaData.title
+            }else{
+                folderModel.folder = Global.currentFolder
+                var title = folderModel.get(Global.songId, 'fileName')
+            }
+            songPlaying.text = artist + ' - ' + title
 
         }
     }
@@ -43,14 +40,14 @@ ApplicationWindow {
     }
     Timer {
         id: myTimer
-             interval: 100; running: false; repeat: false
+             interval: 500; running: false; repeat: false
              onTriggered: {
 
-                     if(playMusic.metaData.albumArtist){
-                         var artist = playMusic.metaData.albumArtist + ''
-                     }else{
-                         var artist = ''
-                     }
+                 if(playMusic.metaData.albumTitle){
+                     var artist = playMusic.metaData.albumTitle
+                 }else{
+                     var artist = 'Unknown Album'
+                 }
                      if(playMusic.metaData.title){
                          var title = playMusic.metaData.title
                      }else{
@@ -58,8 +55,13 @@ ApplicationWindow {
                          var title = folderModel.get(Global.songId, 'fileName')
                      }
 
+
                      page.title = artist + ' - ' + title
                      demo.title = title
+
+                     if(loadedFileFolder){
+                         resetFolders.start()
+                     }
                  }
 
     }
@@ -71,6 +73,18 @@ ApplicationWindow {
                 Qt.resolvedUrl("AllMusicDemo.qml")
                 selectedComponent = "All Music"
             }
+    }
+
+    Timer {
+        id: delayedPlay
+        interval: 100; running: false; repeat: false
+        onTriggered: {
+            folderModel.folder = 'file://' + loadedFileFolder
+            albumFolder.folder = 'file://' + loadedFileFolder
+            playMusic.play()
+
+        }
+
     }
 
     Timer {
@@ -105,48 +119,90 @@ ApplicationWindow {
 
 
     Audio {
-            id: playMusic
+        id: playMusic
 
-            onStatusChanged: {
-                            if (status == MediaPlayer.EndOfMedia) {
-                                folderModel.folder = Global.currentFolder
+        onStatusChanged: {
+            if (status == MediaPlayer.EndOfMedia) {
+                folderModel.folder = Global.currentFolder
+               console.log('length of tracks: ', folderModel.count)
+               if(Global.playedSongs.length == folderModel.count){
+                   Global.playedSongs = [];
+               }
 
-                                if(Global.songId + 1 == folderModel.count){
-
-                                    var folder = folderModel.folder
-                                    folderModel.folder = Global.currentFolder
-                                    var currentSong = playMusic.source
-                                    var nextFile = Global.currentFolder + '/' + folderModel.get(0, 'fileName')
-                                    playMusic.source = nextFile
-                                    playMusic.play()
-                                    Global.songId = 1;
-
-                                }else{
-                                    var folder = folderModel.folder
-                                    folderModel.folder = Global.currentFolder
-                                    var currentSong = playMusic.source
-                                    var nextFile = Global.currentFolder + '/' + folderModel.get(Global.songId + 1, 'fileName')
-                                    playMusic.source = nextFile
-                                    playMusic.play()
-                                    Global.songId++;
-                                }
-                            }
+                if(Global.shuffle){
+                    function getRand() {
+                        var rand = Math.floor(Math.random() * folderModel.count)
+                        if (Global.playedSongs.indexOf(rand) === -1) {
+                            return rand;
+                        } else {
+                            return getRand();
                         }
-            onSourceChanged: {
+                    }
 
-                //demo.title = playMusic.metaData.title
-                myTimer.start()
-                setSeekTimer.start()
-                durationTimer.start()
+                    var rand = getRand();
+                    Global.songId = rand;
+                    var newSongId = Global.songId
+                    folderModel.folder = Global.currentFolder
+                    var currentSong = playMusic.source
+                    var nextFile = Global.currentFolder + '/' + folderModel.get(newSongId, 'fileName')
+                    playMusic.source = nextFile
+                    playMusic.play()
 
+
+                    console.log(Global.playedSongs)
+                    folderModel.folder = Global.currentFolder
+                }else{
+                    if(Global.songId + 1 == folderModel.count){
+                        Global.playedSongs = [];
+
+                        var folder = folderModel.folder
+                        folderModel.folder = Global.currentFolder
+                        var currentSong = playMusic.source
+                        var nextFile = Global.currentFolder + '/' + folderModel.get(0, 'fileName')
+                        playMusic.source = nextFile
+                        playMusic.play()
+                        Global.songId = 1;
+
+                    }else{
+                        var folder = folderModel.folder
+                        folderModel.folder = Global.currentFolder
+                        var currentSong = playMusic.source
+                        var nextFile = Global.currentFolder + '/' + folderModel.get(Global.songId + 1, 'fileName')
+                        playMusic.source = nextFile
+                        playMusic.play()
+                        Global.songId++;
+                    }
+                }
             }
+        }
+        onSourceChanged: {
+            Global.playedSongs.push(Global.songId + 1)
 
+            console.log(Global.playedSongs)
+            folderModel.folder = Global.currentFolder
+            console.log('This song id is ', folderModel.get(Global.songId, 'fileName'))
+            //demo.title = playMusic.metaData.title
+            myTimer.start()
+            setSeekTimer.start()
+            durationTimer.start()
 
         }
+        Component.onCompleted: {
+            if(filePathName){
+                playMusic.source = 'file://' + filePathName
+                delayedPlay.start()
+            }
+        }
+
+
+    }
 
     FolderListModel {
         id: folderModel
-        folder: "file:///home/" // Placeholder
+        folder: {
+            console.log("Home dir is ", homeDirectory);
+            return "file://" + homeDirectory
+        }
         nameFilters: [ "*.mp3", "*.wav" ]
         showDotAndDotDot: false
         showFiles: true
@@ -154,7 +210,7 @@ ApplicationWindow {
 
     FolderListModel {
         id: streamFolder
-        folder: "file:///home/" // Placeholder
+        folder: "file://" + streamDirectory
         nameFilters: [ "*.mp3", "*.wav", "*.ogg", "*.m3u", "*.pls" ]
         showDotAndDotDot: false
         showFiles: true
@@ -162,7 +218,14 @@ ApplicationWindow {
 
     FolderListModel {
         id: albumFolder
-        folder: "file:///home/" //Same as above
+        folder: "file://" + homeDirectory
+    }
+
+    FolderListModel {
+        id: folderGetImage
+        folder: "file://" + homeDirectory
+        nameFilters: ["*.png", "*.jpg"]
+        showFiles: true
     }
 
     id: demo
@@ -170,19 +233,13 @@ ApplicationWindow {
     height: Units.dp(700)
     width: Units.dp(1200)
 
-    Python {
-        id: py
-        Component.onCompleted: {
-            addImportPath(Qt.resolvedUrl("."))
-            importModule_sync("main")
-            py.call("main.home", [], function(response){
-                console.log(response)
-
-                folderModel.folder = response
-                albumFolder.folder = response
-                streamFolder.folder = response + '/streams'
-            })
-
+    Timer {
+        id: resetFolders
+        interval: 100; running:false; repeat:false
+        onTriggered: {
+            folderModel.folder = "file://" + homeDirectory
+            albumFolder.folder = "file://" + homeDirectory
+            streamFolder.folder = "file://" + streamDirectory
 
         }
     }
@@ -219,6 +276,36 @@ ApplicationWindow {
     property string selectedComponent: sidebar[0]
 
     function getNextTrack(){
+        if(Global.shuffle){
+             folderModel.folder = Global.currentFolder
+            console.log('length of tracks: ', folderModel.count)
+            if(Global.playedSongs.length == folderModel.count){
+                Global.playedSongs = [];
+            }
+
+            function getRand() {
+
+                var rand = Math.floor(Math.random() * folderModel.count)
+                if (Global.playedSongs.indexOf(rand) === -1) {
+                    return rand;
+                } else {
+                    return getRand();
+                }
+            }
+
+            var rand = getRand();
+            Global.songId = rand;
+            var newSongId = Global.songId
+            folderModel.folder = Global.currentFolder
+            var currentSong = playMusic.source
+            var nextFile = Global.currentFolder + '/' + folderModel.get(newSongId, 'fileName')
+            playMusic.source = nextFile
+            playMusic.play()
+
+
+            console.log(Global.playedSongs)
+            folderModel.folder = Global.currentFolder
+        }else{
         if(Global.songId == folderModel.count){
             var folder = folderModel.folder
             folderModel.folder = Global.currentFolder
@@ -237,16 +324,18 @@ ApplicationWindow {
             playMusic.play()
             Global.songId++;
         }
+        }
     }
 
     function getPrevTrack(){
+
         var folder = folderModel.folder
         folderModel.folder = Global.currentFolder
         var currentSong = playMusic.source
-        var nextFile = Global.currentFolder + '/' + folderModel.get(Global.songId - 1, 'fileName')
+        var nextFile = Global.currentFolder + '/' + folderModel.get(parseInt(Global.playedSongs[-1]), 'fileName')
         playMusic.source = nextFile
         playMusic.play()
-        Global.songId--;
+        Global.songId = Global.playedSongs[-1];
 
     }
 
@@ -316,7 +405,6 @@ ApplicationWindow {
         Keys.onRightPressed: {
             if(playMusic.source){
                 folderModel.folder = Global.currentFolder
-
                 getNextTrack()
             }
         }
@@ -545,11 +633,9 @@ ApplicationWindow {
                             onClicked: {
                                 console.log(modelData)
                                 selectedComponent = modelData
-                                py.call("main.home", [], function(response){
-                                    console.log(response)
-                                    folderModel.folder = response
-                                    albumFolder.folder = response
-                                })
+                                folderModel.folder = "file://" + homeDirectory
+                                albumFolder.folder = "file://" + homeDirectory
+
                             }
 
                         }
@@ -693,9 +779,7 @@ ApplicationWindow {
                 size: Units.dp(30)
 
                 onClicked: {
-
                         getNextTrack()
-
 
                 }
             }
@@ -712,13 +796,61 @@ ApplicationWindow {
         anchors.rightMargin:Units.dp(30)
         height:Units.dp(40)
         width:Units.dp(150)
+        Component.onCompleted: {
+            if(filePathName){
+                folderModel.folder = loadedFileFolder.toString()
+                albumFolder.folder = loadedFileFolder.toString()
+                playMusic.source = 'file://' + filePathName
+                playMusic.play()
+            }
+        }
+
+        IconButton {
+            id: shuffleButton
+            iconName: {
+                return 'av/shuffle'
+            }
+            height:Units.dp(40)
+            width:Units.dp(50)
+            anchors.topMargin: Units.dp(-50)
+            anchors.right: shuffleLabel.left
+            color: index == 0 ? Theme.light.textColor : Theme.dark.textColor
+            onClicked: {
+                Global.shuffle = !Global.shuffle
+                if(Global.shuffle){
+                    shuffleLabel.text = 'On'
+                }else{
+                    shuffleLabel.text = 'Off'
+                }
+            }
+
+        }
+
+        Label {
+            height:Units.dp(80)
+            width:Units.dp(30)
+            anchors.topMargin: Units.dp(7)
+            id: shuffleLabel
+            anchors.right: volumeIcon.left
+            anchors.top: volumeIcon.top
+
+            text: {
+                if(Global.shuffle){
+                    return "On"
+                }else{
+                    return "Off"
+                }
+
+            }
+        }
 
         IconButton {
             anchors.bottom: parent.bottom
             id: volumeIcon
             iconName: 'av/volume_up'
-            height:Units.dp(56)
+            height:Units.dp(36)
             width:Units.dp(50)
+            anchors.topMargin: Units.dp(-50)
             anchors.rightMargin: Units.dp(60)
             anchors.left: parent.left
             color: index == 0 ? Theme.light.textColor : Theme.dark.textColor
@@ -742,7 +874,7 @@ ApplicationWindow {
             Layout.alignment: Qt.AlignCenter
             width: Units.dp(100)
             anchors.bottom: parent.bottom
-            height:Units.dp(50)
+            height:Units.dp(36)
             anchors.right: parent.right
             darkBackground: index == 1
             updateValueWhileDragging: true

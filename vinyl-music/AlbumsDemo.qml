@@ -21,6 +21,7 @@ Item {
             delegate: ListItem.Subtitled{
                 text: model.fileName
                 subText: {
+                    console.log('Trying to get first image from album: ', albumFolder)
                     var thisName = model.fileName
                     var thisExt = model.fileName.split('.')
                     if(!thisExt[1]){
@@ -34,6 +35,7 @@ Item {
                 action: Image {
 
                     source: {
+                        console.log('Trying to get first image from album: ', albumFolder[1].fileName)
                         var thisName = model.fileName
                         var thisExt = model.fileName.split('.')
                         if(!thisExt[1]){

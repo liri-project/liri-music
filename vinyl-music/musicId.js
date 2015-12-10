@@ -3,5 +3,7 @@
 .pragma library
 var songId = 0;
 var currentFolder = 'file:///home/nick';
-var i = 0
+var i = 0;
+var playedSongs = [];
+var shuffle = true;
 console.log('testing yo');
