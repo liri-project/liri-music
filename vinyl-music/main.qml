@@ -12,13 +12,11 @@ ApplicationWindow {
         id: setSeekTimer
         interval: 100; running: false; repeat: false
         onTriggered: {
-            if(playMusic.source.indexOf(".m3u") >= -1){
-                songPlaying.text = playMusic.source
-            }else{
+
                 seeker.maximumValue = parseInt(playMusic.duration)
 
                 if(playMusic.metaData.albumArtist){
-                    var artist = playMusic.metaData.albumArtist + ' - '
+                    var artist = playMusic.metaData.albumArtist + ' '
                 }else{
                     var artist = 'Unknown Artist'
                 }
@@ -29,7 +27,7 @@ ApplicationWindow {
                     var title = folderModel.get(Global.songId, 'fileName')
                 }
                 songPlaying.text = artist + ' - ' + title
-            }
+
         }
     }
     Timer {
@@ -47,12 +45,9 @@ ApplicationWindow {
         id: myTimer
              interval: 100; running: false; repeat: false
              onTriggered: {
-                 if(playMusic.source.indexOf(".m3u") >= -1){
-
-                 }else{
 
                      if(playMusic.metaData.albumArtist){
-                         var artist = playMusic.metaData.albumArtist + ' - '
+                         var artist = playMusic.metaData.albumArtist + ''
                      }else{
                          var artist = ''
                      }
@@ -63,10 +58,10 @@ ApplicationWindow {
                          var title = folderModel.get(Global.songId, 'fileName')
                      }
 
-                     page.title = artist + title
+                     page.title = artist + ' - ' + title
                      demo.title = title
                  }
-         }
+
     }
 
     Timer {
@@ -204,7 +199,6 @@ ApplicationWindow {
     }
 
 
-
     property var sidebar: [
             "All Music", "Albums", "Artists", "Streams", "Settings"
     ]
@@ -224,6 +218,71 @@ ApplicationWindow {
 
     property string selectedComponent: sidebar[0]
 
+    function getNextTrack(){
+        if(Global.songId == folderModel.count){
+            var folder = folderModel.folder
+            folderModel.folder = Global.currentFolder
+            var currentSong = playMusic.source
+            var nextFile = Global.currentFolder + '/' + folderModel.get(1, 'fileName')
+            playMusic.source = nextFile
+            playMusic.play()
+            Global.songId = 1;
+
+        }else{
+            var folder = folderModel.folder
+            folderModel.folder = Global.currentFolder
+            var currentSong = playMusic.source
+            var nextFile = Global.currentFolder + '/' + folderModel.get(Global.songId + 1, 'fileName')
+            playMusic.source = nextFile
+            playMusic.play()
+            Global.songId++;
+        }
+    }
+
+    function getPrevTrack(){
+        var folder = folderModel.folder
+        folderModel.folder = Global.currentFolder
+        var currentSong = playMusic.source
+        var nextFile = Global.currentFolder + '/' + folderModel.get(Global.songId - 1, 'fileName')
+        playMusic.source = nextFile
+        playMusic.play()
+        Global.songId--;
+
+    }
+
+    function playTriggerAction(){
+        if (playMusic.playbackState == 1){
+            playMusic.pause()
+            button.iconName = 'av/play_arrow'
+            button.name = "Play"
+            playButton1.iconName = 'av/play_arrow'
+        }
+        else{
+            playMusic.play()
+            button.iconName = 'av/pause'
+            playButton1.iconName = 'av/pause'
+            button.name = "Pause"
+        }
+    }
+
+    function volumeUp(){
+        var curvol = playMusic.volume
+        var newVol = curvol + 0.10
+        volumeControl.value = newVol
+        playMusic.volume = newVol
+
+
+
+    }
+
+    function volumeDown(){
+        var curvol = playMusic.volume
+        var newVol = curvol - 0.10
+        volumeControl.value = newVol
+        playMusic.volume = newVol
+
+    }
+
     initialPage: TabbedPage {
         id: page
 
@@ -239,18 +298,17 @@ ApplicationWindow {
         actionBar.maxActionCount: navDrawer.enabled ? 3 : 4
 
         //Key Navigation
+        Keys.onUpPressed: {
+            volumeUp()
+        }
+
+        Keys.onDownPressed: {
+            volumeDown()
+        }
+
         Keys.onSpacePressed: {
             if(playMusic.source){
-                if (playMusic.playbackState == 1){
-                    playMusic.pause()
-                    button.iconName = 'av/play_arrow'
-                    button.name = "Play"
-                }
-                else{
-                    playMusic.play()
-                    button.iconName = 'av/pause'
-                    button.name = "Pause"
-                }
+                playTriggerAction()
             }
         }
 
@@ -259,54 +317,24 @@ ApplicationWindow {
             if(playMusic.source){
                 folderModel.folder = Global.currentFolder
 
-                if(Global.songId + 1 == folderModel.count){
-
-                    var folder = folderModel.folder
-                    folderModel.folder = Global.currentFolder
-                    var currentSong = playMusic.source
-                    var nextFile = Global.currentFolder + '/' + folderModel.get(0, 'fileName')
-                    playMusic.source = nextFile
-                    playMusic.play()
-                    Global.songId = 1;
-
-                }else{
-                    var folder = folderModel.folder
-                    folderModel.folder = Global.currentFolder
-                    var currentSong = playMusic.source
-                    var nextFile = Global.currentFolder + '/' + folderModel.get(Global.songId + 1, 'fileName')
-                    playMusic.source = nextFile
-                    playMusic.play()
-                    Global.songId++;
-                }
+                getNextTrack()
             }
         }
 
+
         Keys.onLeftPressed: {
             if(playMusic.source && Global.songId != 0){
-                var folder = folderModel.folder
-                folderModel.folder = Global.currentFolder
-                var currentSong = playMusic.source
-                var nextFile = Global.currentFolder + '/' + folderModel.get(Global.songId - 1, 'fileName')
-                playMusic.source = nextFile
-                playMusic.play()
-                Global.songId--;
+                getPrevTrack()
             }
         }
 
         actions: [
-
             Action {
                 id: playPrev
                 iconName: "av/skip_previous"
                 name: "Previous"
                 onTriggered: {
-                    var folder = folderModel.folder
-                    folderModel.folder = Global.currentFolder
-                    var currentSong = playMusic.source
-                    var nextFile = Global.currentFolder + '/' + folderModel.get(Global.songId - 1, 'fileName')
-                    playMusic.source = nextFile
-                    playMusic.play()
-                    Global.songId--;
+                    getPrevTrack()
 
                 }
 
@@ -319,17 +347,7 @@ ApplicationWindow {
                 name: "Play"
                 onTriggered: {
                     //showError("Is paused?", "this is paused? " + playMusic.playbackState, "Close", true)
-
-                    if (playMusic.playbackState == 1){
-                                        playMusic.pause()
-                                        button.iconName = 'av/play_arrow'
-                                        button.name = "Play"
-                                    }
-                                    else{
-                                        playMusic.play()
-                                        button.iconName = 'av/pause'
-                                        button.name = "Pause"
-                                   }
+                    playTriggerAction()
                 }
             },
 
@@ -337,32 +355,15 @@ ApplicationWindow {
                 id: playNext
                 iconName: "av/skip_next"
                 name: "Next"
-                onTriggered: {
-                    if(Global.songId == folderModel.count){
-                        var folder = folderModel.folder
-                        folderModel.folder = Global.currentFolder
-                        var currentSong = playMusic.source
-                        var nextFile = Global.currentFolder + '/' + folderModel.get(1, 'fileName')
-                        playMusic.source = nextFile
-                        playMusic.play()
-                        Global.songId = 1;
-
-                    }else{
-                        var folder = folderModel.folder
-                        folderModel.folder = Global.currentFolder
-                        var currentSong = playMusic.source
-                        var nextFile = Global.currentFolder + '/' + folderModel.get(Global.songId + 1, 'fileName')
-                        playMusic.source = nextFile
-                        playMusic.play()
-                        Global.songId++;
-                    }
+                onTriggered: {// This is available in all editors
+                    getNextTrack()
 
                 }
 
             },
 
             Action {
-                iconName: "action/accessibility"
+                iconName: "action/settings"
                 name: "Settings"
                 hoverAnimation: true
                 onTriggered: {
@@ -370,6 +371,11 @@ ApplicationWindow {
                     demo.selectedComponent = "Settings"
                     example.source = Qt.resolvedUrl("qrc:/SettingsDemo.qml")
                 }
+            },
+            Action {
+                id: shuffleTrigger
+                iconName: 'av/shuffle'
+                name: 'Shuffle Music'
             },
 
             Action {
@@ -563,6 +569,7 @@ ApplicationWindow {
                 Loader {
                     id: example
                     anchors.fill: parent
+                    anchors.bottomMargin: Units.dp(100)
                     asynchronous: true
                     visible: status == Loader.Ready
                     // selectedComponent will always be valid, as it defaults to the first component
@@ -593,7 +600,6 @@ ApplicationWindow {
 
     Rectangle {
         color:'#fff'
-
         height:Units.dp(100)
         width:parent.width
         anchors.bottom: parent.bottom
@@ -608,22 +614,28 @@ ApplicationWindow {
         Label {
             id: songPlaying
             text: "Nothing playing"
-            Layout.alignment: Qt.AlignCenter
-            anchors.centerIn: parent
-            height:Units.dp(50)
+            //anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            height:Units.dp(60)
+            anchors.left: seeker.left
+            width:Units.dp(100)
             color: index == 0 ? Theme.light.textColor : Theme.dark.textColor
         }
 
         Slider {
             id: seeker
-            Layout.alignment: Qt.AlignCenter
-            width: parent.width
-            anchors.top: Units.dp(50)
-            height:100
+            width: {
+                return parseInt(parent.width - 50)
+            }
+            anchors.horizontalCenter: parent.horizontalCenter
+            height:50
             value: 0
             darkBackground: index == 1
             updateValueWhileDragging: true
             color:theme.primaryColor
+            anchors.rightMargin: Units.dp(50)
+            anchors.leftMargin:Units.dp(50)
+            anchors.bottom:Units.dp(190)
 
             onValueChanged: {
                 if(seeker.pressed){
@@ -638,7 +650,126 @@ ApplicationWindow {
         }
 
 
+
+        Rectangle {
+
+            anchors.bottomMargin: Units.dp(0)
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            height:Units.dp(60)
+            width:Units.dp(210)
+
+            IconButton {
+                iconName: 'av/skip_previous'
+                height:Units.dp(50)
+                width:Units.dp(70)
+                id: prevButton
+                anchors.left: parent.left
+                size: Units.dp(30)
+                onClicked: {
+                    getPrevTrack()
+                }
+            }
+
+            IconButton {
+                iconName: 'av/play_arrow'
+                height:Units.dp(50)
+                width:Units.dp(70)
+                id: playButton1
+                anchors.left: prevButton.right
+                size: Units.dp(30)
+                onClicked: {
+                    playTriggerAction()
+                }
+
+            }
+
+            IconButton {
+                iconName: 'av/skip_next'
+                height:Units.dp(50)
+                width:Units.dp(70)
+                id: nextButton
+                anchors.left: playButton1.right
+                size: Units.dp(30)
+
+                onClicked: {
+
+                        getNextTrack()
+
+
+                }
+            }
+
+        }
+
+
     }
+
+    Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: Units.dp(10)
+        anchors.right: parent.right
+        anchors.rightMargin:Units.dp(30)
+        height:Units.dp(40)
+        width:Units.dp(150)
+
+        IconButton {
+            anchors.bottom: parent.bottom
+            id: volumeIcon
+            iconName: 'av/volume_up'
+            height:Units.dp(56)
+            width:Units.dp(50)
+            anchors.rightMargin: Units.dp(60)
+            anchors.left: parent.left
+            color: index == 0 ? Theme.light.textColor : Theme.dark.textColor
+            onClicked: {
+                if(volumeControl.value == 0.00){
+                    volumeControl.value = 1
+                    this.iconName = 'av/volume_up'
+                    this.color = Theme.light.textColor
+
+                }else{
+                    volumeControl.value = 0.00
+                    this.iconName = 'av/volume_off'
+                    this.color = theme.primaryColor //Theme.alpha('#f33', .9)
+                }
+            }
+        }
+
+
+        Slider {
+            id: volumeControl
+            Layout.alignment: Qt.AlignCenter
+            width: Units.dp(100)
+            anchors.bottom: parent.bottom
+            height:Units.dp(50)
+            anchors.right: parent.right
+            darkBackground: index == 1
+            updateValueWhileDragging: true
+            color:theme.primaryColor
+            value: 1.0
+            onValueChanged: {
+                if(this.value == 0.00){
+                    volumeIcon.iconName = 'av/volume_off'
+                    volumeIcon.color = theme.primaryColor //Theme.alpha('#f33', .9)
+
+                }else if(this.value > 0.00 && this.value <= 0.60){
+                    volumeIcon.iconName = 'av/volume_down'
+                    volumeIcon.color = Theme.light.textColor
+                }else{
+                    volumeIcon.iconName = 'av/volume_up'
+                    volumeIcon.color = Theme.light.textColor
+                }
+                playMusic.volume = this.value
+            }
+        }
+
+
+
+    }
+
+
+
 
 
 }

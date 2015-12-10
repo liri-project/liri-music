@@ -62,6 +62,7 @@ Item {
                            playMusic.source = streamFolder.folder + '/' + model.fileName
                            playMusic.play()
                            button.iconName = 'av/pause'
+                            playButton1.iconName = 'av/pause'
 
                        }
 
