@@ -51,8 +51,7 @@ OBJECTS_DIR   = ./
 SOURCES       = ../vinyl-music/main.cpp qrc_qml.cpp
 OBJECTS       = main.o \
 		qrc_qml.o
-DIST          = ../vinyl-music/test.py \
-		../vinyl-music/settings.json \
+DIST          = ../vinyl-music/settings.json \
 		../../../Qt5.5.1/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qt5.5.1/5.5/gcc_64/mkspecs/common/unix.conf \
 		../../../Qt5.5.1/5.5/gcc_64/mkspecs/common/linux.conf \
@@ -560,7 +559,6 @@ qrc_qml.cpp: ../vinyl-music/qml.qrc \
 		../vinyl-music/StreamsDemo.qml \
 		../vinyl-music/README.md \
 		../vinyl-music/TestDemo.qml \
-		../vinyl-music/audio.py \
 		../vinyl-music/CustomIconsDemo.qml \
 		../vinyl-music/main.qml
 	/home/nick/Qt5.5.1/5.5/gcc_64/bin/rcc -name qml ../vinyl-music/qml.qrc -o qrc_qml.cpp

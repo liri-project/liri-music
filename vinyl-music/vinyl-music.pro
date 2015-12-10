@@ -14,6 +14,5 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 DISTFILES += \
-    test.py \
     settings.json
 
