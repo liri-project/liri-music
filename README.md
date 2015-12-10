@@ -16,13 +16,24 @@ Material Music is still very early in development, however, if you'd like to giv
 
 qml ./main.qml
 
-Or you could build and install it by running (from the vinyl-music subdirectory [containing the .pro file):
+Or you could build it by opening the project file in Qt Creator, or by running the following (from the vinyl-music subdirectory [containing the .pro file):
 
-qmake
+	qmake
+	make
+	make install
 
-make
-
-make install
+### Features
+##### Keyboard Navigation:
+	Spacebar = play/pause
+	Left Arrow = previous track (if any)
+	Right Arrow = next track
+	up/down = volume up/down
+	
+##### Local Music
+Just drop your music folders into ~/Music, and Vinyl Music will find them
+	
+##### Online Streams
+Download online streams in m3u format, and save them to ~/Music/streams
 
 ### Screenshots
 Latest version
