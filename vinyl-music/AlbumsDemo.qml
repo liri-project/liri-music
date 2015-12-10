@@ -20,8 +20,17 @@ Item {
             model: folderModel
             delegate: ListItem.Subtitled{
                 text: model.fileName
+                visible: {
+                    if(model.fileName != "streams"){
+
+                        return true;
+                    }else{
+                        this.height = Units.dp(0)
+                        return false;
+                    }
+                }
                 subText: {
-                    console.log('Trying to get first image from album: ', albumFolder)
+
                     var thisName = model.fileName
                     var thisExt = model.fileName.split('.')
                     if(!thisExt[1]){
@@ -35,7 +44,7 @@ Item {
                 action: Image {
 
                     source: {
-                        console.log('Trying to get first image from album: ', albumFolder[1].fileName)
+
                         var thisName = model.fileName
                         var thisExt = model.fileName.split('.')
                         if(!thisExt[1]){

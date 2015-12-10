@@ -5,6 +5,7 @@ import QtMultimedia 5.5
 import Qt.labs.folderlistmodel 2.1
 import "musicId.js" as Global
 import QtQuick.Layouts 1.1
+import QtQuick.Dialogs 1.0
 
 ApplicationWindow {
     Timer {
@@ -35,6 +36,16 @@ ApplicationWindow {
             var curtime = playMusic.position
             seeker.value = curtime
             }
+
+        }
+    }
+
+    Timer {
+        id: changeView
+        interval: 100; running: false; repeat: false
+        onTriggered: {
+
+                example.source = Qt.resolvedUrl("%1Demo.qml").arg(demo.selectedComponent.replace(" ", ""))
 
         }
     }
@@ -124,7 +135,6 @@ ApplicationWindow {
         onStatusChanged: {
             if (status == MediaPlayer.EndOfMedia) {
                 folderModel.folder = Global.currentFolder
-               console.log('length of tracks: ', folderModel.count)
                if(Global.playedSongs.length == folderModel.count){
                    Global.playedSongs = [];
                }
@@ -147,10 +157,6 @@ ApplicationWindow {
                     var nextFile = Global.currentFolder + '/' + folderModel.get(newSongId, 'fileName')
                     playMusic.source = nextFile
                     playMusic.play()
-
-
-                    console.log(Global.playedSongs)
-                    folderModel.folder = Global.currentFolder
                 }else{
                     if(Global.songId + 1 == folderModel.count){
                         Global.playedSongs = [];
@@ -177,10 +183,7 @@ ApplicationWindow {
         }
         onSourceChanged: {
             Global.playedSongs.push(Global.songId + 1)
-
-            console.log(Global.playedSongs)
             folderModel.folder = Global.currentFolder
-            console.log('This song id is ', folderModel.get(Global.songId, 'fileName'))
             //demo.title = playMusic.metaData.title
             myTimer.start()
             setSeekTimer.start()
@@ -200,7 +203,6 @@ ApplicationWindow {
     FolderListModel {
         id: folderModel
         folder: {
-            console.log("Home dir is ", homeDirectory);
             return "file://" + homeDirectory
         }
         nameFilters: [ "*.mp3", "*.wav" ]
@@ -211,7 +213,7 @@ ApplicationWindow {
     FolderListModel {
         id: streamFolder
         folder: "file://" + streamDirectory
-        nameFilters: [ "*.mp3", "*.wav", "*.ogg", "*.m3u", "*.pls" ]
+        nameFilters: [ "*.mp3", "*.wav", "*.ogg", "*.m3u", "*.pls", !"streams" ]
         showDotAndDotDot: false
         showFiles: true
     }
@@ -277,8 +279,7 @@ ApplicationWindow {
 
     function getNextTrack(){
         if(Global.shuffle){
-             folderModel.folder = Global.currentFolder
-            console.log('length of tracks: ', folderModel.count)
+            folderModel.folder = Global.currentFolder
             if(Global.playedSongs.length == folderModel.count){
                 Global.playedSongs = [];
             }
@@ -299,12 +300,10 @@ ApplicationWindow {
             folderModel.folder = Global.currentFolder
             var currentSong = playMusic.source
             var nextFile = Global.currentFolder + '/' + folderModel.get(newSongId, 'fileName')
+
+            // Load the file and play
             playMusic.source = nextFile
             playMusic.play()
-
-
-            console.log(Global.playedSongs)
-            folderModel.folder = Global.currentFolder
         }else{
         if(Global.songId == folderModel.count){
             var folder = folderModel.folder
@@ -455,9 +454,8 @@ ApplicationWindow {
                 name: "Settings"
                 hoverAnimation: true
                 onTriggered: {
-                    console.log("Settings")
                     demo.selectedComponent = "Settings"
-                    example.source = Qt.resolvedUrl("qrc:/SettingsDemo.qml")
+                    changeView.start()
                 }
             },
             Action {
@@ -554,6 +552,21 @@ ApplicationWindow {
         }
     }
 
+    FileDialog {
+        id: fileDialog
+        title: "Please choose a file"
+        folder: shortcuts.home
+        onAccepted: {
+            console.log("You chose: " + fileDialog.fileUrls)
+            fileDialog.close()
+        }
+        onRejected: {
+            console.log("Canceled")
+            fileDialog.close()
+        }
+        Component.onCompleted: visible = false
+    }
+
     Dialog {
         id: colorPicker
         title: "Pick color"
@@ -631,7 +644,6 @@ ApplicationWindow {
                             text: modelData
                             selected: modelData == selectedComponent
                             onClicked: {
-                                console.log(modelData)
                                 selectedComponent = modelData
                                 folderModel.folder = "file://" + homeDirectory
                                 albumFolder.folder = "file://" + homeDirectory
@@ -659,6 +671,7 @@ ApplicationWindow {
                     asynchronous: true
                     visible: status == Loader.Ready
                     // selectedComponent will always be valid, as it defaults to the first component
+
                     source: {
                         if (navDrawer.enabled) {
                             return Qt.resolvedUrl("%1Demo.qml").arg(demo.selectedComponent.replace(" ", ""))
@@ -666,7 +679,6 @@ ApplicationWindow {
                             return Qt.resolvedUrl("%1Demo.qml").arg(selectedComponent.replace(" ", ""))
                         }
                     }
-
 
                 }
 
@@ -899,9 +911,5 @@ ApplicationWindow {
 
 
     }
-
-
-
-
 
 }

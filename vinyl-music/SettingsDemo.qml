@@ -46,8 +46,7 @@ Item {
                 subText: "Manage online streams"
 
                 onClicked: {
-                    playMusic.source = 'file:///home/nick/Downloads/tronic.ogg.m3u'
-                    playMusic.play()
+                    fileDialog.open()
                 }
 
                 action: Icon {

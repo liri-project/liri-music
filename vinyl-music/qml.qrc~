@@ -2,6 +2,7 @@
     <qresource prefix="/qml">
         <file>main.qml</file>
         <file>MainForm.ui.qml</file>
+        <file>audio.py</file>
         <file>ColorPaletteDemo.qml</file>
         <file>CustomIconsDemo.qml</file>
         <file>main.db</file>

@@ -19,7 +19,17 @@ Item {
             anchors.fill: parent
             model: folderModel
             delegate: ListItem.Subtitled{
+
                 text: model.fileName
+                visible: {
+                    if(model.fileName != "streams"){
+
+                        return true;
+                    }else{
+                        this.height = Units.dp(0)
+                        return false;
+                    }
+                }
                 subText: {
                     var thisName = model.fileName
                     var thisExt = model.fileName.split('.')
@@ -41,10 +51,20 @@ Item {
                             Global.currentFolder = folderModel.folder
                             albumFolder.folder = Global.currentFolder
                             folderGetImage.folder = albumFolder.folder + model.fileName
-                            console.log("This image is: ", Global.currentFolder +'/'+ folderGetImage.get(0, 'fileName'))
-                            return Qt.resolvedUrl(albumFolder.folder + '/' + model.fileName + "/AlbumArtSmall.jpg")
+                            var thisImage = Qt.resolvedUrl(albumFolder.folder + '/' + model.fileName + "/AlbumArtSmall.jpg")
+
+                            if(thisImage){
+                                return thisImage
+                            }else{
+                                return 'av/volume_up'
+                            }
                         }else{
-                            return Qt.resolvedUrl(folderModel.folder + "/AlbumArtSmall.jpg")
+                            var thisImage = Qt.resolvedUrl(folderModel.folder + "/AlbumArtSmall.jpg")
+                            if(thisImage){
+                                return thisImage
+                            }else{
+                                return 'av/volume_up'
+                            }
 
                         }
                     }
@@ -66,7 +86,6 @@ Item {
                            Global.songId = model.index
                            Global.currentFolder = folderModel.folder
                            albumFolder.folder = Global.currentFolder
-                           console.log('Album Folder: ', Global.currentFolder + '/' + albumFolder.get(0, 'fileName'))
 
                            playMusic.source = folderModel.folder + '/' + model.fileName
                            playMusic.play()
