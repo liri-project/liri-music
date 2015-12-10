@@ -26,9 +26,13 @@ make install
 
 ### Screenshots
 Latest version
+![Image of Vinyl music]
+(https://github.com/nickgermaine/vinyl-music/blob/master/images/screen3.png)
+
+Prior to volume, online streams, settings, and bottom controls:
 ![Image of Material Music 1]
-(https://github.com/nickgermaine/material-music/blob/master/images/screen2.png)
+(https://github.com/nickgermaine/vinyl-music/blob/master/images/screen2.png)
 
 Version 0.00.1
 ![Image of Material Music]
-(https://github.com/nickgermaine/material-music/blob/master/images/screen1.png)
+(https://github.com/nickgermaine/vinyl-music/blob/master/images/screen1.png)
