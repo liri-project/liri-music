@@ -1,7 +1,8 @@
 # Vinyl Music
 The official repo for Vinyl Music (previously called material music).  The idea was to make a pretty, cross platform music player.
 
-Currently (version 0.1) the default functionality is to determine your home directory, and then scan ~/Music and display the resulting albums/songs from that information.  In the near future I'll be moving to using sqlite3 in order to better manage the music database.
+For current functionality, see the "Features" section below.
+
 
 ### Dependencies
 	Python3:
@@ -12,17 +13,30 @@ Currently (version 0.1) the default functionality is to determine your home dire
 		qml-material (https://github.com/papyros/qml-material)
 		pyotherside (https://thp.io/2011/pyotherside)
 
-Material Music is still very early in development, however, if you'd like to give it a try, just install the dependencies, and then run the following from within the material-music directory to launch:
+Vinyl Music is still very early in development, however, if you'd like to give it a try, just install the dependencies, and then run the following from within the material-music directory to launch:
 
 qml ./main.qml
 
-Or you could build and install it by running (from the vinyl-music subdirectory [containing the .pro file):
+Or you could build it by opening the project file in Qt Creator, or by running the following (from the vinyl-music subdirectory [containing the .pro file):
 
-qmake
+	qmake
+	make
+	make install
 
-make
 
-make install
+### Features
+##### Keyboard Navigation:
+	Spacebar = play/pause
+	Left Arrow = previous track (if any)
+	Right Arrow = next track
+	up/down = volume up/down
+	
+##### Local Music
+Just drop your music folders into ~/Music, and Vinyl Music will find them
+	
+##### Online Streams
+Download online streams in m3u format, and save them to ~/Music/streams
+
 
 ### Screenshots
 Latest version
