@@ -3,17 +3,15 @@ The official repo for Vinyl Music (previously called material music).  The idea 
 
 For current functionality, see the "Features" section below.
 
+I played around with using python as the backend, but since, have resolved to only use c++/qml, so the ridiculous dependencies of python have been removed.  Now you just need Qt5 and qml-material.
+
 
 ### Dependencies
-	Python3:
-		Mutagen (https://github.com/LordSputnik/mutagen)
-
 	Qt:
 		Qt5.5 (Tested using 5.5.1)
 		qml-material (https://github.com/papyros/qml-material)
-		pyotherside (https://thp.io/2011/pyotherside)
 
-Vinyl Music is still very early in development, however, if you'd like to give it a try, just install the dependencies, and then run the following from within the material-music directory to launch:
+Vinyl Music is still very early in development, however, if you'd like to give it a try, just install the dependencies, and then run the following from within the vinyl-music directory to launch:
 
 qml ./main.qml
 
@@ -36,6 +34,9 @@ Just drop your music folders into ~/Music, and Vinyl Music will find them
 	
 ##### Online Streams
 Download online streams in m3u format, and save them to ~/Music/streams
+
+##### Shuffle
+This part is still a WIP, as vinyl won't correctly go to the previous shuffled track when clicking previous; instead, it goes to track 0 (the first track in the folder).
 
 
 ### Screenshots
