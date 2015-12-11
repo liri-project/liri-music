@@ -6,6 +6,7 @@ import Qt.labs.folderlistmodel 2.1
 import "musicId.js" as Global
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.0
+import QtQuick.LocalStorage 2.0
 
 ApplicationWindow {
     Timer {
@@ -70,9 +71,7 @@ ApplicationWindow {
                      page.title = artist + ' - ' + title
                      demo.title = title
 
-                     if(loadedFileFolder){
-                         resetFolders.start()
-                     }
+
                  }
 
     }
@@ -134,7 +133,7 @@ ApplicationWindow {
 
         onStatusChanged: {
             if (status == MediaPlayer.EndOfMedia) {
-                folderModel.folder = Global.currentFolder
+                //folderModel.folder = Global.currentFolder
                if(Global.playedSongs.length == folderModel.count){
                    Global.playedSongs = [];
                }
@@ -243,6 +242,7 @@ ApplicationWindow {
             albumFolder.folder = "file://" + homeDirectory
             streamFolder.folder = "file://" + streamDirectory
 
+
         }
     }
 
@@ -250,13 +250,41 @@ ApplicationWindow {
     // Necessary when loading the window from C++
     visible: true
 
+
+
     theme {
-        primaryColor: Palette.colors["deepOrange"]["500"]
+        primaryColor: {
+             console.log("artst", loadedArtist)
+
+                var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
+                db.transaction(
+                    function(tx) {
+                        // Create the database if it doesn't already exist
+                        tx.executeSql('CREATE TABLE IF NOT EXISTS Settings(id INTEGER PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)');
+                        // Show all added greetings
+                        var rs = tx.executeSql('SELECT * FROM Settings WHERE setting="primaryColor"');
+                        var r = ""
+
+                        if(rs.rows.length > 0){
+                            for(var i = 0; i < rs.rows.length; i++) {
+                                r += rs.rows.item(i).setting + ", " + rs.rows.item(i).value + "\n"
+                            }
+                            console.log(r)
+                            console.log(rs.rows.item(0).value)
+                            theme.primaryColor = rs.rows.item(0).value
+                        }else{
+                            theme.primaryColor = Palette.colors["deepOrange"]["500"]
+                        }
+
+                    })
+            }
+
+
+
         primaryDarkColor: Palette.colors["blue"]["700"]
         accentColor: Palette.colors["red"]["A200"]
         tabHighlightColor: "white"
     }
-
 
     property var sidebar: [
             "All Music", "Albums", "Artists", "Streams", "Settings"
@@ -273,7 +301,7 @@ ApplicationWindow {
 
     property var sections: [ sidebar ]
 
-    property var sectionTitles: [ "Collection" ]
+    property var sectionTitles: [ "Collection"]
 
     property string selectedComponent: sidebar[0]
 
@@ -416,75 +444,10 @@ ApplicationWindow {
         }
 
         actions: [
-            Action {
-                id: playPrev
-                iconName: "av/skip_previous"
-                name: "Previous"
-                onTriggered: {
-                    getPrevTrack()
 
-                }
 
-            },
 
-            Action {
 
-                id: button
-                iconName: "av/play_circle_filled"
-                name: "Play"
-                onTriggered: {
-                    //showError("Is paused?", "this is paused? " + playMusic.playbackState, "Close", true)
-                    playTriggerAction()
-                }
-            },
-
-            Action {
-                id: playNext
-                iconName: "av/skip_next"
-                name: "Next"
-                onTriggered: {// This is available in all editors
-                    getNextTrack()
-
-                }
-
-            },
-
-            Action {
-                iconName: "action/settings"
-                name: "Settings"
-                hoverAnimation: true
-                onTriggered: {
-                    demo.selectedComponent = "Settings"
-                    changeView.start()
-                }
-            },
-            Action {
-                id: shuffleTrigger
-                iconName: 'av/shuffle'
-                name: 'Shuffle Music'
-            },
-
-            Action {
-                iconName: "alert/warning"
-                name: "THIS SHOULD BE HIDDEN!"
-                visible: false
-            },
-
-            Action {
-                iconName: "action/language"
-                name: "Language"
-                enabled: false
-            },
-
-            Action {
-                iconName: "action/account_circle"
-                name: "Accounts"
-            },
-            Action {
-                iconName: "image/color_lens"
-                name: "Colors"
-                onTriggered: colorPicker.show()
-            }
         ]
 
         backAction: navDrawer.action
@@ -607,6 +570,22 @@ ApplicationWindow {
                             switch(selection.selectedIndex) {
                                 case 0:
                                     theme.primaryColor = parent.color
+                                    var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
+                                    db.transaction(
+                                        function(tx) {
+                                            // Create the database if it doesn't already exist
+                                            tx.executeSql('CREATE TABLE IF NOT EXISTS Settings(id INT PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)');
+
+                                            var rs = tx.executeSql('SELECT * FROM Settings WHERE setting="primaryColor"')
+                                            if(rs.rows.length > 0){
+                                                tx.executeSql('UPDATE Settings SET value="' + theme.primaryColor + '" WHERE id=' + rs.rows.item(0).id);
+
+                                            }else{
+                                                tx.executeSql('INSERT INTO Settings VALUES (NULL, ?, ?)',  [ 'primaryColor', theme.primaryColor ]);
+                                            }
+
+                                           console.log(theme.primaryColor)
+                                        })
                                     break;
                                 case 1:
                                     theme.accentColor = parent.color
@@ -825,35 +804,72 @@ ApplicationWindow {
             height:Units.dp(40)
             width:Units.dp(50)
             anchors.topMargin: Units.dp(-50)
-            anchors.right: shuffleLabel.left
-            color: index == 0 ? Theme.light.textColor : Theme.dark.textColor
+            anchors.right: volumeIcon.left
+
+            color: {
+                if(Global.shuffle){
+                    return theme.primaryColor;
+                }else{
+                    return Theme.light.textColor
+                }
+            }
+            Component.onCompleted: {
+                var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
+                db.transaction(
+                    function(tx) {
+                        // Create the database if it doesn't already exist
+                        tx.executeSql('CREATE TABLE IF NOT EXISTS Settings(id INTEGER PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)');
+                        // Show all added greetings
+                        var rs = tx.executeSql('SELECT * FROM Settings WHERE setting="shuffle"');
+                        var r = ""
+
+                        if(rs.rows.length > 0){
+                            for(var i = 0; i < rs.rows.length; i++) {
+                                r += rs.rows.item(i).setting + ", " + rs.rows.item(i).value + "\n"
+                            }
+                            console.log(r)
+                            console.log(rs.rows.item(0).value)
+                            Global.shuffle = rs.rows.item(0).value
+                        }else{
+                            Global.shuffle = false;
+                        }
+
+                        if( rs.rows.item(0).value == true){
+                            this.color = theme.primaryColor;
+                        }else{
+                            this.color = Theme.light.textColor
+                        }
+
+                    })
+            }
+
+
             onClicked: {
                 Global.shuffle = !Global.shuffle
                 if(Global.shuffle){
-                    shuffleLabel.text = 'On'
+                    this.color = theme.primaryColor;
                 }else{
-                    shuffleLabel.text = 'Off'
-                }
-            }
-
-        }
-
-        Label {
-            height:Units.dp(80)
-            width:Units.dp(30)
-            anchors.topMargin: Units.dp(7)
-            id: shuffleLabel
-            anchors.right: volumeIcon.left
-            anchors.top: volumeIcon.top
-
-            text: {
-                if(Global.shuffle){
-                    return "On"
-                }else{
-                    return "Off"
+                    this.color = Theme.light.textColor
                 }
 
+                var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
+                db.transaction(
+                    function(tx) {
+                        // Create the database if it doesn't aGlobal.shufflelready exist
+                        tx.executeSql('CREATE TABLE IF NOT EXISTS Settings(id INT PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)');
+
+                        var rs = tx.executeSql('SELECT * FROM Settings WHERE setting="shuffle"')
+                        if(rs.rows.length > 0){
+                            tx.executeSql('UPDATE Settings SET value="' + Global.shuffle + '" WHERE id=' + rs.rows.item(0).id);
+
+                        }else{
+                            tx.executeSql('INSERT INTO Settings VALUES (NULL, ?, ?)',  [ 'shuffle', Global.shuffle ]);
+                        }
+
+                       console.log(Global.shuffle)
+                    })
             }
+
         }
 
         IconButton {

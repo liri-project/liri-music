@@ -44,6 +44,7 @@ Item {
                 action: Image {
 
                     source: {
+                        Global.currentFolder = folderModel.folder
 
                         var thisName = model.fileName
                         var thisExt = model.fileName.split('.')
@@ -76,6 +77,7 @@ Item {
                    id: itemMouseArea
                    anchors.fill: parent
                    onClicked: {
+                       Global.currentFolder = folderModel.folder
                        var thisName = model.fileName
                        var thisExt = model.fileName.split('.')
                        if(!thisExt[1]){
@@ -89,7 +91,6 @@ Item {
 
                            playMusic.source = folderModel.folder + '/' + model.fileName
                            playMusic.play()
-                           button.iconName = 'av/pause'
                            playButton1.iconName = 'av/pause'
 
                        }

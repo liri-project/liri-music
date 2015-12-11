@@ -2,7 +2,7 @@
 //change this variable from multiple qml files
 .pragma library
 var songId = 0;
-var currentFolder = 'file:///home/nick';
+var currentFolder = 'file:///home';
 var i = 0;
 var playedSongs = [];
-var shuffle = true;
+var shuffle = false;
