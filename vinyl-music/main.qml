@@ -254,8 +254,6 @@ ApplicationWindow {
 
     theme {
         primaryColor: {
-             console.log("artst", loadedArtist)
-
                 var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
                 db.transaction(
                     function(tx) {
@@ -269,13 +267,10 @@ ApplicationWindow {
                             for(var i = 0; i < rs.rows.length; i++) {
                                 r += rs.rows.item(i).setting + ", " + rs.rows.item(i).value + "\n"
                             }
-                            console.log(r)
-                            console.log(rs.rows.item(0).value)
                             theme.primaryColor = rs.rows.item(0).value
                         }else{
                             theme.primaryColor = Palette.colors["deepOrange"]["500"]
                         }
-
                     })
             }
 
@@ -386,9 +381,6 @@ ApplicationWindow {
         var newVol = curvol + 0.10
         volumeControl.value = newVol
         playMusic.volume = newVol
-
-
-
     }
 
     function volumeDown(){
@@ -834,10 +826,10 @@ ApplicationWindow {
                             Global.shuffle = false;
                         }
 
-                        if( rs.rows.item(0).value == true){
-                            this.color = theme.primaryColor;
+                        if( rs.rows.item(0).value == "true"){
+                            shuffleButton.color = theme.primaryColor;
                         }else{
-                            this.color = Theme.light.textColor
+                            shuffleButton.color = Theme.light.textColor
                         }
 
                     })
