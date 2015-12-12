@@ -48,11 +48,16 @@ Currently the database gets built during the initial opening of the application,
 
 
 ### Screenshots
-Latest version
+Version 0.5
+![Image of Vinyl music]
+(https://github.com/nickgermaine/vinyl-music/blob/master/images/screen4.png)
+
+
+Version 0.2: Prior to December 11 (couldn't decide where to put the audio controls)
 ![Image of Vinyl music]
 (https://github.com/nickgermaine/vinyl-music/blob/master/images/screen3.png)
 
-Prior to volume, online streams, settings, and bottom controls:
+Version 0.1: Prior to volume, online streams, settings, and bottom controls:
 ![Image of Material Music 1]
 (https://github.com/nickgermaine/vinyl-music/blob/master/images/screen2.png)
 
