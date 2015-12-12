@@ -1,6 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include <QtDeclarative/QDeclarativePropertyMap>
+#include <QtQml/QQmlPropertyMap>
 #include <QString>
 #include <iostream>
 #include <iomanip>
