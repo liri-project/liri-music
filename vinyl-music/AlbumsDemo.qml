@@ -7,13 +7,33 @@ import 'musicId.js' as Global
 
 
 Item {
+
+
+    Button {
+        id: backButton
+        text: "Back to All Albums"
+        anchors.left: parent.left
+        onClicked: {
+            albumDetailView.visible = false
+            albumView.visible = true
+            backButton.visible = false
+        }
+        anchors.margins: Units.dp(32)
+        visible: false
+    }
+
     View {
         anchors {
             fill: parent
             margins: Units.dp(32)
+            topMargin: 50
         }
 
         elevation: 1
+
+
+
+
 
         ListView{
             id: albumView
@@ -42,6 +62,7 @@ Item {
                        albumDetailView.model = model.modelData.getSong
                        currentAlbum.model = model.modelData.getSong
                        Global.mode = allAlbumsModel.model
+                       backButton.visible = true
 
                 }
             }
@@ -77,6 +98,7 @@ Item {
                        songPlaying.text = model.modelData.artist + ' - ' + model.modelData.title
                        page.title = model.modelData.artist + ' - ' + model.modelData.title
                        demo.title = model.modelData.title
+
 
                 }
             }

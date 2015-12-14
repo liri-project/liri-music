@@ -131,47 +131,129 @@ ApplicationWindow {
 
         onStatusChanged: {
             if (status == MediaPlayer.EndOfMedia) {
-                //folderModel.folder = Global.currentFolder
-               if(Global.playedSongs.length == folderModel.count){
-                   Global.playedSongs = [];
-               }
 
-
-                if(Global.shuffle){
-                    var objects = Global.mode
-                    function getRand() {
-                        var rand = Math.floor(Math.random() * parseInt(objects.length))
-                        if (Global.playedSongs.indexOf(rand) === -1) {
-                            return rand;
-                        } else {
-                            return getRand();
+                if(Global.mode[0].objectName == "allSongObjects"){
+                    if(Global.shuffle){
+                        var objects = Global.mode
+                        if(Global.playedSongs.length == allSongObjects.length){
+                            Global.playedSongs = [];
                         }
-                    }
+                        function getRand() {
+                            var rand = Math.floor(Math.random() * parseInt(objects.length))
+                            if (Global.playedSongs.indexOf(rand) === -1) {
+                                return rand;
+                            } else {
+                                return getRand();
+                            }
+                        }
 
-                    var rand = getRand();
-                    Global.songId = rand;
-                    var newSongId = Global.songId
-                    folderModel.folder = Global.currentFolder
-                    var currentSong = playMusic.source
-                    var nextFile = objects[newSongId].path
-                    playMusic.source = "file://" + nextFile
-                    playMusic.play()
+                        var rand = getRand();
+                        Global.songId = rand;
+                        var newSongId = Global.songId
+                        folderModel.folder = Global.currentFolder
+                        var currentSong = playMusic.source
+                        var nextFile = objects[newSongId].path
+                        playMusic.source = "file://" + nextFile
+                        playMusic.play()
 
-                    demo.title = objects[newSongId].title
-                    songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
-                    page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
-                    demo.title = objects[newSongId].title
-
-                }else{
-
+                        demo.title = objects[newSongId].title
+                        songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                        page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                        demo.title = objects[newSongId].title
+                    }else{
+                    if(Global.songId == allSongObjects.length){
                         var folder = folderModel.folder
                         folderModel.folder = Global.currentFolder
                         var currentSong = playMusic.source
-                        var nextFile = Global.currentFolder + '/' + folderModel.get(Global.songId + 1, 'fileName')
+                        var nextFile = Global.currentFolder + '/' + folderModel.get(1, 'fileName')
                         playMusic.source = nextFile
                         playMusic.play()
-                        Global.songId++;
+                        Global.songId = 1;
 
+                    }else{
+                        var objects = Global.mode
+                        if(Global.mode == allSongObjects){
+                            var mode = allSongObjects;
+                        }
+
+                        if(Global.playedSongs.length == allSongObjects.length){
+                            Global.playedSongs = [];
+                        }
+
+
+                        Global.songId = Global.songId + 1;
+                        var newSongId = Global.songId
+                        var currentSong = playMusic.source
+                        var nextFile = allSongObjects[newSongId].path
+                        playMusic.source = "file://" + nextFile
+                        playMusic.play()
+
+                        demo.title = allSongObjects[newSongId].title
+                        songPlaying.text = allSongObjects[newSongId].artist + ' - ' + allSongObjects[newSongId].title
+                        page.title = allSongObjects[newSongId].artist + ' - ' + allSongObjects[newSongId].title
+                        demo.title = allSongObjects[newSongId].title
+                    }
+                    }
+                }else{
+                    if(Global.shuffle){
+                        objects = currentAlbum.model
+                        if(Global.playedSongs.length == objects.length){
+                            Global.playedSongs = [];
+                        }
+                        function getRand() {
+                            var rand = Math.floor(Math.random() * parseInt(objects.length))
+                            if (Global.playedSongs.indexOf(rand) === -1) {
+                                return rand;
+                            } else {
+                                return getRand();
+                            }
+                        }
+
+                        rand = getRand();
+                        Global.songId = rand;
+                        newSongId = Global.songId
+                        folderModel.folder = Global.currentFolder
+                        currentSong = playMusic.source
+                        nextFile = objects[newSongId].path
+                        playMusic.source = "file://" + nextFile
+                        playMusic.play()
+
+                        demo.title = objects[newSongId].title
+                        songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                        page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                        demo.title = objects[newSongId].title
+                    }else{
+                        objects = currentAlbum.model
+                    if(Global.songId == objects.length){
+                        var folder = folderModel.folder
+                        folderModel.folder = Global.currentFolder
+                        var currentSong = playMusic.source
+                        var nextFile = Global.currentFolder + '/' + folderModel.get(1, 'fileName')
+                        playMusic.source = nextFile
+                        playMusic.play()
+                        Global.songId = 1;
+
+                    }else{
+                        objects = currentAlbum.model
+
+                        if(Global.playedSongs.length == objects.length){
+                            Global.playedSongs = [];
+                        }
+
+
+                        Global.songId = Global.songId + 1;
+                        newSongId = Global.songId
+                        currentSong = playMusic.source
+                        nextFile = objects[newSongId].path
+                        playMusic.source = "file://" + nextFile
+                        playMusic.play()
+
+                        demo.title = objects[newSongId].title
+                        songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                        page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                        demo.title = objects[newSongId].title
+                }
+            }
                 }
             }
         }
@@ -363,7 +445,7 @@ ApplicationWindow {
                 var newSongId = Global.songId
                 var currentSong = playMusic.source
                 var nextFile = allSongObjects[newSongId].path
-                console.log(allSongObjects[newSongId].path);
+
                 playMusic.source = "file://" + nextFile
                 playMusic.play()
 
@@ -424,7 +506,6 @@ ApplicationWindow {
                 newSongId = Global.songId
                 currentSong = playMusic.source
                 nextFile = objects[newSongId].path
-                console.log(objects[newSongId].path);
                 playMusic.source = "file://" + nextFile
                 playMusic.play()
 
@@ -448,9 +529,7 @@ ApplicationWindow {
 
             // get new song id
             var newSongId = Global.songId;
-            console.log('song id is', Global.songId);
             var nextFile = allSongObjects[Global.songId].path
-            console.log(nextFile);
             Global.prevTrack = true
             playMusic.source = "file://" + nextFile
             playMusic.play()
@@ -463,10 +542,7 @@ ApplicationWindow {
             Global.playedSongs.splice(-1,1)
             Global.songId = Global.playedSongs[Global.playedSongs.length - 1]
             newSongId = Global.songId
-            console.log('played songs ',Global.playedSongs);
             nextFile = objects[newSongId].path
-            console.log('played songs: ', Global.playedSongs)
-            console.log('next song: ', JSON.stringify(objects[newSongId]))
             Global.prevTrack = true
             playMusic.source = "file://" + nextFile
             playMusic.play()
@@ -692,7 +768,6 @@ ApplicationWindow {
                                                 tx.executeSql('INSERT INTO Settings VALUES (NULL, ?, ?)',  [ 'primaryColor', theme.primaryColor ]);
                                             }
 
-                                           console.log(theme.primaryColor)
                                         })
                                     break;
                                 case 1:
@@ -943,7 +1018,7 @@ ApplicationWindow {
                             console.log(r)
                             console.log(rs.rows.item(0).value)
                             Global.shuffle = rs.rows.item(0).value
-                            if( rs.rows.item(0).value == "true"){
+                            if( rs.rows.item(0).value){
                                 shuffleButton.color = theme.primaryColor;
                             }else{
                                 shuffleButton.color = Theme.light.textColor
@@ -980,7 +1055,6 @@ ApplicationWindow {
                             tx.executeSql('INSERT INTO Settings VALUES (NULL, ?, ?)',  [ 'shuffle', Global.shuffle ]);
                         }
 
-                       console.log(Global.shuffle)
                     })
             }
 
