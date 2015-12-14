@@ -23,6 +23,7 @@
 #include <QList>
 #include <QObject>
 #include <albumobject.h>
+#include <artistobject.h>
 #include <main.h>
 
 
@@ -46,6 +47,23 @@ QList<QObject*> getAlbums(QSqlDatabase db){
         }
     }
     return albumList;
+}
+
+QList<QObject*> getArtists(QSqlDatabase db){
+    QList<QObject*> artistList;
+    if(db.open()){
+        QSqlQuery getAllAlbums;
+        getAllAlbums.prepare("select * FROM Artists");
+        if(getAllAlbums.exec()){
+            while(getAllAlbums.next()){
+                QString artist = getAllAlbums.value(2).toString();
+                artistList.append(new ArtistObject(artist));
+
+            }
+        }
+    }
+    return artistList;
+
 }
 
 
@@ -129,6 +147,29 @@ void addSongsToDatabase(QDir dir, TagLib::String path, QString newpath, QString 
                 QSqlQuery insertAlbum;
                 insertAlbum.prepare("INSERT INTO Albums (id, album, artist, art) VALUES (NULL,'"+ album +"', '"+ artist +"', '"+ art +"')");
                 if(insertAlbum.exec()){
+                    // We inserted the album  :)
+                }
+            }
+        }
+
+        QSqlQuery createArtist;
+        createArtist.prepare("CREATE TABLE IF NOT EXISTS Artists(id INTEGER PRIMARY KEY AUTOINCREMENT, artist TEXT),");
+
+        if(createArtist.exec()){
+            // We created the table if it didnt exist... move along -->
+        }
+
+        // Check if item already exists for this path
+        QSqlQuery getArtist;
+        getArtist.prepare("select * from Artists where artist='" + artist + "'");
+        if(getArtist.exec()){
+            if(getArtist.first()){
+
+            }else{
+
+                QSqlQuery insertArtist;
+                insertArtist.prepare("INSERT INTO Artists (id, artist) VALUES (NULL,'"+ artist +"')");
+                if(insertArtist.exec()){
                     // We inserted the album  :)
                 }
             }
@@ -291,6 +332,7 @@ int main(int argc, char *argv[]){
     engine.rootContext()->setContextProperty("homeDirectory", QString::fromStdString(home_directory));
     engine.rootContext()->setContextProperty("streamDirectory", QString::fromStdString(stream_directory));
     engine.rootContext()->setContextProperty("allSongObjects", QVariant::fromValue(getAllSongs(db)));
+    engine.rootContext()->setContextProperty("allArtists", QVariant::fromValue(getArtists(db)));
     engine.rootContext()->setContextProperty("allAlbums", QVariant::fromValue(getAlbums(db)));
 
 

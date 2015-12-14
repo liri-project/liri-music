@@ -30,8 +30,6 @@ Item {
 
                     source: 'file://' + model.modelData.art
                     anchors.fill: {
-
-                        console.log(allSongObjects[2].path)
                     return parent
                     }
                 }
@@ -41,7 +39,6 @@ Item {
                    id: itemMouseArea2
                    anchors.fill: parent
                    onClicked: {
-                       console.log('this item index: ', model.index)
                        Global.playedSongs.push(model.index)
                        demo.title = model.modelData.title
                        playMusic.source = "file://" + model.modelData.path

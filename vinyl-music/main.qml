@@ -285,7 +285,7 @@ ApplicationWindow {
     }
 
     property var sidebar: [
-            "All Music", "Albums", "Artists", "Streams", "Settings"
+            "Albums", "Artists", "All Music", "Streams", "Settings"
     ]
 
     property var basicComponents: [
@@ -937,15 +937,16 @@ ApplicationWindow {
                             console.log(r)
                             console.log(rs.rows.item(0).value)
                             Global.shuffle = rs.rows.item(0).value
+                            if( rs.rows.item(0).value == "true"){
+                                shuffleButton.color = theme.primaryColor;
+                            }else{
+                                shuffleButton.color = Theme.light.textColor
+                            }
                         }else{
                             Global.shuffle = false;
                         }
 
-                        if( rs.rows.item(0).value == "true"){
-                            shuffleButton.color = theme.primaryColor;
-                        }else{
-                            shuffleButton.color = Theme.light.textColor
-                        }
+
 
                     })
             }

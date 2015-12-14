@@ -12,5 +12,6 @@
         <file>AlbumsDemo.qml</file>
         <file>AllMusicDemo.qml</file>
         <file>StreamsDemo.qml</file>
+        <file>ArtistsDemo.qml</file>
     </qresource>
 </RCC>
