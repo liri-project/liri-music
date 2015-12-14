@@ -320,7 +320,7 @@ ApplicationWindow {
     }
 
     id: demo
-    title: "Vinyl Music Player"
+    title: "Liri Vinyl"
     height: Units.dp(700)
     width: Units.dp(1200)
 
@@ -585,7 +585,7 @@ ApplicationWindow {
     initialPage: TabbedPage {
         id: page
 
-        title: "Vinyl Music Player"
+        title: "Liri Vinyl"
 
         Rectangle {
             height:200
