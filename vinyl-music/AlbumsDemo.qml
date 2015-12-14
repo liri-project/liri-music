@@ -15,45 +15,20 @@ Item {
 
         elevation: 1
 
-        ListView {
+        ListView{
+            id: albumView
+            model: allAlbumsModel.model
+
             anchors.fill: parent
-            model: folderModel
+
             delegate: ListItem.Subtitled{
-                text: model.fileName
-                visible: {
-                    if(model.fileName != "streams"){
-
-                        return true;
-                    }else{
-                        this.height = Units.dp(0)
-                        return false;
-                    }
-                }
-                subText: {
-
-                    var thisName = model.fileName
-                    var thisExt = model.fileName.split('.')
-                    if(!thisExt[1]){
-                        return model.fileName
-                    }else{
-                        var curdir = Qt.resolvedUrl(folderModel.folder).split('/')
-                        return curdir[curdir.length - 1]
-                    }
-                }
+                text: model.modelData.title
+                visible: true
+                subText: model.modelData.artist
 
                 action: Image {
 
-                    source: {
-
-                        var thisName = model.fileName
-                        var thisExt = model.fileName.split('.')
-                        if(!thisExt[1]){
-                            return Qt.resolvedUrl(albumFolder.folder + '/' + model.fileName + "/AlbumArtSmall.jpg")
-                        }else{
-                            return Qt.resolvedUrl(folderModel.folder + "/AlbumArtSmall.jpg")
-
-                        }
-                    }
+                    source: 'file://' + model.modelData.art
                     anchors.fill: parent
                 }
 
@@ -62,32 +37,66 @@ Item {
                    id: itemMouseArea
                    anchors.fill: parent
                    onClicked: {
-
-                       var thisName = model.fileName
-                       var thisExt = model.fileName.split('.')
-                       if(!thisExt[1]){
-                            //demo.showError("isDir", thisName, "Close", true)
-                           folderModel.folder = folderModel.folder + '/' + model.fileName
-                       }else{
-                           //demo.showError("isNotDir", thisName, "Close", true)
-                           Global.songId = model.index
-                           Global.currentFolder = folderModel.folder
-
-                           playMusic.source = folderModel.folder + '/' + model.fileName
-                           playMusic.play()
-                            playButton1.iconName = 'av/pause'
-
-                       }
-
-                   }
+                       albumView.visible = false
+                       albumDetailView.visible = true
+                       albumDetailView.model = model.modelData.getSong
+                       currentAlbum.model = model.modelData.getSong
+                       Global.mode = allAlbumsModel.model
 
                 }
             }
 
+            }
         }
+
+        ListView{
+            id: albumDetailView
+            anchors.fill: parent
+            model: allAlbums
+            visible: false
+            delegate: ListItem.Subtitled{
+                text: model.modelData.title
+                visible: true
+                subText: model.modelData.artist
+
+                action: Image {
+
+                    source: 'file://' + model.modelData.art
+                    anchors.fill: parent
+                }
+
+
+                MouseArea{
+                   id: itemMouseArea2
+                   anchors.fill: parent
+                   onClicked: {
+
+                       demo.title = model.modelData.title
+                       playMusic.source = "file://" + model.modelData.path
+                       playMusic.play()
+                       songPlaying.text = model.modelData.artist + ' - ' + model.modelData.title
+                       page.title = model.modelData.artist + ' - ' + model.modelData.title
+                       demo.title = model.modelData.title
+
+                }
+            }
+
+            }
+        }
+
 
         Column {
             anchors.fill: parent
         }
-    }
+
+        Component.onCompleted: {
+
+
+        }
+
+
 }
+
+}
+
+

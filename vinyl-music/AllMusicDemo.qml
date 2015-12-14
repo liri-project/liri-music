@@ -15,92 +15,47 @@ Item {
 
         elevation: 1
 
+
+
+
         ListView {
             anchors.fill: parent
-            model: folderModel
+            model: allSongObjects
             delegate: ListItem.Subtitled{
-
-                text: model.fileName
-                visible: {
-                    if(model.fileName != "streams"){
-
-                        return true;
-                    }else{
-                        this.height = Units.dp(0)
-                        return false;
-                    }
-                }
-                subText: {
-                    var thisName = model.fileName
-                    var thisExt = model.fileName.split('.')
-                    if(!thisExt[1]){
-                        return model.fileName
-                    }else{
-                        var curdir = Qt.resolvedUrl(folderModel.folder).split('/')
-                        return curdir[curdir.length - 1]
-                    }
-                }
+                text: model.modelData.title
+                visible: true
+                subText: model.modelData.artist
 
                 action: Image {
 
-                    source: {
-                        Global.currentFolder = folderModel.folder
+                    source: 'file://' + model.modelData.art
+                    anchors.fill: {
 
-                        var thisName = model.fileName
-                        var thisExt = model.fileName.split('.')
-                        if(!thisExt[1]){
-                            Global.currentFolder = folderModel.folder
-                            albumFolder.folder = Global.currentFolder
-                            folderGetImage.folder = albumFolder.folder + model.fileName
-                            var thisImage = Qt.resolvedUrl(albumFolder.folder + '/' + model.fileName + "/AlbumArtSmall.jpg")
-
-                            if(thisImage){
-                                return thisImage
-                            }else{
-                                return 'av/volume_up'
-                            }
-                        }else{
-                            var thisImage = Qt.resolvedUrl(folderModel.folder + "/AlbumArtSmall.jpg")
-                            if(thisImage){
-                                return thisImage
-                            }else{
-                                return 'av/volume_up'
-                            }
-
-                        }
+                        console.log(allSongObjects[2].path)
+                    return parent
                     }
-                    anchors.fill: parent
                 }
 
 
                 MouseArea{
-                   id: itemMouseArea
+                   id: itemMouseArea2
                    anchors.fill: parent
                    onClicked: {
-                       Global.currentFolder = folderModel.folder
-                       var thisName = model.fileName
-                       var thisExt = model.fileName.split('.')
-                       if(!thisExt[1]){
-                            //demo.showError("isDir", thisName, "Close", true)
-                           folderModel.folder = folderModel.folder + '/' + model.fileName
-                       }else{
-                           //demo.showError("isNotDir", thisName, "Close", true)
-                           Global.songId = model.index
-                           Global.currentFolder = folderModel.folder
-                           albumFolder.folder = Global.currentFolder
-
-                           playMusic.source = folderModel.folder + '/' + model.fileName
-                           playMusic.play()
-                           playButton1.iconName = 'av/pause'
-
-                       }
-
-                   }
+                       console.log('this item index: ', model.index)
+                       Global.playedSongs.push(model.index)
+                       demo.title = model.modelData.title
+                       playMusic.source = "file://" + model.modelData.path
+                       playMusic.play()
+                       songPlaying.text = model.modelData.artist + ' - ' + model.modelData.title
+                       page.title = model.modelData.artist + ' - ' + model.modelData.title
+                       demo.title = model.modelData.title
 
                 }
             }
+            }
 
         }
+
 
         Column {
             anchors.fill: parent

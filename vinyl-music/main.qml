@@ -25,7 +25,7 @@ ApplicationWindow {
                 folderModel.folder = Global.currentFolder
                 var title = folderModel.get(Global.songId, 'fileName')
             }
-            songPlaying.text = artist + ' - ' + title
+
 
         }
     }
@@ -68,8 +68,6 @@ ApplicationWindow {
                      }
 
 
-                     page.title = artist + ' - ' + title
-                     demo.title = title
 
 
                  }
@@ -138,9 +136,11 @@ ApplicationWindow {
                    Global.playedSongs = [];
                }
 
+
                 if(Global.shuffle){
+                    var objects = Global.mode
                     function getRand() {
-                        var rand = Math.floor(Math.random() * folderModel.count)
+                        var rand = Math.floor(Math.random() * parseInt(objects.length))
                         if (Global.playedSongs.indexOf(rand) === -1) {
                             return rand;
                         } else {
@@ -153,22 +153,17 @@ ApplicationWindow {
                     var newSongId = Global.songId
                     folderModel.folder = Global.currentFolder
                     var currentSong = playMusic.source
-                    var nextFile = Global.currentFolder + '/' + folderModel.get(newSongId, 'fileName')
-                    playMusic.source = nextFile
+                    var nextFile = objects[newSongId].path
+                    playMusic.source = "file://" + nextFile
                     playMusic.play()
+
+                    demo.title = objects[newSongId].title
+                    songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                    page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                    demo.title = objects[newSongId].title
+
                 }else{
-                    if(Global.songId + 1 == folderModel.count){
-                        Global.playedSongs = [];
 
-                        var folder = folderModel.folder
-                        folderModel.folder = Global.currentFolder
-                        var currentSong = playMusic.source
-                        var nextFile = Global.currentFolder + '/' + folderModel.get(0, 'fileName')
-                        playMusic.source = nextFile
-                        playMusic.play()
-                        Global.songId = 1;
-
-                    }else{
                         var folder = folderModel.folder
                         folderModel.folder = Global.currentFolder
                         var currentSong = playMusic.source
@@ -176,18 +171,16 @@ ApplicationWindow {
                         playMusic.source = nextFile
                         playMusic.play()
                         Global.songId++;
-                    }
+
                 }
             }
         }
         onSourceChanged: {
-            Global.playedSongs.push(Global.songId + 1)
-            folderModel.folder = Global.currentFolder
-            //demo.title = playMusic.metaData.title
+            Global.playedSongs.push(Global.songId)
             myTimer.start()
             setSeekTimer.start()
             durationTimer.start()
-
+            playButton1.iconName = 'av/pause'
         }
         Component.onCompleted: {
             if(filePathName){
@@ -227,6 +220,16 @@ ApplicationWindow {
         folder: "file://" + homeDirectory
         nameFilters: ["*.png", "*.jpg"]
         showFiles: true
+    }
+
+    ListView {
+        id: allAlbumsModel
+        model: allAlbums
+        visible: false
+    }
+
+    ListView {
+        id: currentAlbum
     }
 
     id: demo
@@ -301,78 +304,184 @@ ApplicationWindow {
     property string selectedComponent: sidebar[0]
 
     function getNextTrack(){
-        if(Global.shuffle){
-            folderModel.folder = Global.currentFolder
-            if(Global.playedSongs.length == folderModel.count){
-                Global.playedSongs = [];
-            }
 
-            function getRand() {
-
-                var rand = Math.floor(Math.random() * folderModel.count)
-                if (Global.playedSongs.indexOf(rand) === -1) {
-                    return rand;
-                } else {
-                    return getRand();
+        if(Global.mode[0].objectName == "allSongObjects"){
+            if(Global.shuffle){
+                var objects = Global.mode
+                if(Global.playedSongs.length == allSongObjects.length){
+                    Global.playedSongs = [];
                 }
+                function getRand() {
+                    var rand = Math.floor(Math.random() * parseInt(objects.length))
+                    if (Global.playedSongs.indexOf(rand) === -1) {
+                        return rand;
+                    } else {
+                        return getRand();
+                    }
+                }
+
+                var rand = getRand();
+                Global.songId = rand;
+                var newSongId = Global.songId
+                folderModel.folder = Global.currentFolder
+                var currentSong = playMusic.source
+                var nextFile = objects[newSongId].path
+                playMusic.source = "file://" + nextFile
+                playMusic.play()
+
+                demo.title = objects[newSongId].title
+                songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                demo.title = objects[newSongId].title
+            }else{
+            if(Global.songId == allSongObjects.length){
+                var folder = folderModel.folder
+                folderModel.folder = Global.currentFolder
+                var currentSong = playMusic.source
+                var nextFile = Global.currentFolder + '/' + folderModel.get(1, 'fileName')
+                playMusic.source = nextFile
+                playMusic.play()
+                Global.songId = 1;
+
+            }else{
+                var objects = Global.mode
+                if(Global.mode == allSongObjects){
+                    var mode = allSongObjects;
+                }
+
+                if(Global.playedSongs.length == allSongObjects.length){
+                    Global.playedSongs = [];
+                }
+
+
+                Global.songId = Global.songId + 1;
+                var newSongId = Global.songId
+                var currentSong = playMusic.source
+                var nextFile = allSongObjects[newSongId].path
+                console.log(allSongObjects[newSongId].path);
+                playMusic.source = "file://" + nextFile
+                playMusic.play()
+
+                demo.title = allSongObjects[newSongId].title
+                songPlaying.text = allSongObjects[newSongId].artist + ' - ' + allSongObjects[newSongId].title
+                page.title = allSongObjects[newSongId].artist + ' - ' + allSongObjects[newSongId].title
+                demo.title = allSongObjects[newSongId].title
             }
-
-            var rand = getRand();
-            Global.songId = rand;
-            var newSongId = Global.songId
-            folderModel.folder = Global.currentFolder
-            var currentSong = playMusic.source
-            var nextFile = Global.currentFolder + '/' + folderModel.get(newSongId, 'fileName')
-
-            // Load the file and play
-            playMusic.source = nextFile
-            playMusic.play()
+            }
         }else{
-        if(Global.songId == folderModel.count){
-            var folder = folderModel.folder
-            folderModel.folder = Global.currentFolder
-            var currentSong = playMusic.source
-            var nextFile = Global.currentFolder + '/' + folderModel.get(1, 'fileName')
-            playMusic.source = nextFile
-            playMusic.play()
-            Global.songId = 1;
+            if(Global.shuffle){
+                objects = currentAlbum.model
+                if(Global.playedSongs.length == objects.length){
+                    Global.playedSongs = [];
+                }
+                function getRand() {
+                    var rand = Math.floor(Math.random() * parseInt(objects.length))
+                    if (Global.playedSongs.indexOf(rand) === -1) {
+                        return rand;
+                    } else {
+                        return getRand();
+                    }
+                }
 
-        }else{
-            var folder = folderModel.folder
-            folderModel.folder = Global.currentFolder
-            var currentSong = playMusic.source
-            var nextFile = Global.currentFolder + '/' + folderModel.get(Global.songId + 1, 'fileName')
-            playMusic.source = nextFile
-            playMusic.play()
-            Global.songId++;
+                rand = getRand();
+                Global.songId = rand;
+                newSongId = Global.songId
+                folderModel.folder = Global.currentFolder
+                currentSong = playMusic.source
+                nextFile = objects[newSongId].path
+                playMusic.source = "file://" + nextFile
+                playMusic.play()
+
+                demo.title = objects[newSongId].title
+                songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                demo.title = objects[newSongId].title
+            }else{
+                objects = currentAlbum.model
+            if(Global.songId == objects.length){
+                var folder = folderModel.folder
+                folderModel.folder = Global.currentFolder
+                var currentSong = playMusic.source
+                var nextFile = Global.currentFolder + '/' + folderModel.get(1, 'fileName')
+                playMusic.source = nextFile
+                playMusic.play()
+                Global.songId = 1;
+
+            }else{
+                objects = currentAlbum.model
+
+                if(Global.playedSongs.length == objects.length){
+                    Global.playedSongs = [];
+                }
+
+
+                Global.songId = Global.songId + 1;
+                newSongId = Global.songId
+                currentSong = playMusic.source
+                nextFile = objects[newSongId].path
+                console.log(objects[newSongId].path);
+                playMusic.source = "file://" + nextFile
+                playMusic.play()
+
+                demo.title = objects[newSongId].title
+                songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
+                demo.title = objects[newSongId].title
         }
+    }
         }
     }
 
     function getPrevTrack(){
+        if(Global.mode[0].objectName == "allSongObjects"){
+            // Remove last item in songsplayed
+            Global.playedSongs.splice(-1,1)
+            Global.songId = Global.playedSongs[Global.playedSongs.length - 1];
+            if(!Global.playedSongs[Global.playedSongs.length]){
+                Global.songId = 0
+            }
 
-        var folder = folderModel.folder
-        folderModel.folder = Global.currentFolder
-        var currentSong = playMusic.source
-        var nextFile = Global.currentFolder + '/' + folderModel.get(parseInt(Global.playedSongs[-1]), 'fileName')
-        playMusic.source = nextFile
-        playMusic.play()
-        Global.songId = Global.playedSongs[-1];
+            // get new song id
+            var newSongId = Global.songId;
+            console.log('song id is', Global.songId);
+            var nextFile = allSongObjects[Global.songId].path
+            console.log(nextFile);
+            playMusic.source = "file://" + nextFile
+            playMusic.play()
+            demo.title = allSongObjects[newSongId].title
+            songPlaying.text = allSongObjects[newSongId].artist + ' - ' + allSongObjects[newSongId].title
+            page.title = allSongObjects[newSongId].artist + ' - ' + allSongObjects[newSongId].title
+            demo.title = allSongObjects[newSongId].title
+        }else{
+            var objects = currentAlbum.model
+            Global.playedSongs.splice(-1,1)
+            Global.songId = Global.playedSongs[Global.playedSongs.length - 1]
+            newSongId = Global.songId
+            console.log('played songs ',Global.playedSongs);
+            nextFile = objects[newSongId].path
+            console.log('played songs: ', Global.playedSongs)
+            console.log('next song: ', JSON.stringify(objects[newSongId]))
+
+            playMusic.source = "file://" + nextFile
+            playMusic.play()
+            demo.title = objects[newSongId].title
+            songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
+            page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
+            demo.title = objects[newSongId].title
+
+        }
+
 
     }
 
     function playTriggerAction(){
         if (playMusic.playbackState == 1){
             playMusic.pause()
-            button.iconName = 'av/play_arrow'
-            button.name = "Play"
             playButton1.iconName = 'av/play_arrow'
         }
         else{
             playMusic.play()
-            button.iconName = 'av/pause'
             playButton1.iconName = 'av/pause'
-            button.name = "Pause"
         }
     }
 
@@ -476,6 +585,7 @@ ApplicationWindow {
                                     onClicked: {
                                         demo.selectedComponent = modelData
                                         navDrawer.close()
+
                                     }
                                 }
                             }
@@ -615,9 +725,11 @@ ApplicationWindow {
                             text: modelData
                             selected: modelData == selectedComponent
                             onClicked: {
+                                Global.playedSongs = []
                                 selectedComponent = modelData
                                 folderModel.folder = "file://" + homeDirectory
                                 albumFolder.folder = "file://" + homeDirectory
+                                allAlbumsModel.model = allAlbums
 
                             }
 
@@ -644,11 +756,13 @@ ApplicationWindow {
                     // selectedComponent will always be valid, as it defaults to the first component
 
                     source: {
+
                         if (navDrawer.enabled) {
                             return Qt.resolvedUrl("%1Demo.qml").arg(demo.selectedComponent.replace(" ", ""))
                         } else {
                             return Qt.resolvedUrl("%1Demo.qml").arg(selectedComponent.replace(" ", ""))
                         }
+
                     }
 
                 }
@@ -806,6 +920,7 @@ ApplicationWindow {
                 }
             }
             Component.onCompleted: {
+                Global.mode = allSongObjects
                 var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
                 db.transaction(
                     function(tx) {

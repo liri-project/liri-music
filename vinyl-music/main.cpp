@@ -22,11 +22,35 @@
 #include <QtSql/QSqlQuery>
 #include <QList>
 #include <QObject>
+#include <albumobject.h>
 #include <main.h>
+
+
+
+QList<QObject*> getAlbums(QSqlDatabase db){
+    QList<QObject*> albumList;
+
+    if(db.open()){
+        QSqlQuery getAllAlbums;
+        getAllAlbums.prepare("select * FROM Albums");
+        if(getAllAlbums.exec()){
+            while(getAllAlbums.next()){
+                QString album = getAllAlbums.value(1).toString();
+                QString artist = getAllAlbums.value(2).toString();
+                QString art = getAllAlbums.value(3).toString();
+                std::cout << "Album: " << album.toStdString() << std::endl;
+
+                albumList.append(new AlbumObject(album, artist, art));
+
+            }
+        }
+    }
+    return albumList;
+}
+
 
 QList<QObject*> getAllSongs(QSqlDatabase db){
     QList<QObject*> songList;
-    //songList.append(new SongObject());
 
     if(db.open()){
         // DB is open; lets get all songs
@@ -34,19 +58,24 @@ QList<QObject*> getAllSongs(QSqlDatabase db){
         getSongs.prepare("Select * FROM Songs");
         if(getSongs.exec()){
             while(getSongs.next()){
+
                 QString title = getSongs.value(2).toString();
                 QString path = getSongs.value(1).toString();
                 QString album = getSongs.value(4).toString();
                 QString artist = getSongs.value(3).toString();
+                QString art = getSongs.value(5).toString();
 
+                //std::cout << art.toStdString() << std::endl;
+                songList.append(new SongObject(path, QString::fromStdString(title.toStdString()), album, artist, art));
                 //songList.append(new SongObject(getSongs.value(2).fromValue, getSongs.value(1).fromValue, getSongs.value(4).fromValue, getSongs.value(3).fromValue));
             }
         }
     }
+    songList[0]->setObjectName("allSongObjects");
     return songList;
 }
 
-void addSongsToDatabase(TagLib::String path, QString newpath, QSqlDatabase db){
+void addSongsToDatabase(QDir dir, TagLib::String path, QString newpath, QString filename, QSqlDatabase db){
     // Get TagLib instance of song by path
     TagLib::FileRef f(path.toCString());
     TagLib::Tag *tag = f.tag();
@@ -54,16 +83,57 @@ void addSongsToDatabase(TagLib::String path, QString newpath, QSqlDatabase db){
     QString artist = tag->artist().toCString();
     QString title = tag->title().toCString();
     QString album = tag->album().toCString();
+    //QString art = tag->
 
     if(db.open()){
         QSqlQuery qry;
-        qry.prepare("CREATE TABLE IF NOT EXISTS Songs(id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT, title TEXT, artist TEXT, album TEXT)");
+        qry.prepare("CREATE TABLE IF NOT EXISTS Songs(id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT, title TEXT, artist TEXT, album TEXT, art TEXT)");
 
         if(qry.exec()){
             //std::cout << "Created table" << std::endl;
         }
 
+        QSqlQuery createAlbums;
+        createAlbums.prepare("CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT, album TEXT, artist TEXT, art TEXT)");
+
+        if(createAlbums.exec()){
+            // We created the table if it didnt exist... move along -->
+        }
+
         // Check if item already exists for this path
+        QSqlQuery getAlbum;
+        getAlbum.prepare("select * from Albums where album='" + album + "'");
+        if(getAlbum.exec()){
+            if(getAlbum.first()){
+
+            }else{
+                QString art = "placeholder";
+                bool recursive=true;
+                bool symlinks=false;
+                dir.setSorting( QDir::Name );
+                QDir::Filters df = QDir::Files | QDir::NoDotAndDotDot;
+                if (recursive) df |= QDir::Dirs;
+                if (not symlinks) df |= QDir::NoSymLinks;
+                QStringList qsl = dir.entryList(df, QDir::Name | QDir::DirsFirst);
+
+                // For each: if folder, run this method, if mp3, add to DB
+                foreach (const QString &entry, qsl) {
+                    QFileInfo finfo(dir, entry);
+
+                     if (finfo.completeSuffix()=="jpg"){
+                            art = finfo.absoluteFilePath();
+                     }
+
+                }
+
+                QSqlQuery insertAlbum;
+                insertAlbum.prepare("INSERT INTO Albums (id, album, artist, art) VALUES (NULL,'"+ album +"', '"+ artist +"', '"+ art +"')");
+                if(insertAlbum.exec()){
+                    // We inserted the album  :)
+                }
+            }
+        }
+
         QSqlQuery getSong;
         getSong.prepare("SELECT * FROM Songs WHERE path='" + newpath + "'");
         if(getSong.exec()){
@@ -73,10 +143,32 @@ void addSongsToDatabase(TagLib::String path, QString newpath, QSqlDatabase db){
                     //std::cout << getSong.value(1).toString().toUtf8().constData() << std::endl;
                 }
             }else{
+               QString art = "placeholder";
+               bool recursive=true;
+               bool symlinks=false;
+               dir.setSorting( QDir::Name );
+               QDir::Filters df = QDir::Files | QDir::NoDotAndDotDot;
+               if (recursive) df |= QDir::Dirs;
+               if (not symlinks) df |= QDir::NoSymLinks;
+               QStringList qsl = dir.entryList(df, QDir::Name | QDir::DirsFirst);
+
+               // For each: if folder, run this method, if mp3, add to DB
+               foreach (const QString &entry, qsl) {
+                   QFileInfo finfo(dir, entry);
+
+                    if (finfo.completeSuffix()=="jpg"){
+                           art = finfo.absoluteFilePath();
+                    }
+
+               }
                 // If not, we add it.
                 QSqlQuery insertqry;
-                insertqry.prepare("INSERT INTO Songs (id, path, title, artist, album) VALUES "
-                                  "(NULL, '"+ newpath +"', '"+ title +"', '"+ artist +"', '"+ album +"')");
+                if(tag->title().isEmpty()){
+                    std::cout << "Empty title"
+;                    title = filename;
+                }
+                insertqry.prepare("INSERT INTO Songs (id, path, title, artist, album, art) VALUES "
+                                  "(NULL, '"+ newpath +"', '"+ title +"', '"+ artist +"', '"+ album +"', '"+art+"')");
                 if(insertqry.exec()){
                     std::cout << "Inserted data successfully" << std::endl;
                 }else{
@@ -108,7 +200,7 @@ void firstMusicScan(QDir d, QSqlDatabase db, bool recursive=true, bool symlinks=
             firstMusicScan(sd, db);
         } else {
             if (finfo.completeSuffix()=="mp3")
-                addSongsToDatabase(finfo.absoluteFilePath().toStdString(), QString(finfo.absoluteFilePath()), db);
+                addSongsToDatabase(finfo.dir(), finfo.absoluteFilePath().toStdString(), QString(finfo.absoluteFilePath()), finfo.fileName(), db);
         }
     }
 }
@@ -171,11 +263,36 @@ int main(int argc, char *argv[]){
     // Get ~/Music directory and ~/Music/streams directory
     std::string home_directory = QDir::homePath().toStdString() + std::string("/Music");
     std::string stream_directory = QDir::homePath().toStdString() + std::string("/Music/streams");
+    /*
+    QList<QObject*> songList;
+
+    if(db.open()){
+        // DB is open; lets get all songs
+        QSqlQuery getSongs;
+        getSongs.prepare("Select * FROM Songs");
+        if(getSongs.exec()){
+            while(getSongs.next()){
+
+                QString title = getSongs.value(2).toString();
+                QString path = getSongs.value(1).toString();
+                QString album = getSongs.value(4).toString();
+                QString artist = getSongs.value(3).toString();
+
+                std::cout << title.toStdString() << std::endl;
+                songList.append(new SongObject(path, title, album, artist));
+                //songList.append(new SongObject(getSongs.value(2).fromValue, getSongs.value(1).fromValue, getSongs.value(4).fromValue, getSongs.value(3).fromValue));
+            }
+        }
+    }
+    */
+
 
     // Create path variables accessible in QML:
     engine.rootContext()->setContextProperty("homeDirectory", QString::fromStdString(home_directory));
     engine.rootContext()->setContextProperty("streamDirectory", QString::fromStdString(stream_directory));
     engine.rootContext()->setContextProperty("allSongObjects", QVariant::fromValue(getAllSongs(db)));
+    engine.rootContext()->setContextProperty("allAlbums", QVariant::fromValue(getAlbums(db)));
+
 
     // Create view from main.qml:
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
