@@ -24,6 +24,7 @@
 #include <QObject>
 #include <albumobject.h>
 #include <artistobject.h>
+#include <QStandardPaths>
 #include <main.h>
 
 
@@ -283,54 +284,33 @@ int main(int argc, char *argv[]){
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
-    if (argv[1]) {
+    if (app.arguments().size() > 1) {
         // If Vinyl Music was opened with a song path:
-        // This is a real dirty way to do things....
         QFileInfo finfo;
-        finfo.setFile(argv[1]);
+        finfo.setFile(app.arguments().at(1));
         engine.rootContext()->setContextProperty("loadedFileFolder", QString(finfo.path()));
     }
 
     // Initialize the database if not exists, and set Settings table
     initialQuery();
 
+    const QStringList musicLocations = QStandardPaths::standardLocations(QStandardPaths::MusicLocation);
+    QString musicLocation = musicLocations.isEmpty() ?
+                QDir::homePath() + QLatin1String("/Music") : musicLocations.first();
+
     // Open DB and perform initial music dir scan/build Songs table
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setHostName("localhost");
     db.setDatabaseName("vinylmusic");
     std::cout << "Loading database data. " << std::endl;
-    firstMusicScan(QDir::homePath() + "/Music", db);
+    firstMusicScan(QDir(musicLocation), db);
 
-    // Get ~/Music directory and ~/Music/streams directory
-    std::string home_directory = QDir::homePath().toStdString() + std::string("/Music");
-    std::string stream_directory = QDir::homePath().toStdString() + std::string("/Music/streams");
-    /*
-    QList<QObject*> songList;
-
-    if(db.open()){
-        // DB is open; lets get all songs
-        QSqlQuery getSongs;
-        getSongs.prepare("Select * FROM Songs");
-        if(getSongs.exec()){
-            while(getSongs.next()){
-
-                QString title = getSongs.value(2).toString();
-                QString path = getSongs.value(1).toString();
-                QString album = getSongs.value(4).toString();
-                QString artist = getSongs.value(3).toString();
-
-                std::cout << title.toStdString() << std::endl;
-                songList.append(new SongObject(path, title, album, artist));
-                //songList.append(new SongObject(getSongs.value(2).fromValue, getSongs.value(1).fromValue, getSongs.value(4).fromValue, getSongs.value(3).fromValue));
-            }
-        }
-    }
-    */
+    QString stream_directory = musicLocation + QLatin1String("/streams");
 
 
     // Create path variables accessible in QML:
-    engine.rootContext()->setContextProperty("homeDirectory", QString::fromStdString(home_directory));
-    engine.rootContext()->setContextProperty("streamDirectory", QString::fromStdString(stream_directory));
+    engine.rootContext()->setContextProperty("homeDirectory", musicLocation);
+    engine.rootContext()->setContextProperty("streamDirectory", stream_directory);
     engine.rootContext()->setContextProperty("allSongObjects", QVariant::fromValue(getAllSongs(db)));
     engine.rootContext()->setContextProperty("allArtists", QVariant::fromValue(getArtists(db)));
     engine.rootContext()->setContextProperty("allAlbums", QVariant::fromValue(getAlbums(db)));
