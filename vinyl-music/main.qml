@@ -176,7 +176,12 @@ ApplicationWindow {
             }
         }
         onSourceChanged: {
-            Global.playedSongs.push(Global.songId)
+            if(Global.prevTrack){
+
+            }else{
+                Global.playedSongs.push(Global.songId)
+            }
+            Global.prevTrack = false
             myTimer.start()
             setSeekTimer.start()
             durationTimer.start()
@@ -446,6 +451,7 @@ ApplicationWindow {
             console.log('song id is', Global.songId);
             var nextFile = allSongObjects[Global.songId].path
             console.log(nextFile);
+            Global.prevTrack = true
             playMusic.source = "file://" + nextFile
             playMusic.play()
             demo.title = allSongObjects[newSongId].title
@@ -461,7 +467,7 @@ ApplicationWindow {
             nextFile = objects[newSongId].path
             console.log('played songs: ', Global.playedSongs)
             console.log('next song: ', JSON.stringify(objects[newSongId]))
-
+            Global.prevTrack = true
             playMusic.source = "file://" + nextFile
             playMusic.play()
             demo.title = objects[newSongId].title

@@ -57,5 +57,8 @@ Item {
         Column {
             anchors.fill: parent
         }
+        Component.onCompleted: {
+            Global.mode = allSongObjects
+        }
     }
 }

@@ -7,3 +7,4 @@ var i = 0;
 var playedSongs = [];
 var shuffle = false;
 var mode = allSongObjects;
+var prevTrack = false;
