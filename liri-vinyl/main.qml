@@ -587,12 +587,6 @@ ApplicationWindow {
 
         title: "Liri Vinyl"
 
-        Rectangle {
-            height:200
-            width:parent
-            color: theme.primaryColor
-
-        }
 
         actionBar.maxActionCount: navDrawer.enabled ? 3 : 4
 
@@ -802,9 +796,35 @@ ApplicationWindow {
 
                     Repeater {
                         model: section
-                        delegate: ListItem.Standard {
+                        delegate: ListItem.Subtitled {
+
                             text: modelData
                             selected: modelData == selectedComponent
+                            action: IconButton {
+
+                                    iconName: {
+                                        if(modelData == 'Albums'){
+                                        return 'av/album'
+                                        }else if(modelData == 'Artists'){
+                                            return 'social/person'
+                                        }else if(modelData == 'All Music'){
+                                            return 'av/queue_music'
+                                        }else if(modelData == 'Streams'){
+                                            return 'social/public'
+                                        }else if(modelData == 'Settings'){
+                                            return 'action/settings'
+                                        }
+
+                                    }
+                                    anchors.topMargin: Units.dp(20)
+                                    height:Units.dp(36)
+                                    width:Units.dp(12)
+                                    anchors.horizontalCenter: parent.horizontalCenter
+
+                            }
+
+                            height:Units.dp(42)
+
                             onClicked: {
                                 Global.playedSongs = []
                                 selectedComponent = modelData
@@ -883,7 +903,7 @@ ApplicationWindow {
             height:Units.dp(60)
             anchors.left: seeker.left
             width:Units.dp(100)
-            color: index == 0 ? Theme.light.textColor : Theme.dark.textColor
+            color: Theme.light.textColor
         }
 
         Slider {
@@ -1092,7 +1112,6 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             height:Units.dp(36)
             anchors.right: parent.right
-            darkBackground: index == 1
             updateValueWhileDragging: true
             color:theme.primaryColor
             value: 1.0

@@ -26,13 +26,12 @@ Item {
                 visible: true
                 subText: null // model.modelData.artist
 
-                action: Image {
+                action: Icon {
+                    name: "social/person"
+                    height:Units.dp(32)
+                    width:Units.dp(32)
+                    anchors.centerIn: parent
 
-                    source: {
-                        console.log("artists", JSON.stringify(allArtists))
-                        return null
-                    }//
-                    anchors.fill: parent
                 }
 
 

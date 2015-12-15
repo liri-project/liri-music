@@ -40,8 +40,6 @@ QList<QObject*> getAlbums(QSqlDatabase db){
                 QString album = getAllAlbums.value(1).toString();
                 QString artist = getAllAlbums.value(2).toString();
                 QString art = getAllAlbums.value(3).toString();
-                std::cout << "Album: " << album.toStdString() << std::endl;
-
                 albumList.append(new AlbumObject(album, artist, art));
 
             }
@@ -53,11 +51,11 @@ QList<QObject*> getAlbums(QSqlDatabase db){
 QList<QObject*> getArtists(QSqlDatabase db){
     QList<QObject*> artistList;
     if(db.open()){
-        QSqlQuery getAllAlbums;
-        getAllAlbums.prepare("select * FROM Artists");
-        if(getAllAlbums.exec()){
-            while(getAllAlbums.next()){
-                QString artist = getAllAlbums.value(2).toString();
+        QSqlQuery getArtists;
+        getArtists.prepare("select * FROM Artists");
+        if(getArtists.exec()){
+            while(getArtists.next()){
+                QString artist = getArtists.value(1).toString();
                 artistList.append(new ArtistObject(artist));
 
             }
@@ -112,6 +110,13 @@ void addSongsToDatabase(QDir dir, TagLib::String path, QString newpath, QString 
             //std::cout << "Created table" << std::endl;
         }
 
+        QSqlQuery createArtist;
+        createArtist.prepare("CREATE TABLE IF NOT EXISTS Artists(id INTEGER PRIMARY KEY AUTOINCREMENT, artist TEXT)");
+
+        if(createArtist.exec()){
+            // We created the table if it didnt exist... move along -->
+        }
+
         QSqlQuery createAlbums;
         createAlbums.prepare("CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT, album TEXT, artist TEXT, art TEXT)");
 
@@ -153,12 +158,7 @@ void addSongsToDatabase(QDir dir, TagLib::String path, QString newpath, QString 
             }
         }
 
-        QSqlQuery createArtist;
-        createArtist.prepare("CREATE TABLE IF NOT EXISTS Artists(id INTEGER PRIMARY KEY AUTOINCREMENT, artist TEXT),");
 
-        if(createArtist.exec()){
-            // We created the table if it didnt exist... move along -->
-        }
 
         // Check if item already exists for this path
         QSqlQuery getArtist;

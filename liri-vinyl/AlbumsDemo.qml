@@ -26,7 +26,7 @@ Item {
         anchors {
             fill: parent
             margins: Units.dp(32)
-            topMargin: 50
+
         }
 
         elevation: 1
