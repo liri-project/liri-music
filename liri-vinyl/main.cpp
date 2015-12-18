@@ -198,7 +198,7 @@ void addSongsToDatabase(QDir dir, TagLib::String path, QString newpath, QString 
                foreach (const QString &entry, qsl) {
                    QFileInfo finfo(dir, entry);
 
-                    if (finfo.completeSuffix()=="jpg"){
+                    if (finfo.completeSuffix()=="jpg" || finfo.completeSuffix()=="png"){
                            art = finfo.absoluteFilePath();
                     }
 
@@ -212,7 +212,7 @@ void addSongsToDatabase(QDir dir, TagLib::String path, QString newpath, QString 
                 insertqry.prepare("INSERT INTO Songs (id, path, title, artist, album, art) VALUES "
                                   "(NULL, '"+ newpath +"', '"+ title +"', '"+ artist +"', '"+ album +"', '"+art+"')");
                 if(insertqry.exec()){
-                    std::cout << "Inserted data successfully" << std::endl;
+                    std::cout << "Inserted data successfully: " << title.toStdString() << " " << std::endl;
                 }else{
                      std::cout << "Data not inserted" << std::endl;
                 }
@@ -226,7 +226,7 @@ void addSongsToDatabase(QDir dir, TagLib::String path, QString newpath, QString 
     }
 }
 
-void firstMusicScan(QDir d, QSqlDatabase db, bool recursive=true, bool symlinks=false ) {
+bool firstMusicScan(QDir d, QSqlDatabase db, bool recursive=true, bool symlinks=false ) {
     // Get top directory (~/Music by default), and recursively scan for mp3
     d.setSorting( QDir::Name );
     QDir::Filters df = QDir::Files | QDir::NoDotAndDotDot;
@@ -237,13 +237,20 @@ void firstMusicScan(QDir d, QSqlDatabase db, bool recursive=true, bool symlinks=
     // For each: if folder, run this method, if mp3, add to DB
     foreach (const QString &entry, qsl) {
         QFileInfo finfo(d, entry);
+        std::cout << "File Info: " << finfo.absoluteFilePath().toStdString() << std::endl;
+        std::cout << "Suffix: " << finfo.completeSuffix().toStdString() << std::endl;
         if ( finfo.isDir() ) {
             QDir sd(finfo.absoluteFilePath());
             firstMusicScan(sd, db);
         } else {
-            if (finfo.completeSuffix()=="mp3")
+            if (finfo.completeSuffix().toStdString().find("mp3") != std::string::npos)
                 addSongsToDatabase(finfo.dir(), finfo.absoluteFilePath().toStdString(), QString(finfo.absoluteFilePath()), finfo.fileName(), db);
         }
+    }
+    if(d.count() > 0){
+        return false;
+    }else{
+        return true;
     }
 }
 
@@ -303,7 +310,9 @@ int main(int argc, char *argv[]){
     db.setHostName("localhost");
     db.setDatabaseName("vinylmusic");
     std::cout << "Loading database data. " << std::endl;
-    firstMusicScan(QDir(musicLocation), db);
+    if(firstMusicScan(QDir(musicLocation), db)){
+
+    }
 
     QString stream_directory = musicLocation + QLatin1String("/streams");
 
@@ -311,10 +320,13 @@ int main(int argc, char *argv[]){
     // Create path variables accessible in QML:
     engine.rootContext()->setContextProperty("homeDirectory", musicLocation);
     engine.rootContext()->setContextProperty("streamDirectory", stream_directory);
+
+    std::cout << "Song count" << QString(getAllSongs(db).count()).toStdString() << std::endl;
+    if(getAllSongs(db).count() > 0){
     engine.rootContext()->setContextProperty("allSongObjects", QVariant::fromValue(getAllSongs(db)));
     engine.rootContext()->setContextProperty("allArtists", QVariant::fromValue(getArtists(db)));
     engine.rootContext()->setContextProperty("allAlbums", QVariant::fromValue(getAlbums(db)));
-
+}
 
     // Create view from main.qml:
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));

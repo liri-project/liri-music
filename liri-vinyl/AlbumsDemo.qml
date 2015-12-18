@@ -48,7 +48,14 @@ Item {
 
                 action: Image {
 
-                    source: 'file://' + model.modelData.art
+                    source: {
+                        console.log("image is ", model.modelData.art)
+                       if(model.modelData.art != 'placeholder'){
+                            return 'file://' + model.modelData.art
+                        }else{
+                            return Qt.resolvedUrl('images/album.svg')
+                        }
+                    }
                     anchors.fill: parent
                 }
 
