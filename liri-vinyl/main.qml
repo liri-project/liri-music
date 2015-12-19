@@ -372,7 +372,7 @@ ApplicationWindow {
     }
 
     property var sidebar: [
-           "Albums", "Artists", "All Music", "Streams", "Settings"
+            "Albums", "Artists", "All Music", "Streams", "Settings"
     ]
 
     property var basicComponents: [
@@ -919,7 +919,7 @@ ApplicationWindow {
             color:theme.primaryColor
             anchors.rightMargin: Units.dp(50)
             anchors.leftMargin:Units.dp(50)
-            anchors.bottom:Units.dp(190)
+            anchors.bottomMargin:Units.dp(190)
 
             onValueChanged: {
                 if(seeker.pressed){

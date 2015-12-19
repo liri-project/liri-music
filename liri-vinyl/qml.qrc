@@ -13,6 +13,7 @@
         <file>StreamsDemo.qml</file>
         <file>ArtistsDemo.qml</file>
         <file>images/placeholder.png</file>
+        <file>loading.qml</file>
     </qresource>
     <qresource prefix="/">
         <file>images/album.svg</file>

@@ -26,6 +26,7 @@
 #include <artistobject.h>
 #include <QStandardPaths>
 #include <main.h>
+#include <unistd.h>
 
 
 
@@ -97,9 +98,9 @@ void addSongsToDatabase(QDir dir, TagLib::String path, QString newpath, QString 
     TagLib::FileRef f(path.toCString());
     TagLib::Tag *tag = f.tag();
     // std::cout << "Adding " << tag->title() << " " << tag->artist() << " to the database." << std::endl;
-    QString artist = tag->artist().toCString();
-    QString title = tag->title().toCString();
-    QString album = tag->album().toCString();
+    QString artist = tag->artist().toCString(true);
+    QString title = tag->title().toCString(true);
+    QString album = tag->album().toCString(true);
     //QString art = tag->
 
     if(db.open()){
@@ -310,6 +311,11 @@ int main(int argc, char *argv[]){
     db.setHostName("localhost");
     db.setDatabaseName("vinylmusic");
     std::cout << "Loading database data. " << std::endl;
+
+    //engine.load(QUrl(QStringLiteral("qrc:/qml/loading.qml")));
+    //app2.exec();
+    std::cout << "Loaded" << std::endl;
+
     if(firstMusicScan(QDir(musicLocation), db)){
 
     }
