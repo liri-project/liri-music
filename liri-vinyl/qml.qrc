@@ -12,8 +12,10 @@
         <file>AllMusicDemo.qml</file>
         <file>StreamsDemo.qml</file>
         <file>ArtistsDemo.qml</file>
+        <file>images/placeholder.png</file>
     </qresource>
     <qresource prefix="/">
         <file>images/album.svg</file>
+        <file>images/placeholder.png</file>
     </qresource>
 </RCC>

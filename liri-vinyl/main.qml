@@ -372,7 +372,7 @@ ApplicationWindow {
     }
 
     property var sidebar: [
-            "Albums", "Artists", "All Music", "Streams", "Settings"
+           "Albums", "Artists", "All Music", "Streams", "Settings"
     ]
 
     property var basicComponents: [
