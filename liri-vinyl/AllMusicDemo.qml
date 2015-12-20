@@ -24,11 +24,25 @@ Item {
             delegate: ListItem.Subtitled{
                 text: model.modelData.title
                 visible: true
-                subText: model.modelData.artist
+                subText: {
+                    if(model.modelData.artist && model.modelData.album){
+                        return model.modelData.artist + ' - ' + model.modelData.album
+                    }else if(model.modelData.album){
+                        return model.modelData.album;
+                    }else {
+                        return 'Unknown Album'
+                    }
+                }
 
                 action: Image {
 
-                    source: 'file://' + model.modelData.art
+                    source: {
+                        if(model.modelData.art != 'placeholder'){
+                        return "file://" + model.modelData.art
+                        }else{
+                            return "qrc:/images/placeholder.png"
+                        }
+                    }
                     anchors.fill: {
                     return parent
                     }

@@ -4,14 +4,6 @@ import Material.ListItems 0.1 as ListItem
 import Material.Extras 0.1
 import "musicId.js" as Global
 
-Item {
-    View {
-        anchors {
-            fill: parent
-            margins: Units.dp(32)
-        }
-
-        elevation: 1
 
         Column {
             anchors.fill: parent
@@ -90,5 +82,4 @@ Item {
                 }
             }
         }
-    }
-}
+

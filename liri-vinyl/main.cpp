@@ -46,7 +46,12 @@ QList<QObject*> getAlbums(QSqlDatabase db){
             }
         }
     }
-    return albumList;
+    if(albumList.count() > 0){
+        return albumList;
+    }else{
+        albumList.append(new AlbumObject("undefined", "undefined", "undefined"));
+        return albumList;
+    }
 }
 
 QList<QObject*> getArtists(QSqlDatabase db){
@@ -62,7 +67,12 @@ QList<QObject*> getArtists(QSqlDatabase db){
             }
         }
     }
-    return artistList;
+    if(artistList.count() > 0){
+        return artistList;
+    }else{
+        artistList.append(new ArtistObject("undefined"));
+        return artistList;
+    }
 
 }
 
@@ -89,8 +99,16 @@ QList<QObject*> getAllSongs(QSqlDatabase db){
             }
         }
     }
-    songList[0]->setObjectName("allSongObjects");
-    return songList;
+
+
+    if(songList.count() > 0){
+        songList[0]->setObjectName("allSongObjects");
+        return songList;
+    }else{
+        songList.append(new SongObject("undefined", "undefined", "undefined", "undefined", "undefined"));
+        songList[0]->setObjectName("allSongObjects");
+        return songList;
+    }
 }
 
 void addSongsToDatabase(QDir dir, TagLib::String path, QString newpath, QString filename, QSqlDatabase db){
@@ -320,6 +338,7 @@ int main(int argc, char *argv[]){
 
     }
 
+
     QString stream_directory = musicLocation + QLatin1String("/streams");
 
 
@@ -328,11 +347,17 @@ int main(int argc, char *argv[]){
     engine.rootContext()->setContextProperty("streamDirectory", stream_directory);
 
     std::cout << "Song count" << QString(getAllSongs(db).count()).toStdString() << std::endl;
-    if(getAllSongs(db).count() > 0){
+
+    Message msg;
+    engine.rootContext()->setContextProperty("msg", &msg);
+
+    AllAlbums aa;
+    engine.rootContext()->setContextProperty("aa", &aa);
+
     engine.rootContext()->setContextProperty("allSongObjects", QVariant::fromValue(getAllSongs(db)));
     engine.rootContext()->setContextProperty("allArtists", QVariant::fromValue(getArtists(db)));
     engine.rootContext()->setContextProperty("allAlbums", QVariant::fromValue(getAlbums(db)));
-}
+
 
     // Create view from main.qml:
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));

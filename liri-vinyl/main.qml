@@ -311,7 +311,12 @@ ApplicationWindow {
 
     ListView {
         id: allAlbumsModel
-        model: allAlbums
+        model: {
+
+            if(allAlbums[0].title != "undefined"){
+                return allAlbums
+            }
+        }
         visible: false
     }
 
@@ -320,7 +325,7 @@ ApplicationWindow {
     }
 
     id: demo
-    title: "Liri Vinyl"
+    title: "Liri Music"
     height: Units.dp(700)
     width: Units.dp(1200)
 
@@ -372,7 +377,7 @@ ApplicationWindow {
     }
 
     property var sidebar: [
-            "Albums", "Artists", "All Music", "Streams", "Settings"
+            "Albums", "Artists", "All Music", "Streams"
     ]
 
     property var basicComponents: [
@@ -582,6 +587,10 @@ ApplicationWindow {
 
     }
 
+    function setLoaderSource(source){
+        example.setSource(source);
+    }
+
     initialPage: TabbedPage {
         id: page
 
@@ -621,6 +630,15 @@ ApplicationWindow {
         }
 
         actions: [
+
+            Action {
+                id: settingsButton
+                iconName: "action/settings"
+                name: "Settings"
+                onTriggered: {
+                    settingsDialog.show()
+                }
+            }
 
 
 
@@ -693,6 +711,26 @@ ApplicationWindow {
         }
     }
 
+    Dialog {
+        id: settingsDialog
+        title: "Settings"
+        height:Units.dp(400)
+        width:Units.dp(600)
+        positiveButtonText: "Save"
+
+        Loader {
+            height:Units.dp(400)
+            width:Units.dp(600)
+            anchors.fill: parent
+            //anchors.bottomMargin: Units.dp(100)
+            asynchronous: true
+            visible: true
+            source: Qt.resolvedUrl("SettingsDemo.qml")
+
+        }
+        //Component.onCompleted: visible = false
+    }
+
     FileDialog {
         id: fileDialog
         title: "Please choose a file"
@@ -700,6 +738,7 @@ ApplicationWindow {
         onAccepted: {
             console.log("You chose: " + fileDialog.fileUrls)
             fileDialog.close()
+            example.source = Qt.resolvedUrl("ArtistsDemo.qml")
         }
         onRejected: {
             console.log("Canceled")
@@ -830,8 +869,11 @@ ApplicationWindow {
                                 selectedComponent = modelData
                                 folderModel.folder = "file://" + homeDirectory
                                 albumFolder.folder = "file://" + homeDirectory
-                                allAlbumsModel.model = allAlbums
 
+
+                                if(allAlbums[0].title != "undefined"){
+                                   allAlbumsModel.model = allAlbums
+                                }
                             }
 
                         }
@@ -867,7 +909,6 @@ ApplicationWindow {
                     }
 
                 }
-
 
 
                 ProgressCircle {
@@ -1021,6 +1062,9 @@ ApplicationWindow {
                 }
             }
             Component.onCompleted: {
+                msg.author = "Nick"
+                aa.getAlbums = "New Album"
+                console.log(aa.getAlbums);
                 Global.mode = allSongObjects
                 var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
                 db.transaction(
@@ -1130,6 +1174,7 @@ ApplicationWindow {
                 playMusic.volume = this.value
             }
         }
+
 
 
 

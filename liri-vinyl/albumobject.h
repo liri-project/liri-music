@@ -8,6 +8,53 @@
 #include <QList>
 #include <main.h>
 #include <QVariant>
+#include <iostream>
+
+
+class AllAlbums : public QObject {
+    Q_OBJECT
+    Q_PROPERTY(QString getAlbums READ getAlbums WRITE setAlbums NOTIFY albumsChanged)
+
+public:
+    void setAlbums(const QString &album){
+        m_getAlbums = album;
+
+        emit albumsChanged();
+    }
+
+
+
+    QString getAlbums() const {
+        return m_getAlbums;
+    }
+
+
+
+signals:
+    void albumsChanged();
+private:
+    QString m_getAlbums;
+};
+
+class Message : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QString author READ author WRITE setAuthor NOTIFY authorChanged)
+public:
+    void setAuthor(const QString &a) {
+        if (a != m_author) {
+            m_author = a;
+            emit authorChanged();
+        }
+    }
+    QString author() const {
+        return m_author;
+    }
+signals:
+    void authorChanged();
+private:
+    QString m_author;
+};
 
 class AlbumObject : public QObject {
     Q_OBJECT

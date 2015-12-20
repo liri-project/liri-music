@@ -25,7 +25,11 @@ Item {
 
     GridView{
         id: albumView
-        model: allAlbumsModel.model
+        model: {
+            if(allAlbumsModel){
+            return allAlbumsModel.model
+            }
+        }
         anchors {
             fill: parent
             margins: Units.dp(32)
@@ -35,8 +39,8 @@ Item {
 
         width: parent.width - Units.dp(64)
         height: parent.height
-        cellWidth: 240
-        cellHeight: 240
+        cellWidth: 180
+        cellHeight: 180
         anchors.centerIn: parent
 
 
@@ -46,8 +50,8 @@ Item {
 
             View {
                 id: wrapper
-                width: 220
-                height: 220
+                width: 160
+                height: 160
                 anchors.margins:Units.dp(32)
                 elevation: 1
 
@@ -62,8 +66,8 @@ Item {
                         }
                     }
 
-                    height:220
-                    width:220
+                    height:160
+                    width:160
                 }
 
                 Rectangle {
@@ -71,8 +75,8 @@ Item {
                             GradientStop { position: 0.0; color: Theme.alpha("#000", 0.0) }
                             GradientStop { position: 1.0; color: "#000" }
                         }
-                    height:220
-                    width:220
+                    height:160
+                    width:160
 
 
                 Text {
@@ -84,7 +88,7 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: Units.dp(10)
                     wrapMode: Text.WordWrap
-                    width: Units.dp(200)
+                    width: Units.dp(140)
                     verticalAlignment: Text.AlignBottom
                     height:Units.dp(50)
                     anchors.margins:Units.dp(10)
@@ -138,11 +142,25 @@ Item {
             delegate: ListItem.Subtitled{
                 text: model.modelData.title
                 visible: true
-                subText: model.modelData.artist
+                subText: {
+                    if(model.modelData.artist && model.modelData.album){
+                        return model.modelData.artist + ' - ' + model.modelData.album
+                    }else if(model.modelData.album){
+                        return model.modelData.album;
+                    }else {
+                        return 'Unknown Album'
+                    }
+                }
 
                 action: Image {
 
-                    source: 'file://' + model.modelData.art
+                    source: {
+                        if(model.modelData.art != 'placeholder'){
+                        return "file://" + model.modelData.art
+                        }else{
+                            return "qrc:/images/placeholder.png"
+                        }
+                    }
                     anchors.fill: parent
                 }
 
