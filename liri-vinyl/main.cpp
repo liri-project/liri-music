@@ -27,6 +27,7 @@
 #include <QStandardPaths>
 #include <main.h>
 #include <unistd.h>
+#include <musicfolders.h>
 
 
 
@@ -256,8 +257,8 @@ bool firstMusicScan(QDir d, QSqlDatabase db, bool recursive=true, bool symlinks=
     // For each: if folder, run this method, if mp3, add to DB
     foreach (const QString &entry, qsl) {
         QFileInfo finfo(d, entry);
-        std::cout << "File Info: " << finfo.absoluteFilePath().toStdString() << std::endl;
-        std::cout << "Suffix: " << finfo.completeSuffix().toStdString() << std::endl;
+        //std::cout << "File Info: " << finfo.absoluteFilePath().toStdString() << std::endl;
+        //std::cout << "Suffix: " << finfo.completeSuffix().toStdString() << std::endl;
         if ( finfo.isDir() ) {
             QDir sd(finfo.absoluteFilePath());
             firstMusicScan(sd, db);
@@ -273,11 +274,9 @@ bool firstMusicScan(QDir d, QSqlDatabase db, bool recursive=true, bool symlinks=
     }
 }
 
-void initialQuery(){
+bool initialQuery(QSqlDatabase db){
     // Open DB connection
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setHostName("localhost");
-    db.setDatabaseName("vinylmusic");
+
     std::cout << "Loading database data. " << std::endl;
 
     if(db.open()){
@@ -286,6 +285,30 @@ void initialQuery(){
         qry.prepare("CREATE TABLE IF NOT EXISTS Settings(id INTEGER PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)");
         if(qry.exec()){
             std::cout << "Created table" << std::endl;
+
+            // DB is open; let
+            QSqlQuery getFolder;
+            getFolder.prepare("Select * FROM Settings where setting='folder'");
+            if(getFolder.exec()){
+
+                if(getFolder.first()){
+                 // Music folder is already set.
+                    std::cout << "Executed getFolder" << std::endl;
+
+                }else{
+                    std::cout << "Music folder not set" << std::endl;
+                    QSqlQuery setFolder;
+                    QString initialFolder = QDir::homePath() + QLatin1String("/Music");
+                    setFolder.prepare("INSERT INTO Settings VALUES (NULL, 'folder', '"+ initialFolder +"')");
+                    if(setFolder.exec()){
+                        // Set initial folder
+                    }
+                }
+
+            }else{
+                std::cout << "Couldnt get the music folder" << std::endl;
+
+            }
         }else{
             std::cout << "Didnt create table" << std::endl;
         }
@@ -303,6 +326,7 @@ void initialQuery(){
         }
     }
     */
+    return true;
 }
 
 int main(int argc, char *argv[]){
@@ -318,7 +342,7 @@ int main(int argc, char *argv[]){
     }
 
     // Initialize the database if not exists, and set Settings table
-    initialQuery();
+
 
     const QStringList musicLocations = QStandardPaths::standardLocations(QStandardPaths::MusicLocation);
     QString musicLocation = musicLocations.isEmpty() ?
@@ -328,15 +352,19 @@ int main(int argc, char *argv[]){
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setHostName("localhost");
     db.setDatabaseName("vinylmusic");
-    std::cout << "Loading database data. " << std::endl;
+    std::cout << "Loading database data. " << db.connectionName().toStdString() << std::endl;
+    if(initialQuery(db)){
+
+    }
 
     //engine.load(QUrl(QStringLiteral("qrc:/qml/loading.qml")));
     //app2.exec();
     std::cout << "Loaded" << std::endl;
-
+/*
     if(firstMusicScan(QDir(musicLocation), db)){
 
     }
+    */
 
 
     QString stream_directory = musicLocation + QLatin1String("/streams");
@@ -354,9 +382,14 @@ int main(int argc, char *argv[]){
     AllAlbums aa;
     engine.rootContext()->setContextProperty("aa", &aa);
 
+
     engine.rootContext()->setContextProperty("allSongObjects", QVariant::fromValue(getAllSongs(db)));
     engine.rootContext()->setContextProperty("allArtists", QVariant::fromValue(getArtists(db)));
     engine.rootContext()->setContextProperty("allAlbums", QVariant::fromValue(getAlbums(db)));
+    //db.close();
+
+    MusicFolders defaultFolders;
+    engine.rootContext()->setContextProperty("musicFolder", &defaultFolders);
 
 
     // Create view from main.qml:

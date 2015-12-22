@@ -9,6 +9,23 @@ import QtQuick.Dialogs 1.0
 import QtQuick.LocalStorage 2.0
 
 ApplicationWindow {
+
+    function getMusic(){
+        musicFolder.initialMusicScan = "Do this";
+        console.log(musicFolder.initialMusicScan);
+
+    }
+
+    Timer {
+        id:initScan
+        interval:2000; running: false; repeat: false
+        onTriggered: {
+            musicFolder.initialMusicScan = "Do this";
+            console.log(musicFolder.initialMusicScan);
+
+        }
+    }
+
     Timer {
         id: setSeekTimer
         interval: 500; running: false; repeat: false
@@ -733,12 +750,16 @@ ApplicationWindow {
 
     FileDialog {
         id: fileDialog
-        title: "Please choose a file"
+        title: "Please choose a folder"
         folder: shortcuts.home
+        selectFolder: true
+        selectMultiple: false
         onAccepted: {
             console.log("You chose: " + fileDialog.fileUrls)
+            musicFolder.getMusicFolder = fileDialog.fileUrls[0].toString()
+            console.log(musicFolder.getMusicFolder)
             fileDialog.close()
-            example.source = Qt.resolvedUrl("ArtistsDemo.qml")
+
         }
         onRejected: {
             console.log("Canceled")
@@ -1065,6 +1086,7 @@ ApplicationWindow {
                 msg.author = "Nick"
                 aa.getAlbums = "New Album"
                 console.log(aa.getAlbums);
+
                 Global.mode = allSongObjects
                 var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
                 db.transaction(
@@ -1173,6 +1195,10 @@ ApplicationWindow {
                 }
                 playMusic.volume = this.value
             }
+            Component.onCompleted: {
+
+                    initScan.start();
+            }
         }
 
 
@@ -1180,4 +1206,7 @@ ApplicationWindow {
 
     }
 
+
+
 }
+

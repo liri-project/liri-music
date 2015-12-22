@@ -24,7 +24,7 @@ import "musicId.js" as Global
                 text: "Music Folders"
                 subText: "Add/Remove music folders"
 
-                onClicked: colorPicker.show()
+                onClicked: fileDialog.open()
 
                 action: Icon {
                     anchors.centerIn: parent

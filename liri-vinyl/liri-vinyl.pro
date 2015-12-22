@@ -35,4 +35,5 @@ DEPENDPATH += $$PWD/../../../Qt5.5.1/5.5/gcc_64/include
 HEADERS += \
     main.h \
     albumobject.h \
-    artistobject.h
+    artistobject.h \
+    musicfolders.h
