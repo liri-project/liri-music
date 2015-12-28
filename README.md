@@ -2,7 +2,7 @@
 The official repo for Liri Vinyl (previously called Vinyl Music).  The idea is to provide the first cross-platform, material-design-inspired music player, full of awesome features (and all the stuff you'd expect out of a music player).
 
 ![Image of liri vinyl]
-(https://github.com/liri-project/liri-vinyl/blob/master/images/lirimusic3.png)
+(https://github.com/liri-project/liri-vinyl/blob/master/images/lirimusicnew.png)
 
 For current functionality, see the "Features" section below.
 
