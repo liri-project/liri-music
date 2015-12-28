@@ -10,7 +10,6 @@ RESOURCES += qml.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
-
 # Default rules for deployment.
 include(deployment.pri)
 
@@ -29,8 +28,9 @@ win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Qt5.5.1/5.5/gcc_6
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Qt5.5.1/5.5/gcc_64/lib/debug/ -lQt5Sql
 else:unix: LIBS += -L$$PWD/../../../Qt5.5.1/5.5/gcc_64/lib/ -lQt5Sql
 
-INCLUDEPATH += $$PWD/../../../Qt5.5.1/5.5/gcc_64/include
-DEPENDPATH += $$PWD/../../../Qt5.5.1/5.5/gcc_64/include
+INCLUDEPATH += $$PWD/../../../Qt/5.5/gcc_64/include
+DEPENDPATH += $$PWD/../../../Qt/5.5/gcc_64/include
+INCLUDEPATH += /home/nick/Qt/5.5/gcc_64/include
 
 HEADERS += \
     main.h \
