@@ -9,6 +9,23 @@ import QtQuick.Dialogs 1.0
 import QtQuick.LocalStorage 2.0
 
 ApplicationWindow {
+
+    function getMusic(){
+        musicFolder.initialMusicScan = "Do this";
+        console.log(musicFolder.initialMusicScan);
+
+    }
+
+    Timer {
+        id:initScan
+        interval:2000; running: false; repeat: false
+        onTriggered: {
+            musicFolder.initialMusicScan = "Do this";
+            console.log(musicFolder.initialMusicScan);
+
+        }
+    }
+
     Timer {
         id: setSeekTimer
         interval: 500; running: false; repeat: false
@@ -326,7 +343,7 @@ ApplicationWindow {
 
     id: demo
     title: "Liri Music"
-    height: Units.dp(700)
+    height: Units.dp(600)
     width: Units.dp(1200)
 
     Timer {
@@ -391,7 +408,7 @@ ApplicationWindow {
 
     property var sections: [ sidebar ]
 
-    property var sectionTitles: [ "Collection"]
+    property var sectionTitles: []
 
     property string selectedComponent: sidebar[0]
 
@@ -591,8 +608,9 @@ ApplicationWindow {
         example.setSource(source);
     }
 
-    initialPage: TabbedPage {
+    initialPage: Page {
         id: page
+        visible: true
 
         title: "Liri Vinyl"
 
@@ -649,6 +667,7 @@ ApplicationWindow {
 
         NavigationDrawer {
             id: navDrawer
+            visible:true
 
             enabled: page.width < Units.dp(600)
 
@@ -664,23 +683,55 @@ ApplicationWindow {
                     Repeater {
                         model: sections
 
+
                         delegate: Column {
                             width: parent.width
 
-                            ListItem.Subheader {
-                                text: sectionTitles[index]
-                            }
 
                             Repeater {
                                 model: modelData
-                                delegate: ListItem.Standard {
+
+                                delegate: ListItem.Subtitled{
+
                                     text: modelData
-                                    selected: modelData == demo.selectedComponent
-                                    onClicked: {
-                                        demo.selectedComponent = modelData
-                                        navDrawer.close()
+                                    selected: modelData == selectedComponent
+                                    action: IconButton {
+
+                                            iconName: {
+                                                if(modelData == 'Albums'){
+                                                return 'av/album'
+                                                }else if(modelData == 'Artists'){
+                                                    return 'social/person'
+                                                }else if(modelData == 'All Music'){
+                                                    return 'av/queue_music'
+                                                }else if(modelData == 'Streams'){
+                                                    return 'social/public'
+                                                }else if(modelData == 'Settings'){
+                                                    return 'action/settings'
+                                                }
+
+                                            }
+                                            anchors.topMargin: Units.dp(20)
+                                            height:Units.dp(36)
+                                            width:Units.dp(12)
+                                            anchors.horizontalCenter: parent.horizontalCenter
 
                                     }
+
+                                    height:Units.dp(42)
+
+                                    onClicked: {
+                                        Global.playedSongs = []
+                                        selectedComponent = modelData
+                                        folderModel.folder = "file://" + homeDirectory
+                                        albumFolder.folder = "file://" + homeDirectory
+
+
+                                        if(allAlbums[0].title != "undefined"){
+                                           allAlbumsModel.model = allAlbums
+                                        }
+                                    }
+
                                 }
                             }
                         }
@@ -689,25 +740,15 @@ ApplicationWindow {
             }
         }
 
-        Repeater {
-            model: !navDrawer.enabled ? sections : 0
 
-            delegate: Tab {
-                title: sectionTitles[index]
 
-                property string selectedComponent: modelData[0]
-                property var section: modelData
-
-                sourceComponent: tabDelegate
-            }
-        }
 
         Loader {
             anchors.fill: parent
             sourceComponent: tabDelegate
 
             property var section: []
-            visible: navDrawer.enabled
+            visible:true// navDrawer.enabled
         }
     }
 
@@ -733,12 +774,16 @@ ApplicationWindow {
 
     FileDialog {
         id: fileDialog
-        title: "Please choose a file"
+        title: "Please choose a folder"
         folder: shortcuts.home
+        selectFolder: true
+        selectMultiple: false
         onAccepted: {
             console.log("You chose: " + fileDialog.fileUrls)
+            musicFolder.getMusicFolder = fileDialog.fileUrls[0].toString()
+            console.log(musicFolder.getMusicFolder)
             fileDialog.close()
-            example.source = Qt.resolvedUrl("ArtistsDemo.qml")
+
         }
         onRejected: {
             console.log("Canceled")
@@ -834,7 +879,7 @@ ApplicationWindow {
                     width: parent.width
 
                     Repeater {
-                        model: section
+                        model: sections[0]
                         delegate: ListItem.Subtitled {
 
                             text: modelData
@@ -1065,6 +1110,7 @@ ApplicationWindow {
                 msg.author = "Nick"
                 aa.getAlbums = "New Album"
                 console.log(aa.getAlbums);
+
                 Global.mode = allSongObjects
                 var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
                 db.transaction(
@@ -1173,6 +1219,10 @@ ApplicationWindow {
                 }
                 playMusic.volume = this.value
             }
+            Component.onCompleted: {
+
+                    initScan.start();
+            }
         }
 
 
@@ -1180,4 +1230,7 @@ ApplicationWindow {
 
     }
 
+
+
 }
+
