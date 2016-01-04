@@ -22,7 +22,6 @@ ApplicationWindow {
         onTriggered: {
             musicFolder.initialMusicScan = "Do this";
             console.log(musicFolder.initialMusicScan);
-
         }
     }
 
@@ -69,7 +68,7 @@ ApplicationWindow {
     }
     Timer {
         id: myTimer
-             interval: 500; running: false; repeat: false
+             interval: 200; running: false; repeat: false
              onTriggered: {
 
                  if(playMusic.metaData.albumTitle){
@@ -83,10 +82,7 @@ ApplicationWindow {
                          folderModel.folder = Global.currentFolder
                          var title = folderModel.get(Global.songId, 'fileName')
                      }
-
-
-
-
+                     musicFolder.notify = "\"" + artist + "\" \"" + title + "\""
                  }
 
     }
@@ -365,30 +361,8 @@ ApplicationWindow {
 
 
     theme {
-        primaryColor: {
-                var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
-                db.transaction(
-                    function(tx) {
-                        // Create the database if it doesn't already exist
-                        tx.executeSql('CREATE TABLE IF NOT EXISTS Settings(id INTEGER PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)');
-                        // Show all added greetings
-                        var rs = tx.executeSql('SELECT * FROM Settings WHERE setting="primaryColor"');
-                        var r = ""
-
-                        if(rs.rows.length > 0){
-                            for(var i = 0; i < rs.rows.length; i++) {
-                                r += rs.rows.item(i).setting + ", " + rs.rows.item(i).value + "\n"
-                            }
-                            theme.primaryColor = rs.rows.item(0).value
-                        }else{
-                            theme.primaryColor = Palette.colors["deepOrange"]["500"]
-                        }
-                    })
-            }
-
-
-
-        primaryDarkColor: Palette.colors["blue"]["700"]
+        primaryColor: Palette.colors["lightBlue"]["500"]
+        primaryDarkColor: Palette.colors["lightBlue"]["700"]
         accentColor: Palette.colors["red"]["A200"]
         tabHighlightColor: "white"
     }

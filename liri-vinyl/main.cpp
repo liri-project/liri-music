@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 #include <stdio.h>
+#include <stdlib.h>
 #include <taglib/taglib.h>
 #include <taglib/tag.h>
 #include <taglib/fileref.h>
@@ -390,7 +391,6 @@ int main(int argc, char *argv[]){
 
     MusicFolders defaultFolders;
     engine.rootContext()->setContextProperty("musicFolder", &defaultFolders);
-
 
     // Create view from main.qml:
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));

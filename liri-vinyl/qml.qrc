@@ -4,7 +4,6 @@
         <file>MainForm.ui.qml</file>
         <file>ColorPaletteDemo.qml</file>
         <file>CustomIconsDemo.qml</file>
-        <file>main.db</file>
         <file>musicId.js</file>
         <file>SettingsDemo.qml</file>
         <file>TestDemo.qml</file>

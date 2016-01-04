@@ -21,15 +21,22 @@
 #include <QQmlContext>
 #include <QFileInfo>
 #include <QDir>
+#include <stdlib.h>
+#include <sstream>
 
 class MusicFolders : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString getMusicFolder READ getMusicFolder WRITE setMusicFolder NOTIFY folderChanged)
     Q_PROPERTY(QString initialMusicScan READ initialMusicScan WRITE initMusicScan NOTIFY musicScanChanged)
+    Q_PROPERTY(QString notify READ getNotify WRITE setNotify NOTIFY notifyChanged)
 public:
 
     QString initialMusicScan(){
         return m_initialMusicScan;
+    }
+
+    QString getNotify(){
+        return m_notify;
     }
 
     void addSongsToDatabase(QDir dir, TagLib::String path, QString newpath, QString filename, QSqlDatabase db){
@@ -239,12 +246,25 @@ public:
         return m_initialMusicScan;
     }
 
+    void setNotify(const QString &title) {
+        std::cout << title.toStdString() << std::endl;
+        std::string notification = title.toStdString();
+        std::stringstream ss;
+        ss << "notify-send " << title.toStdString();
+
+        system( ss.str().c_str() );
+
+
+    }
+
 signals:
     void folderChanged();
     void musicScanChanged();
+    void notifyChanged();
 
 private:
     QString m_getMusicFolder;
     QString m_initialMusicScan;
+    QString m_notify;
 };
 #endif // MUSICFOLDERS_H

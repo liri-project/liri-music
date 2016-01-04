@@ -30,7 +30,7 @@ else:unix: LIBS += -L$$PWD/../../../Qt5.5.1/5.5/gcc_64/lib/ -lQt5Sql
 
 INCLUDEPATH += $$PWD/../../../Qt/5.5/gcc_64/include
 DEPENDPATH += $$PWD/../../../Qt/5.5/gcc_64/include
-INCLUDEPATH += /home/nick/Qt/5.5/gcc_64/include
+INCLUDEPATH += /home/nickg/Qt/5.5/gcc_64/include
 
 HEADERS += \
     main.h \
