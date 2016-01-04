@@ -4,7 +4,8 @@ QT += qml quick
 CONFIG += c++11
 QMAKE_CXXFLAGS += -ltag
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    utilities.cpp
 
 RESOURCES += qml.qrc
 
@@ -36,4 +37,5 @@ HEADERS += \
     main.h \
     albumobject.h \
     artistobject.h \
-    musicfolders.h
+    musicfolders.h \
+    utilities.h

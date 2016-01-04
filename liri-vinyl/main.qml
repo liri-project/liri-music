@@ -11,8 +11,8 @@ import QtQuick.LocalStorage 2.0
 ApplicationWindow {
 
     function getMusic(){
-        musicFolder.initialMusicScan = "Do this";
-        console.log(musicFolder.initialMusicScan);
+        //musicFolder.initialMusicScan = "Do this";
+        //console.log(musicFolder.initialMusicScan);
 
     }
 
@@ -20,8 +20,8 @@ ApplicationWindow {
         id:initScan
         interval:2000; running: false; repeat: false
         onTriggered: {
-            musicFolder.initialMusicScan = "Do this";
-            console.log(musicFolder.initialMusicScan);
+            //musicFolder.initialMusicScan = "Do this";
+            //console.log(musicFolder.initialMusicScan);
         }
     }
 

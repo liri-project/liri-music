@@ -29,6 +29,7 @@
 #include <main.h>
 #include <unistd.h>
 #include <musicfolders.h>
+#include <utilities.h>
 
 
 
@@ -390,6 +391,12 @@ int main(int argc, char *argv[]){
     //db.close();
 
     MusicFolders defaultFolders;
+
+
+    Utilities newUtils;
+    newUtils.start();
+
+
     engine.rootContext()->setContextProperty("musicFolder", &defaultFolders);
 
     // Create view from main.qml:
