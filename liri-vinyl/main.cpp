@@ -394,6 +394,7 @@ int main(int argc, char *argv[]){
 
 
     Utilities newUtils;
+    QObject::connect(&newUtils,SIGNAL(allAlbumschanged()),&defaultFolders,SLOT(onAlbumsChanged()));
     newUtils.start();
 
 

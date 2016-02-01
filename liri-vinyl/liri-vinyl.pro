@@ -1,6 +1,8 @@
 TEMPLATE = app
 
-QT += qml quick
+QT += qml quick core gui sql
+
+QTPLUGIN += qsvg
 CONFIG += c++11
 QMAKE_CXXFLAGS += -ltag
 
@@ -16,22 +18,8 @@ include(deployment.pri)
 
 DISTFILES += \
 
-INCLUDEPATH += /usr/local/include/
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../usr/local/lib/release/ -ltag
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../usr/local/lib/debug/ -ltag
-else:unix: LIBS += -L$$PWD/../../../../../usr/local/lib/ -ltag
-
-INCLUDEPATH += $$PWD/../../../../../usr/local/include
-DEPENDPATH += $$PWD/../../../../../usr/local/include
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Qt5.5.1/5.5/gcc_64/lib/release/ -lQt5Sql
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Qt5.5.1/5.5/gcc_64/lib/debug/ -lQt5Sql
-else:unix: LIBS += -L$$PWD/../../../Qt5.5.1/5.5/gcc_64/lib/ -lQt5Sql
-
-INCLUDEPATH += $$PWD/../../../Qt/5.5/gcc_64/include
-DEPENDPATH += $$PWD/../../../Qt/5.5/gcc_64/include
-INCLUDEPATH += /home/nickg/Qt/5.5/gcc_64/include
+INCLUDEPATH += /usr/local/include/ \
+ /usr/include
 
 HEADERS += \
     main.h \
@@ -39,3 +27,6 @@ HEADERS += \
     artistobject.h \
     musicfolders.h \
     utilities.h
+
+unix: CONFIG += link_pkgconfig
+unix: PKGCONFIG += taglib

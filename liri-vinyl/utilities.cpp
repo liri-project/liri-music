@@ -21,6 +21,7 @@
 #include <QDateTime>
 #include <QQmlContext>
 #include <QFileInfo>
+#include <musicfolders.h>
 
 Utilities::Utilities(QObject *parent)
 {
@@ -182,9 +183,12 @@ void Utilities::setMusicScan(QDir d, bool recursive=true, bool symlinks=false ) 
             this->setMusicScan(sd, true, false);
         } else {
             if (finfo.completeSuffix().toStdString().find("mp3") != std::string::npos)
-                addSongsToDatabase(finfo.dir(), finfo.absoluteFilePath().toStdString(), QString(finfo.absoluteFilePath()), finfo.fileName(), db);
+                this->addSongsToDatabase(finfo.dir(), finfo.absoluteFilePath().toStdString(), QString(finfo.absoluteFilePath()), finfo.fileName(), db);
         }
+        //emit allAlbumsChanged();
+
     }
+
 
 }
 
@@ -192,4 +196,10 @@ void Utilities::run(){
     qDebug() << "Running thread";
     QDir d = QDir::homePath() + QLatin1String("/Music");
     this->setMusicScan(d);
+
+
+}
+
+void Utilities::onAlbumsChanged(){
+    std::cout << "Finished running thread" << std::endl;
 }

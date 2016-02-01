@@ -23,13 +23,22 @@
 #include <QDir>
 #include <stdlib.h>
 #include <sstream>
+#include <utilities.h>
+#include <albumobject.h>
 
 class MusicFolders : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString getMusicFolder READ getMusicFolder WRITE setMusicFolder NOTIFY folderChanged)
     Q_PROPERTY(QString initialMusicScan READ initialMusicScan WRITE initMusicScan NOTIFY musicScanChanged)
     Q_PROPERTY(QString notify READ getNotify WRITE setNotify NOTIFY notifyChanged)
+    Q_PROPERTY(QList<QObject*> getAlbums READ getAlbums WRITE setAlbums NOTIFY allAlbumsChanged)
 public:
+
+    Utilities *newUtils;
+
+    QList<QObject*> getAlbums(){
+        return m_albums;
+    }
 
     QString initialMusicScan(){
         return m_initialMusicScan;
@@ -257,14 +266,46 @@ public:
 
     }
 
+    void setAlbums(const QList<QObject*> &albums){
+        QList<QObject*> albumList;
+        QSqlDatabase db = QSqlDatabase::database(QString("qt_sql_default_connection"),true);
+
+
+        if(db.open()){
+            QSqlQuery getAllAlbums;
+            getAllAlbums.prepare("select * FROM Albums");
+            if(getAllAlbums.exec()){
+                while(getAllAlbums.next()){
+                    QString album = getAllAlbums.value(1).toString();
+                    QString artist = getAllAlbums.value(2).toString();
+                    QString art = getAllAlbums.value(3).toString();
+                    albumList.append(new AlbumObject(album, artist, art));
+
+                }
+            }
+        }
+        if(albumList.count() > 0){
+            m_albums = albumList;
+        }else{
+            albumList.append(new AlbumObject("undefined", "undefined", "undefined"));
+            m_albums = albumList;
+        }
+    }
+
 signals:
     void folderChanged();
     void musicScanChanged();
     void notifyChanged();
+    void allAlbumsChanged();
 
 private:
     QString m_getMusicFolder;
     QString m_initialMusicScan;
     QString m_notify;
+    QList<QObject*> m_albums;
+
+public slots:
+
+
 };
 #endif // MUSICFOLDERS_H

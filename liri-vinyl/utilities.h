@@ -35,9 +35,13 @@ public:
     void setMusicScan(QDir, bool, bool);
     void addSongsToDatabase(QDir, TagLib::String, QString, QString, QSqlDatabase);
 
+
 signals:
+    void musicScanChanged();
+    void allAlbumschanged();
 
 public slots:
+    void onAlbumsChanged();
 };
 
 #endif // UTILITIES_H
