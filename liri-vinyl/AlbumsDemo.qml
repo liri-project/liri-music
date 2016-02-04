@@ -171,7 +171,9 @@ Item {
                    onClicked: {
 
                        demo.title = model.modelData.title
-                       playMusic.source = "file://" + model.modelData.path
+                       playMusic.source = Qt.resolvedUrl(model.modelData.path)
+                       console.log(model.modelData.getSong)
+                       console.log(JSON.stringify(model.modelData))
                        playMusic.play()
                        songPlaying.text = model.modelData.artist + ' - ' + model.modelData.title
                        page.title = model.modelData.artist + ' - ' + model.modelData.title
