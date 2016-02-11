@@ -10,6 +10,7 @@ SOURCES += main.cpp \
     utilities.cpp
 
 RESOURCES += qml.qrc
+RC_FILE = liri-music.rc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -17,6 +18,7 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 DISTFILES += \
+    liri-music.rc
 
 INCLUDEPATH += /usr/local/include/ \
  /usr/include

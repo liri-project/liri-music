@@ -359,16 +359,7 @@ int main(int argc, char *argv[]){
 
     }
 
-    //engine.load(QUrl(QStringLiteral("qrc:/qml/loading.qml")));
-    //app2.exec();
     std::cout << "Loaded" << std::endl;
-/*
-    if(firstMusicScan(QDir(musicLocation), db)){
-
-    }
-    */
-
-
     QString stream_directory = musicLocation + QLatin1String("/streams");
 
 
@@ -377,9 +368,6 @@ int main(int argc, char *argv[]){
     engine.rootContext()->setContextProperty("streamDirectory", stream_directory);
 
     std::cout << "Song count" << QString(getAllSongs(db).count()).toStdString() << std::endl;
-
-    Message msg;
-    engine.rootContext()->setContextProperty("msg", &msg);
 
     AllAlbums aa;
     engine.rootContext()->setContextProperty("aa", &aa);
@@ -391,12 +379,10 @@ int main(int argc, char *argv[]){
     //db.close();
 
     MusicFolders defaultFolders;
-
-
     Utilities newUtils;
+
     QObject::connect(&newUtils,SIGNAL(allAlbumschanged()),&defaultFolders,SLOT(onAlbumsChanged()));
     newUtils.start();
-
 
     engine.rootContext()->setContextProperty("musicFolder", &defaultFolders);
 
