@@ -317,17 +317,6 @@ bool initialQuery(QSqlDatabase db){
     }else{
         std::cout << "Couldnt open database" << std::endl;
     }
-
-    // Uncomment for debug purposes
-    /*
-    QSqlQuery getSettings;
-    getSettings.prepare("Select * FROM Settings");
-    if(getSettings.exec()){
-        while(getSettings.next()){
-            std::cout << getSettings.value(1).toString().toUtf8().constData() << std::endl;
-        }
-    }
-    */
     return true;
 }
 
@@ -359,15 +348,7 @@ int main(int argc, char *argv[]){
 
     }
 
-    //engine.load(QUrl(QStringLiteral("qrc:/qml/loading.qml")));
-    //app2.exec();
     std::cout << "Loaded" << std::endl;
-/*
-    if(firstMusicScan(QDir(musicLocation), db)){
-
-    }
-    */
-
 
     QString stream_directory = musicLocation + QLatin1String("/streams");
 
