@@ -182,7 +182,7 @@ void Utilities::setMusicScan(QDir d, bool recursive=true, bool symlinks=false ) 
             QDir sd(finfo.absoluteFilePath());
             this->setMusicScan(sd, true, false);
         } else {
-            if (finfo.completeSuffix().toStdString().find("mp3") != std::string::npos)
+            if (finfo.completeSuffix().toStdString().find("mp3") != std::string::npos || finfo.completeSuffix().toStdString().find("MP3") != std::string::npos)
                 this->addSongsToDatabase(finfo.dir(), finfo.absoluteFilePath().toStdString(), QString(finfo.absoluteFilePath()), finfo.fileName(), db);
         }
         //emit allAlbumsChanged();
