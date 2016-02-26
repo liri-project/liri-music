@@ -3,7 +3,7 @@ import Material 0.1
 import Material.ListItems 0.1 as ListItem
 import Material.Extras 0.1
 import Qt.labs.folderlistmodel 2.1
-import 'musicId.js' as Global
+import "../js/musicId.js" as Global
 import People 1.0
 
 Item {

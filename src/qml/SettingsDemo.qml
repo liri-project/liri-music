@@ -2,7 +2,7 @@ import QtQuick 2.4
 import Material 0.1
 import Material.ListItems 0.1 as ListItem
 import Material.Extras 0.1
-import "musicId.js" as Global
+import "../js/musicId.js" as Global
 
 
         Column {

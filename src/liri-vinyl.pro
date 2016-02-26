@@ -10,6 +10,7 @@ SOURCES += main.cpp \
     utilities.cpp
 
 RESOURCES += qml.qrc
+RC_FILE = liri-music.rc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -17,6 +18,7 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 DISTFILES += \
+    liri-music.rc
 
 INCLUDEPATH += /usr/local/include/ \
  /usr/include
@@ -30,3 +32,8 @@ HEADERS += \
 
 unix: CONFIG += link_pkgconfig
 unix: PKGCONFIG += taglib
+
+# As far as I can tell, taglib needs to be statically linked on windows.  See readme for more info.
+win32:CONFIG(release, debug|release): LIBS += "C:/Program Files (x86)/taglib/lib/libtag.dll.a"
+INCLUDEPATH += "C:/Program Files (x86)/taglib/include"
+DEPENDPATH += "C:/Program Files (x86)/taglib/include"

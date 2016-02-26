@@ -261,7 +261,7 @@ public:
         std::stringstream ss;
         ss << "notify-send " << title.toStdString();
 
-        system( ss.str().c_str() );
+        //system( ss.str().c_str() );
 
 
     }
