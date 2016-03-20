@@ -1,5 +1,5 @@
-# Liri Vinyl
-The official repo for Liri Vinyl (previously called Vinyl Music).  The idea is to provide the first cross-platform, material-design-inspired music player, full of awesome features (and all the stuff you'd expect out of a music player).
+# Liri Music
+The official repo for Liri Music (previously called Vinyl Music).  The idea is to provide the first cross-platform, material-design-inspired music player, full of awesome features (and all the stuff you'd expect out of a music player).
 
 ![Image of liri vinyl]
 (https://github.com/liri-project/liri-vinyl/blob/master/images/liri-music-03-2016.png)
@@ -16,7 +16,7 @@ For current functionality, see the "Features" section below.
 		Qt5.5 (Tested using 5.5.1)
 		qml-material (https://github.com/papyros/qml-material)
 
-Liri Music is still very early in development, however, if you'd like to give it a try, just install the dependencies, and then Qt Creator, and open the .pro file.  Then run it from Qt Creator.
+Liri Music is still early in development, however, if you'd like to give it a try, just install the dependencies, and then Qt Creator, and open the .pro file.  Then run it from Qt Creator.
 
 Or you could build it by running the following (from the liri-vinyl subdirectory containing the .pro file):
 
