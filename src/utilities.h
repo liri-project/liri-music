@@ -11,7 +11,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QList>
-#include <main.h>
+#include "songobject.h"
 #include <QVariant>
 #include <iostream>
 #include <taglib/taglib.h>
