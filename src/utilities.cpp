@@ -7,7 +7,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QList>
-#include <main.h>
+#include "songobject.h"
 #include <QVariant>
 #include <iostream>
 #include <taglib/taglib.h>
@@ -21,7 +21,7 @@
 #include <QDateTime>
 #include <QQmlContext>
 #include <QFileInfo>
-#include <musicfolders.h>
+#include "musicfolders.h"
 
 Utilities::Utilities(QObject *parent)
 {

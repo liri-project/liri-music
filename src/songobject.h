@@ -3,7 +3,6 @@
 
 #include <QObject>
 
-
 class SongObject : public QObject
 {
     Q_OBJECT

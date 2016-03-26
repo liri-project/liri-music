@@ -23,13 +23,13 @@
 #include <QtSql/QSqlQuery>
 #include <QList>
 #include <QObject>
-#include <albumobject.h>
-#include <artistobject.h>
+#include "albumobject.h"
+#include "artistobject.h"
 #include <QStandardPaths>
-#include <main.h>
+#include "songobject.h"
 #include <unistd.h>
-#include <musicfolders.h>
-#include <utilities.h>
+#include "musicfolders.h"
+#include "utilities.h"
 
 
 
