@@ -30,10 +30,14 @@ HEADERS += \
     musicfolders.h \
     utilities.h
 
-unix: CONFIG += link_pkgconfig
-unix: PKGCONFIG += taglib
+unix:{
+    CONFIG += link_pkgconfig
+    PKGCONFIG += taglib
+}
 
 # As far as I can tell, taglib needs to be statically linked on windows.  See readme for more info.
-win32:CONFIG(release, debug|release): LIBS += "C:/Program Files (x86)/taglib/lib/libtag.dll.a"
-INCLUDEPATH += "C:/Program Files (x86)/taglib/include"
-DEPENDPATH += "C:/Program Files (x86)/taglib/include"
+win32:CONFIG(release, debug|release): {
+    LIBS += "C:/Program Files (x86)/taglib/lib/libtag.dll.a"
+    INCLUDEPATH += "C:/Program Files (x86)/taglib/include"
+    DEPENDPATH += "C:/Program Files (x86)/taglib/include"
+}
