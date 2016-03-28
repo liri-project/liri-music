@@ -18,15 +18,20 @@ class SongObject : public QObject
     QString m_artist;
     QString m_art;
 
+public:
+    SongObject();
+    explicit SongObject(const QString &path, const QString &title, const QString &album, const QString &artist, const QString &art); 
+    SongObject(const SongObject&);
+
+    SongObject& operator=(const SongObject&);
 
     QString path();
     QString title();
     QString album();
     QString artist();
     QString art();
-
-public:
-    explicit SongObject(const QString &path, const QString &title, const QString &album, const QString &artist, const QString &art); 
 };
+
+Q_DECLARE_METATYPE(SongObject)
 
 #endif // SONG_OBJECT_MAIN

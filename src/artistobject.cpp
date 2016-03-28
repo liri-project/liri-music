@@ -7,10 +7,24 @@
 
 #include "songobject.h"
 
+ArtistObject::ArtistObject() :
+    QObject() {
+}
+
 ArtistObject::ArtistObject(const QString& artist) :
     QObject(),
     m_artist(artist)
 {
+}
+
+ArtistObject::ArtistObject(const ArtistObject& other) :
+    QObject(),
+    m_artist(other.m_artist) {
+}
+
+ArtistObject& ArtistObject::operator=(const ArtistObject& other) {
+    m_artist = other.m_artist;
+    return *this;
 }
 
 QList<QObject*> ArtistObject::getSong() const {

@@ -64,15 +64,20 @@ class AlbumObject : public QObject {
     QString m_title;
     QString m_artist;
     QString m_art;
+public:
+    AlbumObject();
+    explicit AlbumObject(const QString &title, const QString &artist, const QString &art);
+    AlbumObject(const AlbumObject&);
+
+    AlbumObject& operator=(const AlbumObject&);
 
     QString title();
     QString artist();
     QString art();
     QList<QObject*> getSong();
-
-public:
-    explicit AlbumObject(const QString &title, const QString &artist, const QString &art);
 };
+
+Q_DECLARE_METATYPE(AlbumObject);
 
 #endif // ALBUMOBJECT
 

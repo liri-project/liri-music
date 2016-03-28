@@ -1,8 +1,23 @@
 #include "albumobject.h"
 #include "moc_albumobject.cpp"
 
+AlbumObject::AlbumObject() :
+    QObject() {
+}
+
 AlbumObject::AlbumObject(const QString& title, const QString& artist, const QString& art) :
     QObject(), m_title(title), m_artist(artist), m_art(art) {
+}
+
+AlbumObject::AlbumObject(const AlbumObject& other) :
+    QObject(), m_title(other.m_title), m_artist(other.m_artist), m_art(other.m_art) {
+}
+
+AlbumObject& AlbumObject::operator=(const AlbumObject& other) {
+    m_title = other.m_title;
+    m_artist = other.m_artist;
+    m_art = other.m_art;
+    return *this;
 }
 
 QString AlbumObject::title() {
