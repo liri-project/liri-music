@@ -19,22 +19,14 @@ class SongObject : public QObject
     QString m_art;
 
 
-    QString path() { return m_path;}
-    QString title() { return m_title;}
-    QString album() { return m_album;}
-    QString artist() {return m_artist;}
-    QString art() {return m_art;}
+    QString path();
+    QString title();
+    QString album();
+    QString artist();
+    QString art();
 
 public:
-    explicit SongObject(const QString &path, const QString &title, const QString &album, const QString &artist, const QString &art) :
-        QObject(),
-        m_path(path),
-        m_title(title),
-        m_album(album),
-        m_artist(artist),
-        m_art(art)
-    {}
-
+    explicit SongObject(const QString &path, const QString &title, const QString &album, const QString &artist, const QString &art); 
 };
 
 #endif // SONG_OBJECT_MAIN
