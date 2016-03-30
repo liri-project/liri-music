@@ -323,6 +323,7 @@ bool initialQuery(QSqlDatabase db){
 int main(int argc, char *argv[]){
 
     QGuiApplication app(argc, argv);
+    app.setApplicationName("LiriMusic");
     QQmlApplicationEngine engine;
 
     if (app.arguments().size() > 1) {
