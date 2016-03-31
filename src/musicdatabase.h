@@ -31,6 +31,7 @@ public:
 
     QString getMusicFolder();
 public slots:
+    void addSong(const SongObject&);
     void addArtist(const ArtistObject&);
     void setMusicFolder(const QString&);
 signals:
