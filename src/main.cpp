@@ -23,7 +23,7 @@
 #include <QtSql/QSqlQuery>
 #include <QList>
 #include <QObject>
-#include "albumobject.h"
+#include "album.h"
 #include "artistobject.h"
 #include <QStandardPaths>
 #include "songobject.h"
@@ -32,6 +32,7 @@
 #include "utilities.h"
 #include "musicdatabase.h"
 #include "musicscanner.h"
+#include "albummodel.h"
 #include <QGst/Init>
 
 int main(int argc, char *argv[]){
@@ -55,9 +56,10 @@ int main(int argc, char *argv[]){
     engine.rootContext()->setContextProperty("homeDirectory", musicLocation);
     engine.rootContext()->setContextProperty("streamDirectory", stream_directory);
 
+    AlbumModel albumModel;
     engine.rootContext()->setContextProperty("allSongObjects", QVariant::fromValue(MusicDatabase::get().getAllSongs()));
     engine.rootContext()->setContextProperty("allArtists", QVariant::fromValue(MusicDatabase::get().getAllArtists()));
-    engine.rootContext()->setContextProperty("allAlbums", QVariant::fromValue(MusicDatabase::get().getAllAlbums()));
+    engine.rootContext()->setContextProperty("albumModel", &albumModel);
 
     MusicScanner scanner {};
     MusicDatabase& db = MusicDatabase::get();

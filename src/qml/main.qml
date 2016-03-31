@@ -325,12 +325,9 @@ ApplicationWindow {
     ListView {
         id: allAlbumsModel
         model: {
-
-            if(allAlbums[0].title != "undefined"){
-                return allAlbums
-            }
+                return albumModel
         }
-        visible: false
+        visible: true
     }
 
     ListView {
@@ -888,11 +885,6 @@ ApplicationWindow {
                                 selectedComponent = modelData
                                 folderModel.folder = "file://" + homeDirectory
                                 albumFolder.folder = "file://" + homeDirectory
-
-
-                                if(allAlbums[0].title != "undefined"){
-                                   allAlbumsModel.model = allAlbums
-                                }
                             }
 
                         }

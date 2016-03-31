@@ -6,7 +6,7 @@
 
 #include <exception>
 
-#include "albumobject.h"
+#include "album.h"
 #include "artistobject.h"
 #include "songobject.h"
 
@@ -25,13 +25,14 @@ public:
 
     static MusicDatabase& get();
 public:
-    QList<AlbumObject> getAllAlbums();
+    QList<Album> getAllAlbums();
     QList<ArtistObject> getAllArtists();
     QList<SongObject> getAllSongs();
 
     QString getMusicFolder();
 public slots:
     void addSong(const SongObject&);
+    void addAlbum(const Album&album);
     void addArtist(const ArtistObject&);
     void setMusicFolder(const QString&);
 signals:
