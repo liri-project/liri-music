@@ -111,7 +111,7 @@ QString MusicDatabase::getMusicFolder() {
         return getFolderQuery.value(2).toString();
     } else {
         QSqlQuery createFolderQuery;
-        QString initialFolder = QDir::homePath() + QLatin1String("/Musique");
+        QString initialFolder = QStandardPaths::standardLocations(QStandardPaths::MusicLocation).first();
         createFolderQuery.prepare("INSERT INTO Settings(setting, value) VALUES('folder', :value)");
         createFolderQuery.bindValue(":value", initialFolder);
         createFolderQuery.exec();

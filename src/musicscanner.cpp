@@ -6,6 +6,7 @@
 #include <QList>
 #include <QGst/Caps>
 #include <QGst/Discoverer>
+#include <QThread>
 #include <iostream>
 
 MusicScanner::MusicScanner() {
@@ -31,4 +32,5 @@ void MusicScanner::scan(const QDir& dir, QGst::DiscovererPtr& discoverer) {
             emit foundSong(song);
         }
     }
+    this->thread()->quit();
 }

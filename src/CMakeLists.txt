@@ -21,3 +21,4 @@ target_compile_features(${CMAKE_PROJECT_NAME} PRIVATE
 )
 target_link_libraries(${CMAKE_PROJECT_NAME} Qt5::Core Qt5::Gui Qt5::Svg Qt5::Qml Qt5::Quick Qt5::Sql ${TAGLIB_LIBRARIES} ${QTGSTREAMER_LIBRARIES})
 
+install(TARGETS ${CMAKE_PROJECT_NAME} DESTINATION bin)
