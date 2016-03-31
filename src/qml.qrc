@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/main.qml</file>
-        <file>qml/MainForm.ui.qml</file>
         <file>qml/ColorPaletteDemo.qml</file>
         <file>qml/CustomIconsDemo.qml</file>
         <file>js/musicId.js</file>
@@ -13,8 +12,6 @@
         <file>qml/ArtistsDemo.qml</file>
         <file>images/placeholder.png</file>
         <file>qml/loading.qml</file>
-    </qresource>
-    <qresource prefix="/">
         <file>images/album.svg</file>
         <file>images/placeholder.png</file>
     </qresource>
