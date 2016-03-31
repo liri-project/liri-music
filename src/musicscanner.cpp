@@ -9,39 +9,26 @@
 #include <iostream>
 
 MusicScanner::MusicScanner() {
-    discoverer = QGst::Discoverer::create(QGst::ClockTime::fromSeconds(15));
-    discoverer->start();
-    QGlib::connect(discoverer, "discovered", this, &MusicScanner::uriDiscovered);
 }
 
 void MusicScanner::startScan() {
     QDir musicDirectory { MusicDatabase::get().getMusicFolder() };
-    scan(musicDirectory);
+    QGst::DiscovererPtr discoverer = QGst::Discoverer::create(QGst::ClockTime::fromSeconds(1));
+    scan(musicDirectory, discoverer);
 }
 
-void MusicScanner::scan(const QDir& dir) {
+void MusicScanner::scan(const QDir& dir, QGst::DiscovererPtr& discoverer) {
     QDir::Filters directoryFilters = QDir::Files | QDir::NoDotAndDotDot | QDir::Dirs | QDir::NoSymLinks;
 
     QFileInfoList entries = dir.entryInfoList(directoryFilters, QDir::Name);
 
     for(const auto& entry : entries) {
         if(entry.isDir())
-            scan(QDir { entry.absoluteFilePath() });
+            scan(QDir { entry.absoluteFilePath() }, discoverer);
         else {
-            discoverer->discoverUriAsync(QUrl::fromLocalFile(entry.absoluteFilePath()).toEncoded());
+            QGst::DiscovererInfoPtr info = discoverer->discoverUri(QUrl::fromLocalFile(entry.absoluteFilePath()).toEncoded());
+            SongObject song { info->uri().toLocalFile(), info->tags().title(), info->tags().tagValue("album").toString(), info->tags().artist(), "placeholder" };
+            emit foundSong(song);
         }
     }
-}
-
-void MusicScanner::uriDiscovered(QGst::DiscovererInfoPtr ptr) {
-    /*for(const auto& stream : ptr->streams()) {
-        std::cout << stream->streamTypeNick().toStdString() << std::endl;
-        std::cout << stream->caps()->toString().toStdString() << std::endl;
-    }*/
-    //std::cout << ptr->tags().title().toStdString() << std::endl;
-    std::cout << "SongObject { " << std::endl;
-    std::cout << "  path:" << ptr->uri().toLocalFile().toStdString() << std::endl;
-    std::cout << "}" << std::endl;
-    SongObject object { ptr->uri().toLocalFile(), ptr->tags().title(), ptr->tags().tagValue("album").toString(), ptr->tags().artist(), "" };
-    emit foundSong(object);
 }
