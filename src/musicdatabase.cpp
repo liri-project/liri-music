@@ -8,6 +8,10 @@
 
 MusicDatabase::MusicDatabase() 
     : db { QSqlDatabase::addDatabase("QSQLITE") } {
+    QDir databaseDirectory { QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation)[0] };
+    if(!databaseDirectory.exists()) {
+        databaseDirectory.mkpath(".");
+    }
     db.setDatabaseName(QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation)[0] +
         QDir::separator() + "musicdb.sqlite");
     if(!db.open())
@@ -104,7 +108,7 @@ QString MusicDatabase::getMusicFolder() {
     getFolderQuery.prepare("SELECT * FROM Settings where setting='folder'");
     getFolderQuery.exec();
     if(getFolderQuery.first()) {
-        return getFolderQuery.value(3).toString();
+        return getFolderQuery.value(2).toString();
     } else {
         QSqlQuery createFolderQuery;
         QString initialFolder = QDir::homePath() + QLatin1String("/Music");
@@ -121,4 +125,7 @@ void MusicDatabase::setMusicFolder(const QString& folder) {
     setFolderQuery.bindValue(":value", folder);
     setFolderQuery.exec();
     emit musicFolderChanged(folder);
+}
+
+void MusicDatabase::addSong(const SongObject& song) {
 }

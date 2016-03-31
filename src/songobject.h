@@ -25,11 +25,11 @@ public:
 
     SongObject& operator=(const SongObject&);
 
-    QString path();
-    QString title();
-    QString album();
-    QString artist();
-    QString art();
+    QString path() const;
+    QString title() const;
+    QString album() const;
+    QString artist() const;
+    QString art() const;
 };
 
 Q_DECLARE_METATYPE(SongObject)

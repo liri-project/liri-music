@@ -34,22 +34,22 @@ SongObject& SongObject::operator=(const SongObject& other) {
     return *this;
 }
 
-QString SongObject::path() {
+QString SongObject::path() const {
     return m_path;
 }
 
-QString SongObject::title() {
+QString SongObject::title() const {
     return m_title;
 }
 
-QString SongObject::album() {
+QString SongObject::album() const {
     return m_album;
 }
 
-QString SongObject::artist() {
+QString SongObject::artist() const {
     return m_artist;
 }
 
-QString SongObject::art() {
+QString SongObject::art() const {
     return m_art;
 }
