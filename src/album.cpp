@@ -1,38 +1,38 @@
-#include "albumobject.h"
-#include "moc_albumobject.cpp"
+#include "album.h"
+#include "moc_album.cpp"
 
-AlbumObject::AlbumObject() :
+Album::Album() :
     QObject() {
 }
 
-AlbumObject::AlbumObject(const QString& title, const QString& artist, const QString& art) :
+Album::Album(const QString& title, const QString& artist, const QString& art) :
     QObject(), m_title(title), m_artist(artist), m_art(art) {
 }
 
-AlbumObject::AlbumObject(const AlbumObject& other) :
+Album::Album(const Album& other) :
     QObject(), m_title(other.m_title), m_artist(other.m_artist), m_art(other.m_art) {
 }
 
-AlbumObject& AlbumObject::operator=(const AlbumObject& other) {
+Album& Album::operator=(const Album& other) {
     m_title = other.m_title;
     m_artist = other.m_artist;
     m_art = other.m_art;
     return *this;
 }
 
-QString AlbumObject::title() {
+QString Album::title() const {
     return m_title;
 }
 
-QString AlbumObject::artist() {
+QString Album::artist() const {
     return m_artist;
 }
 
-QString AlbumObject::art() {
+QString Album::art() const {
     return m_art;
 }
 
-QList<QObject*> AlbumObject::getSong() {
+QList<QObject*> Album::getSong() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setHostName("localhost");
     db.setDatabaseName("vinylusic");

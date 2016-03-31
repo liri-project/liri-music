@@ -5,7 +5,8 @@ set(liri_vinyl_SOURCES
   main.cpp
   utilities.cpp
   songobject.cpp
-  albumobject.cpp
+  album.cpp
+  albummodel.cpp
   artistobject.cpp
   musicfolders.cpp
   musicdatabase.cpp

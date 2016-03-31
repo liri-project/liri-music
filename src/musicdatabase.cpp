@@ -6,7 +6,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 
-MusicDatabase::MusicDatabase() 
+MusicDatabase::MusicDatabase()
     : db { QSqlDatabase::addDatabase("QSQLITE") } {
     QDir databaseDirectory { QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation)[0] };
     if(!databaseDirectory.exists()) {
@@ -47,8 +47,8 @@ MusicDatabase& MusicDatabase::get() {
     return musicDatabase;
 }
 
-QList<AlbumObject> MusicDatabase::getAllAlbums() {
-    QList<AlbumObject> albumList;
+QList<Album> MusicDatabase::getAllAlbums() {
+    QList<Album> albumList;
 
     QSqlQuery albumsQuery("SELECT * FROM Albums", db);
 
@@ -56,7 +56,7 @@ QList<AlbumObject> MusicDatabase::getAllAlbums() {
         QString album = albumsQuery.value(1).toString();
         QString artist = albumsQuery.value(2).toString();
         QString art = albumsQuery.value(3).toString();
-        albumList.push_back(AlbumObject {album, artist, art});
+        albumList.push_back(Album {album, artist, art});
     }
     return albumList;
 }
@@ -74,7 +74,7 @@ QList<ArtistObject> MusicDatabase::getAllArtists() {
 
 QList<SongObject> MusicDatabase::getAllSongs() {
     QList<SongObject> songList;
- 
+
     QSqlQuery songsQuery("SELECT * FROM Songs");
     while(songsQuery.next()) {
         QString title = songsQuery.value(2).toString();
@@ -128,4 +128,35 @@ void MusicDatabase::setMusicFolder(const QString& folder) {
 }
 
 void MusicDatabase::addSong(const SongObject& song) {
+
+    addAlbum(Album{song.album(), song.artist(), song.art()});
+    //Check if the songs already exists in DB.
+    QSqlQuery songExistsQuery(QString("SELECT COUNT (*) FROM Songs WHERE artist = '%1' AND title = '%2'").arg(song.artist()).arg(song.title()), db);
+    songExistsQuery.next();
+    if(songExistsQuery.value(0).toInt() == 0)
+    {
+        QSqlQuery addSongQuery(db);
+        addSongQuery.prepare("INSERT INTO Songs(path, title, artist, album, art) VALUES (:path, :title, :artist, :album, :art)");
+        addSongQuery.bindValue(":path", song.path());
+        addSongQuery.bindValue(":title", song.title());
+        addSongQuery.bindValue(":artist", song.artist());
+        addSongQuery.bindValue(":album", song.album());
+        addSongQuery.bindValue(":art", song.art());
+        addSongQuery.exec();
+    }
+}
+
+void MusicDatabase::addAlbum(const Album &album)
+{
+    QSqlQuery albumExistsQuery(QString("SELECT COUNT (*) as albumCount FROM Albums WHERE artist = '%1' AND album = '%2'").arg(album.artist()).arg(album.title()), db);
+    albumExistsQuery.next();
+    if(albumExistsQuery.value(0).toInt() == 0)
+    {
+        QSqlQuery addAlbumQuery(db);
+        addAlbumQuery.prepare("INSERT INTO Albums(album, artist, art) VALUES (:title, :artist, :art)");
+        addAlbumQuery.bindValue(":title", album.title());
+        addAlbumQuery.bindValue(":artist", album.artist());
+        addAlbumQuery.bindValue(":art", album.art());
+        addAlbumQuery.exec();
+    }
 }

@@ -10,7 +10,7 @@
 #include <taglib/tag.h>
 #include <taglib/fileref.h>
 
-#include "albumobject.h"
+#include "album.h"
 
 QList<QObject*> MusicFolders::getAlbums() {
     return m_albums;
@@ -174,13 +174,13 @@ void MusicFolders::setAlbums(const QList<QObject*> &albums) {
                 QString album = getAllAlbums.value(1).toString();
                 QString artist = getAllAlbums.value(2).toString();
                 QString art = getAllAlbums.value(3).toString();
-                albumList.append(new AlbumObject(album, artist, art));
+                albumList.append(new Album(album, artist, art));
             }
         }
         if(albumList.count() > 0) {
             m_albums = albumList;
         }else{
-            albumList.append(new AlbumObject("undefined", "undefined", "undefined"));
+            albumList.append(new Album("undefined", "undefined", "undefined"));
             m_albums = albumList;
         }
     }
