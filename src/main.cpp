@@ -59,19 +59,18 @@ int main(int argc, char *argv[]){
     engine.rootContext()->setContextProperty("allArtists", QVariant::fromValue(MusicDatabase::get().getAllArtists()));
     engine.rootContext()->setContextProperty("allAlbums", QVariant::fromValue(MusicDatabase::get().getAllAlbums()));
 
-    MusicScanner* scanner = new MusicScanner {};
+    MusicScanner scanner {};
     MusicDatabase& db = MusicDatabase::get();
-    QObject::connect(scanner, &MusicScanner::foundSong, &db, &MusicDatabase::addSong);
+    QObject::connect(&scanner, &MusicScanner::foundSong, &db, &MusicDatabase::addSong);
+
     QThread t;
-    scanner->moveToThread(&t);
+    scanner.moveToThread(&t);
+    QObject::connect(&t, &QThread::started, &scanner, &MusicScanner::startScan);
     t.start();
-    scanner->startScan();
 
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 
-    int retval = app.exec();
-    t.quit();
-    return retval;
+    return app.exec();
 }
 
 

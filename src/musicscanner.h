@@ -19,9 +19,7 @@ public slots:
 signals:
     void foundSong(const SongObject&);
 private:
-    void scan(const QDir&);
-    void uriDiscovered(QGst::DiscovererInfoPtr);
-    QGst::DiscovererPtr discoverer;
+    void scan(const QDir&, QGst::DiscovererPtr&);
 };
 
 #endif
