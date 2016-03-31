@@ -1,5 +1,6 @@
 #include "albummodel.h"
 #include "musicdatabase.h"
+#include "moc_albummodel.cpp"
 
 AlbumModel::AlbumModel(QObject *parent):
     QAbstractListModel(parent)
@@ -19,7 +20,6 @@ int AlbumModel::rowCount(const QModelIndex &parent) const
 
 QVariant AlbumModel::data(const QModelIndex &index, int role) const
 {
-    Q_UNUSED(role)
     Album current = MusicDatabase::get().getAllAlbums().at(index.row());
     switch(role)
     {
@@ -33,6 +33,13 @@ QVariant AlbumModel::data(const QModelIndex &index, int role) const
 
     return QVariant();
 
+}
+
+void AlbumModel::addAlbum(const Album &album)
+{
+    emit beginInsertRows(QModelIndex(), rowCount(QModelIndex()), rowCount(QModelIndex()));
+    MusicDatabase::get().addAlbum(album);
+    emit endInsertRows();
 }
 
 QHash<int, QByteArray> AlbumModel::roleNames() const
