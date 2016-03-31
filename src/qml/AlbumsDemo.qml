@@ -137,16 +137,16 @@ Item {
         ListView{
             id: albumDetailView
             anchors.fill: parent
-            model: allAlbums
+            model: albumModel
             visible: false
             delegate: ListItem.Subtitled{
-                text: model.modelData.title
+                text: title
                 visible: true
                 subText: {
-                    if(model.modelData.artist && model.modelData.album){
-                        return model.modelData.artist + ' - ' + model.modelData.album
-                    }else if(model.modelData.album){
-                        return model.modelData.album;
+                    if(artist && title){
+                        return artist + ' - ' + title
+                    }else if(title){
+                        return title;
                     }else {
                         return 'Unknown Album'
                     }
@@ -155,8 +155,8 @@ Item {
                 action: Image {
 
                     source: {
-                        if(model.modelData.art != 'placeholder'){
-                        return "file://" + model.modelData.art
+                        if(art != 'placeholder'){
+                        return "file://" + art
                         }else{
                             return "qrc:/images/placeholder.png"
                         }
