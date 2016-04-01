@@ -18,6 +18,7 @@ public:
 public slots:
     void startScan();
     void directoryChanged(const QString &path);
+    void stop();
 
 signals:
     void foundSong(const SongObject&);

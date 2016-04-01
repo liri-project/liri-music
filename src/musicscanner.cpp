@@ -60,3 +60,8 @@ void MusicScanner::scan(const QDir& dir, QGst::DiscovererPtr& discoverer) {
         }
     }
 }
+
+void MusicScanner::stop() {
+  this->thread()->quit();
+}
+
