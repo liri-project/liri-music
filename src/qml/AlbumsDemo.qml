@@ -58,13 +58,13 @@ Item {
 
                 Image {
                     id: albumImage
-                    source: {
+                    source: "image://art/" + art /*{
                         if(art != 'placeholder'){
                         return "file://" + art
                         }else{
                             return "qrc:/images/placeholder.png"
                         }
-                    }
+                    }*/
 
                     height:160
                     width:160

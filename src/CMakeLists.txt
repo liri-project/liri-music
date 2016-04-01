@@ -11,6 +11,7 @@ set(liri_vinyl_SOURCES
   musicfolders.cpp
   musicdatabase.cpp
   musicscanner.cpp
+  albumartprovider.cpp
 )
 
 qt5_add_resources(liri_vinyl_RESOURCES qml.qrc)

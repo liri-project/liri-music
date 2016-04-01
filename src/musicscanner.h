@@ -23,6 +23,7 @@ public slots:
 signals:
     void foundSong(const SongObject&);
     void foundAlbum(const Album &);
+    void foundAlbumArt(const Album&, QByteArray art);
 
 private:
     void scan(const QDir&, QGst::DiscovererPtr&);
