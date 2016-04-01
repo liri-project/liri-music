@@ -5,6 +5,7 @@
 #include <QStandardPaths>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 MusicDatabase::MusicDatabase()
     : db { QSqlDatabase::addDatabase("QSQLITE") } {
@@ -20,7 +21,7 @@ MusicDatabase::MusicDatabase()
     if(!db.tables().contains(QLatin1String("Albums"))) {
         QSqlQuery createAlbums {
             "CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT,"
-            "album TEXT, artist TEXT, art TEXT)", db };
+            "album TEXT, artist TEXT, art TEXT, image BLOB)", db };
     }
 
     if(!db.tables().contains(QLatin1String("Songs"))) {
@@ -159,4 +160,13 @@ void MusicDatabase::addAlbum(const Album &album)
         addAlbumQuery.bindValue(":art", album.art());
         addAlbumQuery.exec();
     }
+}
+
+void MusicDatabase::addArtworkToAlbum(const Album& album, QByteArray artwork) {
+    QSqlQuery addArtQuery;
+    addArtQuery.prepare("UPDATE Albums SET image = :image WHERE (artist = :artist AND album = :album)");
+    addArtQuery.bindValue(":artist", album.artist());
+    addArtQuery.bindValue(":album", album.title());
+    addArtQuery.bindValue(":image", artwork);
+    addArtQuery.exec();
 }

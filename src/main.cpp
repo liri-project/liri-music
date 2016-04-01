@@ -66,6 +66,7 @@ int main(int argc, char *argv[]){
     QObject::connect(&scanner, &MusicScanner::foundSong, &db, &MusicDatabase::addSong);
     qRegisterMetaType<Album>();
     QObject::connect(&scanner, &MusicScanner::foundAlbum, &albumModel, &AlbumModel::addAlbum);
+    QObject::connect(&scanner, &MusicScanner::foundAlbumArt, &db, &MusicDatabase::addArtworkToAlbum);
 
     QThread t;
     scanner.moveToThread(&t);
