@@ -30,6 +30,7 @@ public:
     QString artist() const;
     QString art() const;
     QList<QObject*> getSong();
+
 };
 
 Q_DECLARE_METATYPE(Album);

@@ -4,6 +4,8 @@
 #include <QAbstractListModel>
 #include <QModelIndex>
 
+#include "album.h"
+
 class AlbumModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -18,6 +20,9 @@ public:
 
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
+
+public slots:
+    void addAlbum(const Album &album);
 
 protected:
     QHash<int, QByteArray> roleNames() const;
