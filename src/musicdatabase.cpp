@@ -170,3 +170,12 @@ void MusicDatabase::addArtworkToAlbum(const Album& album, QByteArray artwork) {
     addArtQuery.bindValue(":image", artwork);
     addArtQuery.exec();
 }
+
+QByteArray MusicDatabase::getArt(const QString& art) {
+    QSqlQuery getArtQuery;
+    getArtQuery.prepare("SELECT image FROM Albums WHERE art = :art");
+    getArtQuery.bindValue(":art", art);
+    getArtQuery.exec();
+    getArtQuery.first();
+    return getArtQuery.value(0).toByteArray();
+}

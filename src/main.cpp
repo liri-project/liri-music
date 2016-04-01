@@ -34,6 +34,7 @@
 #include "musicscanner.h"
 #include "albummodel.h"
 #include <QGst/Init>
+#include "albumartprovider.h"
 
 int main(int argc, char *argv[]){
     QGuiApplication app(argc, argv);
@@ -60,6 +61,7 @@ int main(int argc, char *argv[]){
     engine.rootContext()->setContextProperty("allSongObjects", QVariant::fromValue(MusicDatabase::get().getAllSongs()));
     engine.rootContext()->setContextProperty("allArtists", QVariant::fromValue(MusicDatabase::get().getAllArtists()));
     engine.rootContext()->setContextProperty("albumModel", &albumModel);
+    engine.addImageProvider("art", new AlbumArtProvider());
 
     MusicScanner scanner {};
     MusicDatabase& db = MusicDatabase::get();

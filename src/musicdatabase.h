@@ -30,6 +30,7 @@ public:
     QList<SongObject> getAllSongs();
 
     QString getMusicFolder();
+    QByteArray getArt(const QString&);
 public slots:
     void addSong(const SongObject&);
     void addAlbum(const Album&album);
