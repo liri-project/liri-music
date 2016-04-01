@@ -1,9 +1,9 @@
-#ifndef SONG_OBJECT_MAIN
-#define SONG_OBJECT_MAIN
+#ifndef LIRI_MUSIC_SONG_H
+#define LIRI_MUSIC_SONG_H
 
 #include <QObject>
 
-class SongObject : public QObject
+class Song : public QObject
 {
     Q_OBJECT
 
@@ -19,11 +19,11 @@ class SongObject : public QObject
     QString m_art;
 
 public:
-    SongObject();
-    explicit SongObject(const QString &path, const QString &title, const QString &album, const QString &artist, const QString &art); 
-    SongObject(const SongObject&);
+    Song();
+    explicit Song(const QString &path, const QString &title, const QString &album, const QString &artist, const QString &art); 
+    Song(const Song&);
 
-    SongObject& operator=(const SongObject&);
+    Song& operator=(const Song&);
 
     QString path() const;
     QString title() const;
@@ -32,6 +32,6 @@ public:
     QString art() const;
 };
 
-Q_DECLARE_METATYPE(SongObject)
+Q_DECLARE_METATYPE(Song)
 
 #endif // SONG_OBJECT_MAIN

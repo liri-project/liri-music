@@ -5,7 +5,7 @@
 #include <QFileSystemWatcher>
 #include <QGst/Discoverer>
 #include <QGlib/Connect>
-#include "songobject.h"
+#include "song.h"
 #include "album.h"
 
 class QDir;
@@ -21,7 +21,7 @@ public slots:
     void stop();
 
 signals:
-    void foundSong(const SongObject&);
+    void foundSong(const Song&);
     void foundAlbum(const Album &);
     void foundAlbumArt(const Album&, QByteArray art);
 

@@ -62,19 +62,19 @@ QList<Album> MusicDatabase::getAllAlbums() {
     return albumList;
 }
 
-QList<ArtistObject> MusicDatabase::getAllArtists() {
-    QList<ArtistObject> artistList;
+QList<Artist> MusicDatabase::getAllArtists() {
+    QList<Artist> artistList;
     QSqlQuery artistsQuery("SELECT * FROM Artists", db);
 
     while(artistsQuery.next()) {
-        artistList.push_back(ArtistObject { artistsQuery.value(1).toString() });
+        artistList.push_back(Artist { artistsQuery.value(1).toString() });
     }
 
     return artistList;
 }
 
-QList<SongObject> MusicDatabase::getAllSongs() {
-    QList<SongObject> songList;
+QList<Song> MusicDatabase::getAllSongs() {
+    QList<Song> songList;
 
     QSqlQuery songsQuery("SELECT * FROM Songs");
     while(songsQuery.next()) {
@@ -84,13 +84,13 @@ QList<SongObject> MusicDatabase::getAllSongs() {
         QString artist = songsQuery.value(3).toString();
         QString art = songsQuery.value(5).toString();
 
-        songList.push_back(SongObject { path, title, album, artist, art });
+        songList.push_back(Song { path, title, album, artist, art });
     }
 
     return songList;
 }
 
-void MusicDatabase::addArtist(const ArtistObject& artist) {
+void MusicDatabase::addArtist(const Artist& artist) {
     QSqlQuery artistExistsQuery;
     artistExistsQuery.prepare("SELECT COUNT(artist) AS artistCount WHERE artist = :artist");
     artistExistsQuery.bindValue(":artist", artist.artist());
@@ -128,7 +128,7 @@ void MusicDatabase::setMusicFolder(const QString& folder) {
     emit musicFolderChanged(folder);
 }
 
-void MusicDatabase::addSong(const SongObject& song) {
+void MusicDatabase::addSong(const Song& song) {
 
     addAlbum(Album{song.album(), song.artist(), song.art()});
     //Check if the songs already exists in DB.

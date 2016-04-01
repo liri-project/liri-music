@@ -1,33 +1,33 @@
-#include "artistobject.h"
-#include "moc_artistobject.cpp"
+#include "artist.h"
+#include "moc_artist.cpp"
 
 #include <QVariant>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 
-#include "songobject.h"
+#include "song.h"
 
-ArtistObject::ArtistObject() :
+Artist::Artist() :
     QObject() {
 }
 
-ArtistObject::ArtistObject(const QString& artist) :
+Artist::Artist(const QString& artist) :
     QObject(),
     m_artist(artist)
 {
 }
 
-ArtistObject::ArtistObject(const ArtistObject& other) :
+Artist::Artist(const Artist& other) :
     QObject(),
     m_artist(other.m_artist) {
 }
 
-ArtistObject& ArtistObject::operator=(const ArtistObject& other) {
+Artist& Artist::operator=(const Artist& other) {
     m_artist = other.m_artist;
     return *this;
 }
 
-QList<QObject*> ArtistObject::getSong() const {
+QList<QObject*> Artist::getSong() const {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setHostName("localhot");
     db.setDatabaseName("vinylmusic");
@@ -44,13 +44,13 @@ QList<QObject*> ArtistObject::getSong() const {
                 QString artist = getSongs.value(3).toString();
                 QString art = getSongs.value(5).toString();
 
-                songList.append(new SongObject(path, title, album, artist, art));
+                songList.append(new Song(path, title, album, artist, art));
             }
         }
     }
     return songList;
 }
 
-QString ArtistObject::artist() const {
+QString Artist::artist() const {
     return m_artist;
 }

@@ -43,7 +43,7 @@ void MusicScanner::scan(const QDir& dir, QGst::DiscovererPtr& discoverer) {
         }
         else {
             QGst::DiscovererInfoPtr info = discoverer->discoverUri(QUrl::fromLocalFile(entry.absoluteFilePath()).toEncoded());
-            SongObject song { info->uri().toLocalFile(), info->tags().title(), info->tags().tagValue("album").toString(), info->tags().artist(), "placeholder" };
+            Song song { info->uri().toLocalFile(), info->tags().title(), info->tags().tagValue("album").toString(), info->tags().artist(), "placeholder" };
             Album album { song.album(), song.artist(), song.art() };
             emit foundSong(song);
             emit foundAlbum(album);

@@ -1,11 +1,11 @@
-#include "songobject.h"
-#include "moc_songobject.cpp"
+#include "song.h"
+#include "moc_song.cpp"
 
-SongObject::SongObject() :
+Song::Song() :
     QObject() {
 }
 
-SongObject::SongObject(const QString& path, const QString& title, const QString& album,
+Song::Song(const QString& path, const QString& title, const QString& album,
                        const QString& artist, const QString& art) :
     QObject(),
     m_path(path),
@@ -16,7 +16,7 @@ SongObject::SongObject(const QString& path, const QString& title, const QString&
 {
 }
 
-SongObject::SongObject(const SongObject& other) :
+Song::Song(const Song& other) :
     QObject(),
     m_path(other.m_path),
     m_title(other.m_title),
@@ -25,7 +25,7 @@ SongObject::SongObject(const SongObject& other) :
     m_art(other.m_art) {
 }
 
-SongObject& SongObject::operator=(const SongObject& other) {
+Song& Song::operator=(const Song& other) {
     m_path = other.m_path;
     m_title = other.m_title;
     m_album = other.m_album;
@@ -34,22 +34,22 @@ SongObject& SongObject::operator=(const SongObject& other) {
     return *this;
 }
 
-QString SongObject::path() const {
+QString Song::path() const {
     return m_path;
 }
 
-QString SongObject::title() const {
+QString Song::title() const {
     return m_title;
 }
 
-QString SongObject::album() const {
+QString Song::album() const {
     return m_album;
 }
 
-QString SongObject::artist() const {
+QString Song::artist() const {
     return m_artist;
 }
 
-QString SongObject::art() const {
+QString Song::art() const {
     return m_art;
 }

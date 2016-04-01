@@ -1,10 +1,10 @@
-#ifndef ARTISTOBJECT
-#define ARTISTOBJECT
+#ifndef LIRI_MUSIC_ARTIST_H
+#define LIRI_MUSIC_ARTIST_H
 
 #include <QObject>
 #include <QList>
 
-class ArtistObject : public QObject {
+class Artist : public QObject {
     Q_OBJECT
 
     Q_PROPERTY(QString artist READ artist CONSTANT)
@@ -13,18 +13,18 @@ class ArtistObject : public QObject {
     QString m_artist;
 
 public:
-    ArtistObject();
-    explicit ArtistObject(const QString &artist); 
-    ArtistObject(const ArtistObject&);
+    Artist();
+    explicit Artist(const QString &artist); 
+    Artist(const Artist&);
 
-    ArtistObject& operator=(const ArtistObject&);
+    Artist& operator=(const Artist&);
 
     QString artist() const;
     QList<QObject*> getSong() const;
 
 };
 
-Q_DECLARE_METATYPE(ArtistObject)
+Q_DECLARE_METATYPE(Artist)
 
 #endif // ARTISTOBJECT
 

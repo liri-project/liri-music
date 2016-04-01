@@ -3,12 +3,10 @@ set(CMAKE_AUTOMOC ON)
 
 set(liri_vinyl_SOURCES
   main.cpp
-  utilities.cpp
-  songobject.cpp
+  song.cpp
   album.cpp
   albummodel.cpp
-  artistobject.cpp
-  musicfolders.cpp
+  artist.cpp
   musicdatabase.cpp
   musicscanner.cpp
   albumartprovider.cpp

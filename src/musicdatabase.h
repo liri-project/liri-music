@@ -7,8 +7,8 @@
 #include <exception>
 
 #include "album.h"
-#include "artistobject.h"
-#include "songobject.h"
+#include "artist.h"
+#include "song.h"
 
 class MusicDatabase : public QObject {
     Q_OBJECT
@@ -26,15 +26,15 @@ public:
     static MusicDatabase& get();
 public:
     QList<Album> getAllAlbums();
-    QList<ArtistObject> getAllArtists();
-    QList<SongObject> getAllSongs();
+    QList<Artist> getAllArtists();
+    QList<Song> getAllSongs();
 
     QString getMusicFolder();
     QByteArray getArt(const QString&);
 public slots:
-    void addSong(const SongObject&);
+    void addSong(const Song&);
     void addAlbum(const Album&album);
-    void addArtist(const ArtistObject&);
+    void addArtist(const Artist&);
     void setMusicFolder(const QString&);
     void addArtworkToAlbum(const Album&, QByteArray);
 signals:
