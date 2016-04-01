@@ -70,11 +70,14 @@ int main(int argc, char *argv[]){
     QThread t;
     scanner.moveToThread(&t);
     QObject::connect(&t, &QThread::started, &scanner, &MusicScanner::startScan);
+    QObject::connect(qApp, &QCoreApplication::aboutToQuit, &scanner, &MusicScanner::stop);
     t.start();
 
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 
-    return app.exec();
+    int retval = app.exec();
+    t.wait();
+    return retval;
 }
 
 
