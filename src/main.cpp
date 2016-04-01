@@ -1,42 +1,20 @@
+#include <QFileInfo>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include <QtQml/QQmlPropertyMap>
-#include <QString>
-#include <iostream>
-#include <iomanip>
-#include <stdio.h>
-#include <stdlib.h>
-#include <taglib/taglib.h>
-#include <taglib/tag.h>
-#include <taglib/fileref.h>
-#include <taglib/taglib_config.h>
-#include <taglib/tpropertymap.h>
-#include <qdebug.h>
-#include <qqml.h>
-#include <QQuickView>
-#include <QDateTime>
 #include <QQmlContext>
-#include <QFileInfo>
-#include <QDir>
-#include <QtSql/QSql>
-#include <QtSql/QSqlDatabase>
-#include <QtSql/QSqlQuery>
-#include <QList>
-#include <QObject>
-#include "album.h"
-#include "artistobject.h"
+#include <QQuickView>
 #include <QStandardPaths>
-#include "songobject.h"
-#include <unistd.h>
-#include "musicfolders.h"
-#include "utilities.h"
+#include <QString>
+#include <QThread>
+#include <QGst/Init>
+#include "album.h"
+#include "albummodel.h"
 #include "musicdatabase.h"
 #include "musicscanner.h"
-#include "albummodel.h"
-#include <QGst/Init>
 #include "albumartprovider.h"
 
 int main(int argc, char *argv[]){
+    qRegisterMetaType<Album>();
     QGuiApplication app(argc, argv);
     app.setApplicationName("LiriMusic");
     QQmlApplicationEngine engine;
@@ -66,7 +44,6 @@ int main(int argc, char *argv[]){
     MusicScanner scanner {};
     MusicDatabase& db = MusicDatabase::get();
     QObject::connect(&scanner, &MusicScanner::foundSong, &db, &MusicDatabase::addSong);
-    qRegisterMetaType<Album>();
     QObject::connect(&scanner, &MusicScanner::foundAlbum, &albumModel, &AlbumModel::addAlbum);
     QObject::connect(&scanner, &MusicScanner::foundAlbumArt, &db, &MusicDatabase::addArtworkToAlbum);
 

@@ -49,7 +49,7 @@ QList<QObject*> Album::getSong() {
                 QString artist = getSongs.value(3).toString();
                 QString art = getSongs.value(5).toString();
 
-                songList.append(new SongObject(path, title, album, artist, art));
+                songList.append(new Song(path, title, album, artist, art));
             }
         }
     }
