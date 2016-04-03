@@ -1,5 +1,5 @@
 import QtQuick 2.4
-import Material 0.1
+import Material 0.2
 import Material.ListItems 0.1 as ListItem
 import QtMultimedia 5.5
 import Qt.labs.folderlistmodel 2.1
@@ -369,19 +369,18 @@ ApplicationWindow {
     ]
 
     property var basicComponents: [
-            "Button", "CheckBox", "Progress Bar", "Radio Button",
-            "Slider", "Switch", "TextField"
+            "Home", "Profile", "Discover", "Settings"
     ]
 
     property var compoundComponents: [
-            "Bottom Sheet", "Dialog", "Forms", "List Items", "Page Stack", "Time Picker", "Date Picker"
+            "Artists"
     ]
 
-    property var sections: [ sidebar ]
+    property var sections: [ sidebar, basicComponents, compoundComponents ]
 
-    property var sectionTitles: []
+    property var sectionTitles: [ "Music", "Community", "Storage"]
 
-    property string selectedComponent: sidebar[0]
+    property string selectedComponent: sidebar[0][0]
 
     function getNextTrack(){
 
@@ -579,12 +578,23 @@ ApplicationWindow {
         example.setSource(source);
     }
 
-    initialPage: Page {
+    initialPage: TabbedPage {
+
+
         id: page
         visible: true
 
-        title: "Liri Vinyl"
+        title: "Liri Music"
 
+
+
+        Rectangle {
+            height:200
+            width:parent
+            color: theme.primaryColor
+
+
+         }
 
         actionBar.maxActionCount: navDrawer.enabled ? 3 : 4
 
@@ -660,51 +670,67 @@ ApplicationWindow {
 
 
                             Repeater {
-                                model: modelData
+                                                    model: sections
 
-                                delegate: ListItem.Subtitled{
+                                                    delegate: Column {
+                                                        width: parent.width
 
-                                    text: modelData
-                                    selected: modelData == selectedComponent
-                                    action: IconButton {
+                                                        ListItem.Subheader {
+                                                            text: sectionTitles[index]
+                                                        }
 
-                                            iconName: {
-                                                if(modelData == 'Albums'){
-                                                return 'av/album'
-                                                }else if(modelData == 'Artists'){
-                                                    return 'social/person'
-                                                }else if(modelData == 'All Music'){
-                                                    return 'av/queue_music'
-                                                }else if(modelData == 'Streams'){
-                                                    return 'social/public'
-                                                }else if(modelData == 'Settings'){
-                                                    return 'action/settings'
+                                                        Repeater {
+                                                            model: modelData
+                                                            delegate: ListItem.Subtitled{
+
+                                                                text: modelData
+                                                                selected: modelData == selectedComponent
+                                                                action: IconButton {
+
+                                                                        iconName: {
+                                                                            if(modelData == 'Albums'){
+                                                                            return 'av/album'
+                                                                            }else if(modelData == 'Artists'){
+                                                                                return 'social/person'
+                                                                            }else if(modelData == 'All Music'){
+                                                                                return 'av/queue_music'
+                                                                            }else if(modelData == 'Streams'){
+                                                                                return 'social/public'
+                                                                            }else if(modelData == 'Settings'){
+                                                                                return 'action/settings'
+                                                                            }
+
+                                                                        }
+                                                                        anchors.topMargin: Units.dp(20)
+                                                                        height:Units.dp(36)
+                                                                        width:Units.dp(12)
+                                                                        anchors.horizontalCenter: parent.horizontalCenter
+
+                                                                }
+
+                                                                height:Units.dp(42)
+
+                                                                onClicked: {
+                                                                    Global.playedSongs = []
+                                                                    if(modelData == 'Profile'){
+                                                                        console.log("Loading profile route.")
+                                                                    }else{
+                                                                        selectedComponent = modelData
+                                                                    }
+                                                                    folderModel.folder = "file://" + homeDirectory
+                                                                    albumFolder.folder = "file://" + homeDirectory
+
+
+                                                                    if(allAlbums[0].title != "undefined"){
+                                                                       allAlbumsModel.model = allAlbums
+                                                                    }
+                                                                }
+
+                                                            }
+                                                        }
+                                                    }
                                                 }
 
-                                            }
-                                            anchors.topMargin: Units.dp(20)
-                                            height:Units.dp(36)
-                                            width:Units.dp(12)
-                                            anchors.horizontalCenter: parent.horizontalCenter
-
-                                    }
-
-                                    height:Units.dp(42)
-
-                                    onClicked: {
-                                        Global.playedSongs = []
-                                        selectedComponent = modelData
-                                        folderModel.folder = "file://" + homeDirectory
-                                        albumFolder.folder = "file://" + homeDirectory
-
-
-                                        if(allAlbums[0].title != "undefined"){
-                                           allAlbumsModel.model = allAlbums
-                                        }
-                                    }
-
-                                }
-                            }
                         }
                     }
                 }
@@ -712,14 +738,28 @@ ApplicationWindow {
         }
 
 
+        Repeater {
+                    model: !navDrawer.enabled ? sections : 0
+
+                    delegate: Tab {
+                        title: sectionTitles[index]
+
+                        property string selectedComponent: modelData[0]
+                        property var section: modelData
+
+                        sourceComponent: tabDelegate
+                    }
+                }
 
 
         Loader {
-            anchors.fill: parent
-            sourceComponent: tabDelegate
+            id: smallLoader
+                       anchors.fill: parent
+                       sourceComponent: tabDelegate
 
-            property var section: []
-            visible:true// navDrawer.enabled
+                       property var section: []
+                       visible: active
+                       active: false
         }
     }
 
@@ -850,7 +890,7 @@ ApplicationWindow {
                     width: parent.width
 
                     Repeater {
-                        model: sections[0]
+                        model: section
                         delegate: ListItem.Subtitled {
 
                             text: modelData
@@ -882,7 +922,12 @@ ApplicationWindow {
 
                             onClicked: {
                                 Global.playedSongs = []
+                                if(modelData == 'Profile'){
+                                 console.log("loading profile")
+                                }else{
+
                                 selectedComponent = modelData
+                                }
                                 folderModel.folder = "file://" + homeDirectory
                                 albumFolder.folder = "file://" + homeDirectory
                             }
