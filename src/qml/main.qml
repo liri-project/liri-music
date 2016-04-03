@@ -369,7 +369,7 @@ ApplicationWindow {
     ]
 
     property var basicComponents: [
-            "Home", "Profile", "Discover", "Settings"
+            "Activity", "Profile", "Messages", "Discover", "Settings"
     ]
 
     property var compoundComponents: [
@@ -908,6 +908,14 @@ ApplicationWindow {
                                             return 'social/public'
                                         }else if(modelData == 'Settings'){
                                             return 'action/settings'
+                                        }else if(modelData == 'Profile'){
+                                            return 'social/person'
+                                        }else if(modelData == 'Activity'){
+                                            return 'action/dashboard'
+                                        }else if(modelData == 'Discover'){
+                                            return 'action/language'
+                                        }else if(modelData == 'Messages'){
+                                            return 'communication/chat'
                                         }
 
                                     }

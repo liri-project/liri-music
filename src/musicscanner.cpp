@@ -50,19 +50,21 @@ void MusicScanner::scan(const QDir& dir, QGst::DiscovererPtr& discoverer) {
                 continue;
             }
 
-            Song song { info->uri().toLocalFile(), info->tags().title(), info->tags().tagValue("album").toString(), info->tags().artist(), "placeholder" };
-            Album album { song.album(), song.artist(), song.art() };
-            emit foundSong(song);
-            emit foundAlbum(album);
+            if(info->audioStreams().count() != 0){
+                Song song { info->uri().toLocalFile(), info->tags().title(), info->tags().tagValue("album").toString(), info->tags().artist(), "placeholder" };
+                Album album { song.album(), song.artist(), song.art() };
+                emit foundSong(song);
+                emit foundAlbum(album);
 
-            if(info->tags().image()) {
-                QGst::BufferPtr buffer = info->tags().image()->buffer();
-                // This is only necessary to keep the compile warning free
-                // Why QByteArray doesn't take a std::size_t is beyond me
-                int size = buffer->size() & std::numeric_limits<int>::max();
-                QByteArray outputBuffer { size, 0 };
-                buffer->extract(0, outputBuffer.data(), buffer->size());
-                emit foundAlbumArt(album, outputBuffer);
+                if(info->tags().image()) {
+                    QGst::BufferPtr buffer = info->tags().image()->buffer();
+                    // This is only necessary to keep the compile warning free
+                    // Why QByteArray doesn't take a std::size_t is beyond me
+                    int size = buffer->size() & std::numeric_limits<int>::max();
+                    QByteArray outputBuffer { size, 0 };
+                    buffer->extract(0, outputBuffer.data(), buffer->size());
+                    emit foundAlbumArt(album, outputBuffer);
+                }
             }
         }
     }

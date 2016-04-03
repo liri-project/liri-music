@@ -1,6 +1,8 @@
 #include "albummodel.h"
 #include "musicdatabase.h"
 #include "moc_albummodel.cpp"
+#include <stdio.h>
+#include <iostream>
 
 AlbumModel::AlbumModel(QObject *parent):
     QAbstractListModel(parent)
@@ -39,6 +41,7 @@ void AlbumModel::addAlbum(const Album &album)
 {
     emit beginInsertRows(QModelIndex(), rowCount(QModelIndex()), rowCount(QModelIndex()));
     MusicDatabase::get().addAlbum(album);
+    std::cout << "album is " << album.title().toStdString() << std::endl;
     emit endInsertRows();
 }
 
