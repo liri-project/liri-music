@@ -5,22 +5,15 @@ import Material.Extras 0.1
 import "../js/musicId.js" as Global
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
-import QtWebEngine 1.1
+import QtWebEngine 1.2
 
 
-Column {
-    anchors.fill: parent
-    id: browserContainer
-
-    Component {
-        id: ctn
         WebEngineView {
             id: webView
             anchors.fill: parent
-            url: "http://pointybracket.net/"
+            url: "http://localhost:3000/embed/"
             focus: true
 
         }
 
-    }
-}
+

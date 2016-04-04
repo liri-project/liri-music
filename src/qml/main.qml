@@ -650,7 +650,7 @@ ApplicationWindow {
             id: navDrawer
             visible:true
 
-            enabled: page.width < Units.dp(600)
+            enabled: selectedComponent == 'Activity' //page.width < Units.dp(600)
 
             Flickable {
                 anchors.fill: parent
@@ -884,7 +884,7 @@ ApplicationWindow {
             Sidebar {
                 id: sidebar
 
-                expanded: !navDrawer.enabled
+                expanded: !navDrawer.enabled && selectedComponent != 'Activity'
 
                 Column {
                     width: parent.width

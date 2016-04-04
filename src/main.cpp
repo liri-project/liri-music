@@ -7,6 +7,9 @@
 #include <QString>
 #include <QThread>
 #include <QGst/Init>
+#include <QtWebEngine>
+#include <QtWebEngine/qtwebengineglobal.h>
+#include <QtWebEngine/QtWebEngine>
 #include "album.h"
 #include "albummodel.h"
 #include "musicdatabase.h"
@@ -47,6 +50,7 @@ int main(int argc, char *argv[]){
     QObject::connect(&scanner, &MusicScanner::foundAlbum, &albumModel, &AlbumModel::addAlbum);
     QObject::connect(&scanner, &MusicScanner::foundAlbumArt, &db, &MusicDatabase::addArtworkToAlbum);
 
+    QtWebEngine::initialize();
     QThread t;
     scanner.moveToThread(&t);
     QObject::connect(&t, &QThread::started, &scanner, &MusicScanner::startScan);
