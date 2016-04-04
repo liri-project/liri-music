@@ -14,5 +14,6 @@
         <file>qml/loading.qml</file>
         <file>images/album.svg</file>
         <file>images/placeholder.png</file>
+        <file>qml/ActivityDemo.qml</file>
     </qresource>
 </RCC>
