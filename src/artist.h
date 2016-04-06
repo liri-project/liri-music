@@ -7,21 +7,23 @@
 class Artist : public QObject {
     Q_OBJECT
 
-    Q_PROPERTY(QString artist READ artist CONSTANT)
-    Q_PROPERTY(QList<QObject*> getSong READ getSong CONSTANT)
+    Q_PROPERTY(QString artist READ artist WRITE setArtist)
+    Q_PROPERTY(quint64 id READ id WRITE setId)
 
     QString m_artist;
-
+    quint64 m_id;
 public:
     Artist();
-    explicit Artist(const QString &artist); 
+    Artist(quint64, const QString &);
     Artist(const Artist&);
 
     Artist& operator=(const Artist&);
 
+    quint64 id() const;
     QString artist() const;
-    QList<QObject*> getSong() const;
 
+    void setId(quint64);
+    void setArtist(const QString&);
 };
 
 Q_DECLARE_METATYPE(Artist)

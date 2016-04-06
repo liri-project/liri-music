@@ -7,20 +7,23 @@ class Song : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString path READ path CONSTANT)
-    Q_PROPERTY(QString title READ title CONSTANT)
-    Q_PROPERTY(QString album READ album CONSTANT)
-    Q_PROPERTY(QString artist READ artist CONSTANT)
-    Q_PROPERTY(QString art READ art CONSTANT)
+    Q_PROPERTY(quint64 id READ id WRITE setId)
+    Q_PROPERTY(QString path READ path WRITE setPath)
+    Q_PROPERTY(QString title READ title WRITE setTitle)
+    Q_PROPERTY(QString album READ album WRITE setAlbum)
+    Q_PROPERTY(QString artist READ artist WRITE setArtist)
+    Q_PROPERTY(QString art READ art WRITE setArt)
+
     QString m_path;
     QString m_title;
     QString m_album;
     QString m_artist;
     QString m_art;
+    quint64 m_id;
 
 public:
     Song();
-    explicit Song(const QString &path, const QString &title, const QString &album, const QString &artist, const QString &art); 
+    explicit Song(quint64, const QString &path, const QString &title, const QString &album, const QString &artist, const QString &art);
     Song(const Song&);
 
     Song& operator=(const Song&);
@@ -30,6 +33,14 @@ public:
     QString album() const;
     QString artist() const;
     QString art() const;
+    quint64 id() const;
+
+    void setId(quint64);
+    void setPath(const QString& path);
+    void setTitle(const QString& title);
+    void setAlbum(const QString& album);
+    void setArtist(const QString& artist);
+    void setArt(const QString& art);
 };
 
 Q_DECLARE_METATYPE(Song)

@@ -51,7 +51,7 @@ void MusicScanner::scan(const QDir& dir, QGst::DiscovererPtr& discoverer) {
             }
 
             if(info->audioStreams().count() != 0){
-                Song song { info->uri().toLocalFile(), info->tags().title(), info->tags().tagValue("album").toString(), info->tags().artist(), "placeholder" };
+                Song song { 0, info->uri().toLocalFile(), info->tags().title(), info->tags().tagValue("album").toString(), info->tags().artist(), "placeholder" };
                 Album album { 0, song.album(), song.artist(), song.art() };
                 emit foundSong(song);
                 emit foundAlbum(album);

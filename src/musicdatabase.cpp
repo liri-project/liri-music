@@ -10,18 +10,48 @@
 #include <iostream>
 
 CREATE_TABLE(
-        Album, albums, "Albums",
-        (
-            (create, "CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT, album TEXT, artist TEXT, image BLOB)"),
-            (find, "SELECT * FROM Albums WHERE album = :album AND artist = :artist", (title, artist)),
-            (find_all, "SELECT * FROM Albums"),
-            (exists, "SELECT COUNT(id) FROM Albums WHERE id = :id", (id))
-        )
-        ,
-        ((id, quint64))
-        ((title, QString))
-        ((artist, QString))
-        ((art, QString))
+    Album, albums, "Albums",
+    (
+        (create, "CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT, album TEXT, artist TEXT, image BLOB)"),
+        (find, "SELECT * FROM Albums WHERE album = :album AND artist = :artist", (title, artist)),
+        (find_all, "SELECT * FROM Albums"),
+        (exists, "SELECT COUNT(id) FROM Albums WHERE id = :id", (id)),
+        (insert, "INSERT INTO Albums(album, artist, image) VALUES(:album, :artist, :image)", (title, artist, art))
+    )
+    ,
+    ((id, quint64))
+    ((title, QString))
+    ((artist, QString))
+    ((art, QString))
+)
+
+CREATE_TABLE(
+    Song, songs, "Songs",
+    (
+        (create, "CREATE TABLE IF NOT EXISTS Songs(id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT, title TEXT, artist TEXT, album TEXT, art TEXT)"),
+        (find, "SELECT * FROM Songs WHERE title = :title AND artist = :artist AND album = :album", (title, artist, album)),
+        (find_all, "SELECT * FROM Songs"),
+        (exists, "SELECT COUNT(id) FROM Songs WHERE id = :id", (id)),
+        (insert, "INSERT INTO Songs(path, title, artist, album, art) VALUES(:path, :title, :artist, :album)", (path, title, artist, album))
+    ),
+    ((id, quint64))
+    ((path, QString))
+    ((title, QString))
+    ((artist, QString))
+    ((album, QString))
+)
+
+CREATE_TABLE(
+    Artist, artists, "Artists",
+    (
+        (create, "CREATE TABLE IF NOT EXISTS Artists(id INTEGER PRIMARY KEY AUTOINCREMENT, artist TEXT"),
+        (find, "SELECT * FROM Artists WHERE artist = :artist", (artist)),
+        (find_all, "SELECT * FROM Artists"),
+        (exists, "SELECT COUNT(id) FROM Artists WHERE id = :id", (id)),
+        (insert, "INSERT INTO Artists(artist) VALUES(:artist)", (artist))
+    ),
+    ((id, quint64))
+    ((artist, QString))
 )
 
 MusicDatabase::MusicDatabase()
@@ -36,17 +66,8 @@ MusicDatabase::MusicDatabase()
         throw DatabaseNotFoundException {};
 
     database::makeTable<Album>(db);
-    if(!db.tables().contains(QLatin1String("Songs"))) {
-        QSqlQuery createSongs {
-            "CREATE TABLE IF NOT EXISTS Songs(id INTEGER PRIMARY KEY AUTOINCREMENT,"
-            "path TEXT, title TEXT, artist TEXT, album TEXT, art TEXT)", db };
-    }
-
-    if(!db.tables().contains(QLatin1String("Artists"))) {
-        QSqlQuery createArtists {
-            "CREATE TABLE IF NOT EXISTS Artists(id INTEGER PRIMARY KEY AUTOINCREMENT,"
-            "artist TEXT", db };
-    }
+    database::makeTable<Song>(db);
+    database::makeTable<Artist>(db);
 
     if(!db.tables().contains(QLatin1String("Settings"))) {
         QSqlQuery createSettings {
@@ -61,48 +82,20 @@ MusicDatabase& MusicDatabase::get() {
 }
 
 QList<Album> MusicDatabase::getAllAlbums() {
-    return database::getAll<Album>(db);
+    return database::findAll<Album>(db);
 }
 
 QList<Artist> MusicDatabase::getAllArtists() {
-    QList<Artist> artistList;
-    QSqlQuery artistsQuery("SELECT * FROM Artists", db);
-
-    while(artistsQuery.next()) {
-        artistList.push_back(Artist { artistsQuery.value(1).toString() });
-    }
-
-    return artistList;
+    return database::findAll<Artist>(db);
 }
 
 QList<Song> MusicDatabase::getAllSongs() {
-    QList<Song> songList;
-
-    QSqlQuery songsQuery("SELECT * FROM Songs");
-    while(songsQuery.next()) {
-        QString title = songsQuery.value(2).toString();
-        QString path = songsQuery.value(1).toString();
-        QString album = songsQuery.value(4).toString();
-        QString artist = songsQuery.value(3).toString();
-        QString art = songsQuery.value(5).toString();
-
-        songList.push_back(Song { path, title, album, artist, art });
-    }
-
-    return songList;
+    return database::findAll<Song>(db);
 }
 
 void MusicDatabase::addArtist(const Artist& artist) {
-    QSqlQuery artistExistsQuery;
-    artistExistsQuery.prepare("SELECT COUNT(artist) AS artistCount WHERE artist = :artist");
-    artistExistsQuery.bindValue(":artist", artist.artist());
-    artistExistsQuery.exec();
-    artistExistsQuery.next();
-    if(artistExistsQuery.value(1).toInt() == 0) {
-        QSqlQuery artistQuery;
-        artistQuery.prepare("INSERT INTO Artists (artist) VALUES(:artist)");
-        artistQuery.bindValue(":artist", artist.artist());
-        artistQuery.exec();
+    if(database::find(db, artist).size() == 0) {
+        database::insert(db, artist);
     }
 }
 
@@ -134,31 +127,14 @@ void MusicDatabase::addSong(const Song& song) {
 
     addAlbum(Album{ 0, song.album(), song.artist(), song.art()});
     //Check if the songs already exists in DB.
-    QSqlQuery songExistsQuery(QString("SELECT COUNT (*) FROM Songs WHERE artist = '%1' AND title = '%2'").arg(song.artist()).arg(song.title()), db);
-    songExistsQuery.next();
-    if(songExistsQuery.value(0).toInt() == 0)
-    {
-        QSqlQuery addSongQuery(db);
-        addSongQuery.prepare("INSERT INTO Songs(path, title, artist, album, art) VALUES (:path, :title, :artist, :album, :art)");
-        addSongQuery.bindValue(":path", song.path());
-        addSongQuery.bindValue(":title", song.title());
-        addSongQuery.bindValue(":artist", song.artist());
-        addSongQuery.bindValue(":album", song.album());
-        addSongQuery.bindValue(":art", song.art());
-        addSongQuery.exec();
-    }
+    if(database::find(db, song).size() == 0)
+        database::insert(db, song);
 }
 
 void MusicDatabase::addAlbum(const Album &album)
 {
     if(database::find(db, album).size() == 0) {
-        std::cout << "Inserting album." << std::endl;
-        QSqlQuery addAlbumQuery(db);
-        addAlbumQuery.prepare("INSERT INTO Albums(album, artist, image) VALUES (:title, :artist, :art)");
-        addAlbumQuery.bindValue(":title", album.title());
-        addAlbumQuery.bindValue(":artist", album.artist());
-        addAlbumQuery.bindValue(":art", album.art());
-        addAlbumQuery.exec();
+        database::insert(db, album);
     }
 }
 

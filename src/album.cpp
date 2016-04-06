@@ -52,27 +52,3 @@ void Album::setArtist(const QString &artist) {
 void Album::setArt(const QString &art) {
     m_art = art;
 }
-
-QList<QObject*> Album::getSong() {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setHostName("localhost");
-    db.setDatabaseName("vinylusic");
-    QList<QObject*> songList;
-
-    if(db.open()) {
-        QSqlQuery getSongs;
-        getSongs.prepare("Select * FROM Songs where album='"+ m_title +"'");
-        if(getSongs.exec()) {
-            while(getSongs.next()) {
-                QString title = getSongs.value(2).toString();
-                QString path = getSongs.value(1).toString();
-                QString album = getSongs.value(4).toString();
-                QString artist = getSongs.value(3).toString();
-                QString art = getSongs.value(5).toString();
-
-                songList.append(new Song(path, title, album, artist, art));
-            }
-        }
-    }
-    return songList;
-}

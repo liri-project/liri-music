@@ -5,7 +5,7 @@
 #include <boost/mpl/map.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/preprocessor.hpp>
-#include <iostream>
+
 namespace database
 {
     namespace queries {
@@ -13,6 +13,7 @@ namespace database
         struct find;
         struct find_all;
         struct exists;
+        struct insert;
     }
 
     namespace detail {
@@ -77,6 +78,7 @@ namespace database
         using create = detail::query<T, queries::create>;
         using find_all = detail::query<T, queries::find_all>;
         using exists = detail::query<T, queries::exists>;
+        using insert = detail::query<T, queries::insert>;
         using mapper = typename detail::mapper<T>::value;
     };
 
@@ -90,17 +92,13 @@ namespace database
 
     template<typename T>
     void makeTable(QSqlDatabase& db) {
-        std::cout << Table<T>::create::value << std::endl;
-        if(!db.tables().contains(Table<T>::name)) {
-            QSqlQuery create { Table<T>::create::value, db };
-        }
+        QSqlQuery create { Table<T>::create::value, db };
     }
 
     template<typename T>
-    auto getAll(QSqlDatabase& db)
+    auto findAll(QSqlDatabase& db)
         -> QList<T> {
         QList<T> items;
-        std::cout << Table<T>::find_all::value << std::endl;
         QSqlQuery q { Table<T>::find_all::value, db };
         while(q.next()) {
             items.push_back(map<T>(q));
@@ -126,7 +124,7 @@ namespace database
     template<typename T>
     bool exists(QSqlDatabase& db, T item) {
         QSqlQuery q;
-        q.prepare(Table<T>::exists::query);
+        q.prepare(Table<T>::exists::value);
         detail::query_binder<T> binder { q, item };
         boost::mpl::for_each<typename Table<T>::exists::params>(binder);
         q.exec();
@@ -134,6 +132,15 @@ namespace database
         if(q.value(0).toInt() != 0)
             return true;
         return false;
+    }
+
+    template<typename T>
+    void insert(QSqlDatabase& db, const T& item) {
+        QSqlQuery q;
+        q.prepare(Table<T>::insert::value);
+        detail::query_binder<T> binder { q, item };
+        boost::mpl::for_each<typename Table<T>::insert::params>(binder);
+        q.exec();
     }
 }
 
@@ -167,7 +174,7 @@ namespace database
 #define EQ_PRED(r, state) \
     BOOST_PP_NOT_EQUAL ( \
         BOOST_PP_TUPLE_ELEM(0, state), \
-        BOOST_PP_INC(BOOST_PP_TUPLE_ELEM(1, state)) \
+        BOOST_PP_TUPLE_ELEM(1, state) \
     ) \
 
 #define EQ_OP(r, state) \
@@ -214,7 +221,7 @@ namespace database
                     BOOST_PP_ENUM(BOOST_PP_SEQ_SIZE(mappings), EXPAND_MAPPINGS, (ns, mappings)) \
                 >; \
             }; \
-            BOOST_PP_FOR((0, BOOST_PP_TUPLE_SIZE(BOOST_PP_TUPLE_ELEM(0, queries)), queries, (class_name, ns)), \
+            BOOST_PP_FOR((0, BOOST_PP_TUPLE_SIZE(queries), queries, (class_name, ns)), \
                 EQ_PRED, EQ_OP, EXPAND_QUERIES) \
         } \
     }

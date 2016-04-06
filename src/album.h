@@ -15,7 +15,6 @@ class Album : public QObject {
     Q_PROPERTY(QString title READ title WRITE setTitle)
     Q_PROPERTY(QString artist READ artist WRITE setArtist)
     Q_PROPERTY(QString art READ art WRITE setArt)
-    Q_PROPERTY(QList<QObject*> getSong READ getSong)
 
     QString m_title;
     QString m_artist;
@@ -37,9 +36,6 @@ public:
     void setTitle(const QString&);
     void setArtist(const QString&);
     void setArt(const QString&);
-
-    QList<QObject*> getSong();
-
 };
 
 Q_DECLARE_METATYPE(Album);
