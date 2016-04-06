@@ -6,6 +6,23 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
+#include "database.h"
+#include <iostream>
+
+CREATE_TABLE(
+        Album, albums, "Albums",
+        (
+            (create, "CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT, album TEXT, artist TEXT, image BLOB)"),
+            (find, "SELECT * FROM Albums WHERE album = :album AND artist = :artist", (title, artist)),
+            (find_all, "SELECT * FROM Albums"),
+            (exists, "SELECT COUNT(id) FROM Albums WHERE id = :id", (id))
+        )
+        ,
+        ((id, quint64))
+        ((title, QString))
+        ((artist, QString))
+        ((art, QString))
+)
 
 MusicDatabase::MusicDatabase()
     : db { QSqlDatabase::addDatabase("QSQLITE") } {
@@ -18,12 +35,7 @@ MusicDatabase::MusicDatabase()
     if(!db.open())
         throw DatabaseNotFoundException {};
 
-    if(!db.tables().contains(QLatin1String("Albums"))) {
-        QSqlQuery createAlbums {
-            "CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT,"
-            "album TEXT, artist TEXT, art TEXT, image BLOB)", db };
-    }
-
+    database::makeTable<Album>(db);
     if(!db.tables().contains(QLatin1String("Songs"))) {
         QSqlQuery createSongs {
             "CREATE TABLE IF NOT EXISTS Songs(id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -49,17 +61,7 @@ MusicDatabase& MusicDatabase::get() {
 }
 
 QList<Album> MusicDatabase::getAllAlbums() {
-    QList<Album> albumList;
-
-    QSqlQuery albumsQuery("SELECT * FROM Albums", db);
-
-    while(albumsQuery.next()) {
-        QString album = albumsQuery.value(1).toString();
-        QString artist = albumsQuery.value(2).toString();
-        QString art = albumsQuery.value(3).toString();
-        albumList.push_back(Album {album, artist, art});
-    }
-    return albumList;
+    return database::getAll<Album>(db);
 }
 
 QList<Artist> MusicDatabase::getAllArtists() {
@@ -130,7 +132,7 @@ void MusicDatabase::setMusicFolder(const QString& folder) {
 
 void MusicDatabase::addSong(const Song& song) {
 
-    addAlbum(Album{song.album(), song.artist(), song.art()});
+    addAlbum(Album{ 0, song.album(), song.artist(), song.art()});
     //Check if the songs already exists in DB.
     QSqlQuery songExistsQuery(QString("SELECT COUNT (*) FROM Songs WHERE artist = '%1' AND title = '%2'").arg(song.artist()).arg(song.title()), db);
     songExistsQuery.next();
@@ -149,12 +151,10 @@ void MusicDatabase::addSong(const Song& song) {
 
 void MusicDatabase::addAlbum(const Album &album)
 {
-    QSqlQuery albumExistsQuery(QString("SELECT COUNT (*) as albumCount FROM Albums WHERE artist = '%1' AND album = '%2'").arg(album.artist()).arg(album.title()), db);
-    albumExistsQuery.next();
-    if(albumExistsQuery.value(0).toInt() == 0)
-    {
+    if(database::find(db, album).size() == 0) {
+        std::cout << "Inserting album." << std::endl;
         QSqlQuery addAlbumQuery(db);
-        addAlbumQuery.prepare("INSERT INTO Albums(album, artist, art) VALUES (:title, :artist, :art)");
+        addAlbumQuery.prepare("INSERT INTO Albums(album, artist, image) VALUES (:title, :artist, :art)");
         addAlbumQuery.bindValue(":title", album.title());
         addAlbumQuery.bindValue(":artist", album.artist());
         addAlbumQuery.bindValue(":art", album.art());

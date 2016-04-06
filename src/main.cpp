@@ -1,11 +1,13 @@
 #include <QFileInfo>
-#include <QGuiApplication>
+//#include <QGuiApplication>
+#include <QtWidgets/QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickView>
 #include <QStandardPaths>
 #include <QString>
 #include <QThread>
+#include <QtWebEngine/QtWebEngine>
 #include <QGst/Init>
 #include <QtWebEngine>
 #include <QtWebEngine/qtwebengineglobal.h>
@@ -17,8 +19,10 @@
 #include "albumartprovider.h"
 
 int main(int argc, char *argv[]){
+    //QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
+    QtWebEngine::initialize();
     qRegisterMetaType<Album>();
-    QGuiApplication app(argc, argv);
     app.setApplicationName("LiriMusic");
     QQmlApplicationEngine engine;
 
