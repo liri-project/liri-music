@@ -6,53 +6,8 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
-#include "database.h"
 #include <iostream>
-
-CREATE_TABLE(
-    Album, albums, "Albums",
-    (
-        (create, "CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT, album TEXT, artist TEXT, image BLOB)"),
-        (find, "SELECT * FROM Albums WHERE album = :album AND artist = :artist", (title, artist)),
-        (find_all, "SELECT * FROM Albums"),
-        (exists, "SELECT COUNT(id) FROM Albums WHERE id = :id", (id)),
-        (insert, "INSERT INTO Albums(album, artist, image) VALUES(:album, :artist, :image)", (title, artist, art))
-    )
-    ,
-    ((id, quint64))
-    ((title, QString))
-    ((artist, QString))
-    ((art, QString))
-)
-
-CREATE_TABLE(
-    Song, songs, "Songs",
-    (
-        (create, "CREATE TABLE IF NOT EXISTS Songs(id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT, title TEXT, artist TEXT, album TEXT, art TEXT)"),
-        (find, "SELECT * FROM Songs WHERE title = :title AND artist = :artist AND album = :album", (title, artist, album)),
-        (find_all, "SELECT * FROM Songs"),
-        (exists, "SELECT COUNT(id) FROM Songs WHERE id = :id", (id)),
-        (insert, "INSERT INTO Songs(path, title, artist, album, art) VALUES(:path, :title, :artist, :album)", (path, title, artist, album))
-    ),
-    ((id, quint64))
-    ((path, QString))
-    ((title, QString))
-    ((artist, QString))
-    ((album, QString))
-)
-
-CREATE_TABLE(
-    Artist, artists, "Artists",
-    (
-        (create, "CREATE TABLE IF NOT EXISTS Artists(id INTEGER PRIMARY KEY AUTOINCREMENT, artist TEXT"),
-        (find, "SELECT * FROM Artists WHERE artist = :artist", (artist)),
-        (find_all, "SELECT * FROM Artists"),
-        (exists, "SELECT COUNT(id) FROM Artists WHERE id = :id", (id)),
-        (insert, "INSERT INTO Artists(artist) VALUES(:artist)", (artist))
-    ),
-    ((id, quint64))
-    ((artist, QString))
-)
+#include "database.h"
 
 MusicDatabase::MusicDatabase()
     : db { QSqlDatabase::addDatabase("QSQLITE") } {
@@ -68,12 +23,7 @@ MusicDatabase::MusicDatabase()
     database::makeTable<Album>(db);
     database::makeTable<Song>(db);
     database::makeTable<Artist>(db);
-
-    if(!db.tables().contains(QLatin1String("Settings"))) {
-        QSqlQuery createSettings {
-            "CREATE TABLE IF NOT EXISTS Settings(id INTEGER PRIMARY KEY AUTOINCREMENT,"
-            "setting TEXT, value TEXT)", db };
-    }
+    database::makeTable<Setting>(db);
 }
 
 MusicDatabase& MusicDatabase::get() {
@@ -100,18 +50,13 @@ void MusicDatabase::addArtist(const Artist& artist) {
 }
 
 QString MusicDatabase::getMusicFolder() {
-    QSqlQuery getFolderQuery;
-    getFolderQuery.prepare("SELECT * FROM Settings where setting='folder'");
-    getFolderQuery.exec();
-    if(getFolderQuery.first()) {
-        return getFolderQuery.value(2).toString();
+    QList<Setting> currentSettings = database::find_by<database::settings::setting>(db, "folder");
+    if(currentSettings.size() == 0) {
+        Setting setting { 0, "folder", QStandardPaths::standardLocations(QStandardPaths::MusicLocation).first() };
+        database::insert(db, setting);
+        return setting.value();
     } else {
-        QSqlQuery createFolderQuery;
-        QString initialFolder = QStandardPaths::standardLocations(QStandardPaths::MusicLocation).first();
-        createFolderQuery.prepare("INSERT INTO Settings(setting, value) VALUES('folder', :value)");
-        createFolderQuery.bindValue(":value", initialFolder);
-        createFolderQuery.exec();
-        return initialFolder;
+        return currentSettings.front().value();
     }
 }
 

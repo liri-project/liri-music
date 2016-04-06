@@ -9,6 +9,7 @@
 #include "album.h"
 #include "artist.h"
 #include "song.h"
+#include "settings.h"
 
 class MusicDatabase : public QObject {
     Q_OBJECT

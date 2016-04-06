@@ -33,6 +33,18 @@ namespace database
         struct mapper {};
 
         template<typename T>
+        struct table_name {};
+
+        template<typename T>
+        struct field_type {};
+
+        template<typename T>
+        struct result_type {};
+
+        template<typename T>
+        struct field_name {};
+
+        template<typename T>
         struct query_binder {
             query_binder(QSqlQuery& q, const T& item)
                 : query(q), index(0), item(item) {
@@ -136,11 +148,24 @@ namespace database
 
     template<typename T>
     void insert(QSqlDatabase& db, const T& item) {
-        QSqlQuery q;
+        QSqlQuery q { db };
         q.prepare(Table<T>::insert::value);
         detail::query_binder<T> binder { q, item };
         boost::mpl::for_each<typename Table<T>::insert::params>(binder);
         q.exec();
+    }
+
+    template<typename T>
+    QList<typename database::detail::result_type<T>::value> find_by(QSqlDatabase& db, const typename database::detail::field_type<T>::value & value) {
+        QSqlQuery q { db };
+        q.prepare(QString("SELECT * FROM ") + database::detail::table_name<T>::value + " WHERE "
+                  + database::detail::field_name<T>::value + " = :value");
+        q.bindValue(":value", value);
+        q.exec();
+        QList<typename database::detail::result_type<T>::value> items;
+        while(q.next())
+            items.push_back(map<typename detail::result_type<T>::value>(q));
+        return items;
     }
 }
 
@@ -164,6 +189,30 @@ namespace database
         static BOOST_PP_TUPLE_ELEM(1, elem) apply(BOOST_PP_TUPLE_ELEM(0, data)& a, const BOOST_PP_TUPLE_ELEM(1, elem)& value) { \
             a.setProperty(BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(0, elem)), value); \
         } \
+    };
+
+#define EXPAND_FIELD_TYPES(r, data, elem) \
+    template<> \
+    struct field_type<database :: BOOST_PP_TUPLE_ELEM(1, data) :: BOOST_PP_TUPLE_ELEM(0, elem)> { \
+        using value = BOOST_PP_TUPLE_ELEM(1, elem); \
+    };
+
+#define EXPAND_TABLES(r, data, elem) \
+    template<> \
+    struct table_name<database :: BOOST_PP_TUPLE_ELEM(1, data) :: BOOST_PP_TUPLE_ELEM(0, elem)> { \
+        static constexpr const char* value = BOOST_PP_TUPLE_ELEM(2, data); \
+    };
+
+#define EXPAND_FIELD_NAMES(r, data, elem) \
+    template<> \
+    struct field_name<database :: BOOST_PP_TUPLE_ELEM(1, data) :: BOOST_PP_TUPLE_ELEM(0, elem)> { \
+        static constexpr const char* value = BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(0, elem)); \
+    };
+
+#define EXPAND_RESULT_TYPES(r, data, elem) \
+    template<> \
+    struct result_type<database :: BOOST_PP_TUPLE_ELEM(1, data) :: BOOST_PP_TUPLE_ELEM(0, elem)> { \
+        using value = BOOST_PP_TUPLE_ELEM(0, data); \
     };
 
 #define EXPAND_MAPPINGS(index, count, mappings) \
@@ -215,6 +264,10 @@ namespace database
             }; \
             BOOST_PP_SEQ_FOR_EACH(EXPAND_GETTERS, (class_name, ns), mappings) \
             BOOST_PP_SEQ_FOR_EACH(EXPAND_SETTERS, (class_name, ns), mappings) \
+            BOOST_PP_SEQ_FOR_EACH(EXPAND_TABLES, (class_name, ns, title), mappings) \
+            BOOST_PP_SEQ_FOR_EACH(EXPAND_FIELD_TYPES, (class_name, ns), mappings) \
+            BOOST_PP_SEQ_FOR_EACH(EXPAND_FIELD_NAMES, (class_name, ns), mappings) \
+            BOOST_PP_SEQ_FOR_EACH(EXPAND_RESULT_TYPES, (class_name, ns), mappings) \
             template<> \
             struct mapper<class_name> { \
                 using value  = boost::mpl::map< \
@@ -225,4 +278,64 @@ namespace database
                 EQ_PRED, EQ_OP, EXPAND_QUERIES) \
         } \
     }
+
+CREATE_TABLE(
+    Album, albums, "Albums",
+    (
+        (create, "CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT, album TEXT, artist TEXT, image BLOB)"),
+        (find, "SELECT * FROM Albums WHERE album = :album AND artist = :artist", (title, artist)),
+        (find_all, "SELECT * FROM Albums"),
+        (exists, "SELECT COUNT(id) FROM Albums WHERE id = :id", (id)),
+        (insert, "INSERT INTO Albums(album, artist, image) VALUES(:album, :artist, :image)", (title, artist, art))
+    )
+    ,
+    ((id, quint64))
+    ((title, QString))
+    ((artist, QString))
+    ((art, QString))
+)
+
+CREATE_TABLE(
+    Song, songs, "Songs",
+    (
+        (create, "CREATE TABLE IF NOT EXISTS Songs(id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT, title TEXT, artist TEXT, album TEXT, art TEXT)"),
+        (find, "SELECT * FROM Songs WHERE title = :title AND artist = :artist AND album = :album", (title, artist, album)),
+        (find_all, "SELECT * FROM Songs"),
+        (exists, "SELECT COUNT(id) FROM Songs WHERE id = :id", (id)),
+        (insert, "INSERT INTO Songs(path, title, artist, album, art) VALUES(:path, :title, :artist, :album)", (path, title, artist, album))
+    ),
+    ((id, quint64))
+    ((path, QString))
+    ((title, QString))
+    ((artist, QString))
+    ((album, QString))
+)
+
+CREATE_TABLE(
+    Artist, artists, "Artists",
+    (
+        (create, "CREATE TABLE IF NOT EXISTS Artists(id INTEGER PRIMARY KEY AUTOINCREMENT, artist TEXT"),
+        (find, "SELECT * FROM Artists WHERE artist = :artist", (artist)),
+        (find_all, "SELECT * FROM Artists"),
+        (exists, "SELECT COUNT(id) FROM Artists WHERE id = :id", (id)),
+        (insert, "INSERT INTO Artists(artist) VALUES(:artist)", (artist))
+    ),
+    ((id, quint64))
+    ((artist, QString))
+)
+
+CREATE_TABLE(
+    Setting, settings, "Settings",
+    (
+        (create, "CREATE TABLE IF NOT EXISTS Settings(id INTEGER PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)"),
+        (find, "SELECT * FROM Settings WHERE setting = :setting AND value = :value", (setting, value)),
+        (find_all, "SELECT * FROM Settings"),
+        (exists, "SELECT COUNT(id) FROM Settings WHERE id = : id", (id)),
+        (insert, "INSERT INTO Settings(setting, value) VALUES(:setting, :value)", (setting, value))
+    ),
+    ((id, quint64))
+    ((setting, QString))
+    ((value, QString))
+)
+
 #endif

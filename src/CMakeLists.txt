@@ -10,6 +10,7 @@ set(liri_vinyl_SOURCES
   musicdatabase.cpp
   musicscanner.cpp
   albumartprovider.cpp
+  settings.cpp
 )
 
 set(liri_vinyl_HEADERS
@@ -21,6 +22,7 @@ set(liri_vinyl_HEADERS
     musicdatabase.h
     musicscanner.h
     song.h
+    settings.h
 )
 
 qt5_add_resources(liri_vinyl_RESOURCES qml.qrc)
