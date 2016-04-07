@@ -167,6 +167,106 @@ namespace database
             items.push_back(map<typename detail::result_type<T>::value>(q));
         return items;
     }
+
+    template<typename T>
+    void find_by_many_build_query(QString& query, const typename database::detail::field_type<T>::value& t) {
+        query += QString(" AND ") + database::detail::field_name<T>::value + " = :" + database::detail::field_name<T>::value;
+    }
+
+    template<typename T, typename... Ts>
+    void find_by_many_build_query(QString& query,
+                                  const typename database::detail::field_type<T>::value& t,
+                                  const typename database::detail::field_type<Ts>::value&... ts) {
+        query += QString(" AND ") + database::detail::field_name<T>::value + " = :" + database::detail::field_name<T>::value;
+        find_by_many_build_query<Ts...>(query, ts...);
+    }
+
+    template<typename T>
+    void find_by_many_bind_values(QSqlQuery& q, const typename database::detail::field_type<T>::value& t) {
+        q.bindValue(QString(":") + database::detail::field_name<T>::value, t);
+    }
+
+    template<typename T, typename... Ts>
+    void find_by_many_bind_values(QSqlQuery& q,
+                                  const typename database::detail::field_type<T>::value& t,
+                                  const typename database::detail::field_type<Ts>::value&... ts) {
+        q.bindValue(QString(":") + database::detail::field_name<T>::value, t);
+        find_by_many_bind_values<Ts...>(q, ts...);
+    }
+
+    template<typename T, typename... Ts>
+    QList<typename database::detail::result_type<T>::value>
+    find_by_many(QSqlDatabase& db,
+                 const typename database::detail::field_type<T>::value& value,
+                 const typename database::detail::field_type<Ts>::value&... ts) {
+        QSqlQuery q { db };
+        QString query = QString("SELECT * FROM ") + database::detail::table_name<T>::value + " WHERE "
+                + database::detail::field_name<T>::value + " = :" + database::detail::field_name<T>::value;
+        find_by_many_build_query<Ts...>(query, ts...);
+        q.prepare(query);
+        q.bindValue(QString(":") + database::detail::field_name<T>::value, value);
+        find_by_many_bind_values<Ts...>(q, ts...);
+        q.exec();
+        QList<typename database::detail::result_type<T>::value> items;
+        while(q.next())
+            items.push_back(map<typename detail::result_type<T>::value>(q));
+        return items;
+    }
+
+    template<typename Field>
+    void update_build_set(QString& query, const typename database::detail::field_type<Field>::value &field) {
+        query += QString(", ") + database::detail::field_name<Field>::value + " = :"
+                + database::detail::field_name<Field>::value;
+    }
+
+    template<typename Field, typename... Fields>
+    void update_build_set(QString& query, const typename database::detail::field_type<Field>::value &field,
+                          const typename database::detail::field_type<Fields>::value&... fields) {
+        query += QString(", ") + database::detail::field_name<Field>::value + " = :"
+                + database::detail::field_name<Field>::value;
+        update_build_set<Fields...>(query, fields...);
+    }
+
+    template<typename Item, typename Field, typename... Fields>
+    typename std::enable_if<
+        !std::is_same<
+            std::integral_constant<int, sizeof...(Fields)>,
+            std::integral_constant<int, 0>
+        >::value>::type update(QSqlDatabase& db, const Item& item,
+                const typename database::detail::field_type<Field>::value& field,
+                const typename database::detail::field_type<Fields>::value&... fields) {
+        QSqlQuery q { db };
+        QString query = QString("UPDATE ") + database::detail::name<Item>::value + " SET "
+                + database::detail::field_name<Field>::value + " = :"
+                + database::detail::field_name<Field>::value;
+        update_build_set<Fields...>(query, fields...);
+        query += " WHERE :id = id";
+        q.prepare(query);
+        q.bindValue(QString(":") + database::detail::field_name<Field>::value, field);
+        q.bindValue(":id", item.id());
+        // Looks wierd, but find_by_many_bind_values could just be called bind_values
+        find_by_many_bind_values<Fields...>(q, fields...);
+        q.exec();
+    }
+
+    template<typename Item, typename Field, typename... Fields>
+    typename std::enable_if<
+        std::is_same<
+            std::integral_constant<int, sizeof...(Fields)>,
+            std::integral_constant<int, 0>
+        >::value>::type update(QSqlDatabase& db, const Item& item,
+                               const typename database::detail::field_type<Field>::value& field,
+                               const typename database::detail::field_type<Fields>::value&... fields) {
+        QSqlQuery q { db };
+        QString query = QString("UPDATE ") + database::detail::name<Item>::value + " SET "
+                + database::detail::field_name<Field>::value + " = :"
+                + database::detail::field_name<Field>::value;
+        query += " WHERE :id = id";
+        q.prepare(query);
+        q.bindValue(QString(":") + database::detail::field_name<Field>::value, field);
+        q.bindValue(":id", item.id());
+        q.exec();
+    }
 }
 
 /**
@@ -282,11 +382,11 @@ namespace database
 CREATE_TABLE(
     Album, albums, "Albums",
     (
-        (create, "CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT, album TEXT, artist TEXT, image BLOB)"),
-        (find, "SELECT * FROM Albums WHERE album = :album AND artist = :artist", (title, artist)),
+        (create, "CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, artist TEXT, image BLOB)"),
+        (find, "SELECT * FROM Albums WHERE title = :title AND artist = :artist", (title, artist)),
         (find_all, "SELECT * FROM Albums"),
         (exists, "SELECT COUNT(id) FROM Albums WHERE id = :id", (id)),
-        (insert, "INSERT INTO Albums(album, artist, image) VALUES(:album, :artist, :image)", (title, artist, art))
+        (insert, "INSERT INTO Albums(title, artist, image) VALUES(:title, :artist, :image)", (title, artist, art))
     )
     ,
     ((id, quint64))
