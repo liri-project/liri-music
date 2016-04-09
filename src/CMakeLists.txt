@@ -23,6 +23,7 @@ set(liri_vinyl_HEADERS
     musicscanner.h
     song.h
     settings.h
+    schema.h
 )
 
 qt5_add_resources(liri_vinyl_RESOURCES qml.qrc)

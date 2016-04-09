@@ -11,21 +11,21 @@ Artist::Artist() :
     QObject() {
 }
 
-Artist::Artist(quint64 id, const QString& artist) :
+Artist::Artist(quint64 id, const QString& name) :
     QObject(),
-    m_artist(artist),
+    m_name(name),
     m_id(id)
 {
 }
 
 Artist::Artist(const Artist& other) :
     QObject(),
-    m_artist(other.m_artist),
+    m_name(other.m_name),
     m_id(other.m_id) {
 }
 
 Artist& Artist::operator=(const Artist& other) {
-    m_artist = other.m_artist;
+    m_name = other.m_name;
     m_id = other.m_id;
     return *this;
 }
@@ -34,14 +34,14 @@ quint64 Artist::id() const {
     return m_id;
 }
 
-QString Artist::artist() const {
-    return m_artist;
+QString Artist::name() const {
+    return m_name;
 }
 
 void Artist::setId(quint64 id) {
     m_id = id;
 }
 
-void Artist::setArtist(const QString& artist) {
-    m_artist = artist;
+void Artist::setName(const QString& name) {
+    m_name = name;
 }

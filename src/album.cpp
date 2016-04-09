@@ -5,7 +5,7 @@ Album::Album() :
     QObject() {
 }
 
-Album::Album(quint64 id, const QString& title, const QString& artist, const QString& art) :
+Album::Album(quint64 id, const QString& title, quint64 artist, const QString& art) :
     QObject(), m_title(title), m_artist(artist), m_art(art), m_id(id) {
 }
 
@@ -29,7 +29,7 @@ QString Album::title() const {
     return m_title;
 }
 
-QString Album::artist() const {
+quint64 Album::artist() const {
     return m_artist;
 }
 
@@ -45,7 +45,7 @@ void Album::setTitle(const QString &title) {
     m_title = title;
 }
 
-void Album::setArtist(const QString &artist) {
+void Album::setArtist(quint64 artist) {
     m_artist = artist;
 }
 

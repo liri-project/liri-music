@@ -9,11 +9,13 @@
 #include <QGst/Discoverer>
 #include <QGst/Sample>
 #include <QThread>
+#include <iostream>
 
 MusicScanner::MusicScanner():
     watcher()
 {
     QDir musicDirectory { MusicDatabase::get().getMusicFolder() };
+    std::cout << musicDirectory.absolutePath().toStdString() << std::endl;
     watcher.addPath(musicDirectory.absolutePath());
     QObject::connect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(directoryChanged(QString)));
 }
@@ -51,20 +53,26 @@ void MusicScanner::scan(const QDir& dir, QGst::DiscovererPtr& discoverer) {
             }
 
             if(info->audioStreams().count() != 0){
-                Song song { 0, info->uri().toLocalFile(), info->tags().title(), info->tags().tagValue("album").toString(), info->tags().artist(), "placeholder" };
-                Album album { 0, song.album(), song.artist(), song.art() };
-                emit foundSong(song);
-                emit foundAlbum(album);
+                Artist artist { 0, info->tags().artist() };
+                Song song { 0, info->uri().toLocalFile(), info->tags().title(), 0, 0, "placeholder" };
+                Album album { 0, info->tags().tagValue("album").toString(), 0, "placeholder" };
+                //emit foundSong(song);
+                //emit foundAlbum(album);
+
+                QByteArray artwork;
 
                 if(info->tags().image()) {
                     QGst::BufferPtr buffer = info->tags().image()->buffer();
                     // This is only necessary to keep the compile warning free
                     // Why QByteArray doesn't take a std::size_t is beyond me
                     int size = buffer->size() & std::numeric_limits<int>::max();
-                    QByteArray outputBuffer { size, 0 };
-                    buffer->extract(0, outputBuffer.data(), buffer->size());
-                    emit foundAlbumArt(album, outputBuffer);
+                    //QByteArray outputBuffer { size, 0 };
+                    artwork.resize(size);
+                    buffer->extract(0, artwork.data(), buffer->size());
+                    //emit foundAlbumArt(album, outputBuffer);
                 }
+
+                emit foundLibraryItem(artist, song, album, artwork);
             }
         }
     }

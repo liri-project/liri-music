@@ -7,6 +7,7 @@
 #include <QGlib/Connect>
 #include "song.h"
 #include "album.h"
+#include "artist.h"
 
 class QDir;
 
@@ -21,10 +22,7 @@ public slots:
     void stop();
 
 signals:
-    void foundSong(const Song&);
-    void foundAlbum(const Album &);
-    void foundAlbumArt(const Album&, QByteArray art);
-
+    void foundLibraryItem(Artist, Song, Album, QByteArray);
 private:
     void scan(const QDir&, QGst::DiscovererPtr&);
     QFileSystemWatcher watcher;

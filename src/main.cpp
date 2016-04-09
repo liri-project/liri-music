@@ -19,7 +19,6 @@
 #include "albumartprovider.h"
 
 int main(int argc, char *argv[]){
-    //QGuiApplication app(argc, argv);
     QApplication app(argc, argv);
     QtWebEngine::initialize();
     qRegisterMetaType<Album>();
@@ -50,9 +49,8 @@ int main(int argc, char *argv[]){
 
     MusicScanner scanner {};
     MusicDatabase& db = MusicDatabase::get();
-    QObject::connect(&scanner, &MusicScanner::foundSong, &db, &MusicDatabase::addSong);
-    QObject::connect(&scanner, &MusicScanner::foundAlbum, &albumModel, &AlbumModel::addAlbum);
-    QObject::connect(&scanner, &MusicScanner::foundAlbumArt, &db, &MusicDatabase::addArtworkToAlbum);
+    QObject::connect(&scanner, &MusicScanner::foundLibraryItem, &db, &MusicDatabase::libraryItemFound);
+    QObject::connect(&db,&MusicDatabase::addedNewAlbum, &albumModel, &AlbumModel::addAlbum);
 
     QtWebEngine::initialize();
     QThread t;

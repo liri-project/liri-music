@@ -1,441 +1,389 @@
 #ifndef LIRI_MUSIC_DATABASE_H
 #define LIRI_MUSIC_DATABASE_H
 
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/map.hpp>
-#include <boost/mpl/for_each.hpp>
-#include <boost/preprocessor.hpp>
-
+/*
+ * API That should be supported:
+ * Album = find<album::id>(id);
+ *
+ * Album = find<album:id, album::artist>(id, artist);
+ *
+ * insert<
+ * 	set<album::id, album::artist, album::title>
+ * >(album);
+ *
+ * insert(db, album); // Should also work
+ *
+ * create<Album>();
+ *
+ * update<
+ * 	set<album::artist, album::title>,
+ * 	where<album::id>>(album);
+ *
+ * delete<where<album::id>>(id);
+ */
 namespace database
 {
-    namespace queries {
-        struct create;
-        struct find;
-        struct find_all;
-        struct exists;
-        struct insert;
-    }
+    template<typename T>
+    struct Table {};
+
+    template<typename... Ts>
+    struct Columns {};
+
+    template<typename T>
+    struct ColumnTraits {};
+
+    template<typename... Ts>
+    struct set {};
+
+    template<typename... Ts>
+    struct where {};
 
     namespace detail {
-        template<typename Tag>
-        struct get {};
-
-        template<typename Tag>
-        struct name {};
-
-        template<typename Tag>
-        struct set{};
-
-        template<typename T, typename Tag>
-        struct query {};
-
-        template<typename T>
-        struct mapper {};
-
-        template<typename T>
-        struct table_name {};
-
-        template<typename T>
-        struct field_type {};
-
-        template<typename T>
-        struct result_type {};
-
-        template<typename T>
-        struct field_name {};
-
-        template<typename T>
-        struct query_binder {
-            query_binder(QSqlQuery& q, const T& item)
-                : query(q), index(0), item(item) {
-            }
-
-            template<typename U>
-            QVariant operator()(U&) {
-                QVariant result = detail::get<U>::apply(item);
-                query.bindValue(index, result);
-                ++index;
-                return result;
-            }
-        private:
-            int index;
-            QSqlQuery& query;
-            const T& item;
+        //--------------------------------------
+        // The Next two structs are just helpers
+        // that get the first type from a list
+        // of types (eg. int from a list of
+        // int, std::string, long long
+        template<typename T, typename... Ts>
+        struct FirstOfImpl {
+            using value = T;
         };
 
-        template<typename T>
-        struct result_binder {
-            result_binder(const QSqlQuery& q, T& item)
-                : query(q), item(item), index(0) {
-            }
-
-            template<typename U>
-            void operator()(U) {
-                detail::set<typename U::first>::apply(item,
-                                                      query.value(index).value<typename U::second>());
-                ++index;
-            }
-        private:
-            int index;
-            T& item;
-            const QSqlQuery& query;
+        template<typename... Ts>
+        struct FirstOf : FirstOfImpl<Ts...> {
         };
+        //--------------------------------------
+
+        //--------------------------------------
+        // Forward declare a type for mapping
+        // queries into QObjects
+        template<typename Item, typename T, typename... Ts>
+        struct Mapper;
+
+        // Base case to terminate template
+        // instatiations
+        template<typename Item, typename T>
+        struct Mapper<Item, T> {
+            static void apply(QSqlQuery& q, Item& item) {
+                item.setProperty(ColumnTraits<T>::name, q.value(ColumnTraits<T>::name).template value<typename ColumnTraits<T>::type>());
+            }
+        };
+
+        // Recursive case expands elements into
+        // code that does the mapping
+        template<typename Item, typename T, typename... Ts>
+        struct Mapper {
+            static void apply(QSqlQuery& q, Item& item) {
+                item.setProperty(ColumnTraits<T>::name, q.value(ColumnTraits<T>::name).template value<typename ColumnTraits<T>::type>());
+                Mapper<Item, Ts...>::apply(q, item);
+            }
+        };
+
+        // Helper to get types out of the
+        // Columns<...> type
+        template<typename Item, typename... Ts>
+        struct Mapper<Item, Columns<Ts...>> {
+            static void apply(QSqlQuery& query, Item& item) {
+                Mapper<Item, Ts...>::apply(query, item);
+            }
+        };
+        //--------------------------------------
+
+        //--------------------------------------
+        // These structs are used to build a
+        // comparison clause for a select query
+        template<typename T, typename... Ts>
+        struct ComparisonClauseBuilder;
+
+        template<typename T>
+        struct ComparisonClauseBuilder<T> {
+            static void apply(QString& query) {
+                query += ColumnTraits<T>::name;
+                query += " = :";
+                query += ColumnTraits<T>::name;
+            }
+        };
+
+        template<typename T, typename... Ts>
+        struct ComparisonClauseBuilder {
+            static void apply(QString& query) {
+                query += ColumnTraits<T>::name;
+                query += " = :";
+                query += ColumnTraits<T>::name;
+                query += " AND ";
+                ComparisonClauseBuilder<Ts...>::apply(query);
+            }
+        };
+        //--------------------------------------
+
+        //--------------------------------------
+        // These structs are used to bind a list
+        // of values to a query
+        template<typename T, typename... Ts>
+        struct ValueBinder;
+
+        template<typename T>
+        struct ValueBinder<T> {
+            static void apply(QSqlQuery& query,
+                              const typename ColumnTraits<T>::type& value) {
+                query.bindValue(QString(":") + ColumnTraits<T>::name,
+                                value);
+            }
+        };
+
+        template<typename T, typename... Ts>
+        struct ValueBinder {
+            static void apply(QSqlQuery& query,
+                              const typename ColumnTraits<T>::type& value,
+                              const typename ColumnTraits<Ts>::type&... values) {
+                query.bindValue(QString(":") + ColumnTraits<T>::name,
+                                value);
+                ValueBinder<Ts...>::apply(query, values...);
+            }
+        };
+        //--------------------------------------
+
+        //--------------------------------------
+        // These struct are used to build a
+        // table query based on the column names
+        template<typename T, typename... Ts>
+        struct TableQueryBuilder;
+
+        template<typename T>
+        struct TableQueryBuilder<T> {
+           static void apply(QString& query) {
+               query += ColumnTraits<T>::name;
+               query += " ";
+               query += ColumnTraits<T>::dbType;
+           }
+        };
+
+        template<typename T, typename... Ts>
+        struct TableQueryBuilder {
+            static void apply(QString& query) {
+                query += ColumnTraits<T>::name;
+                query += " ";
+                query += ColumnTraits<T>::dbType;
+                query += ",";
+                TableQueryBuilder<Ts...>::apply(query);
+            }
+        };
+
+        template<typename... Ts>
+        struct TableQueryBuilder<Columns<Ts...>> {
+            static void apply(QString& query) {
+                TableQueryBuilder<Ts...>::apply(query);
+            }
+        };
+        //--------------------------------------
+        // Builds a list of columns for an
+        // insert statement
+        template<typename T, typename... Ts>
+        struct InsertQueryBuilder;
+
+        template<typename T>
+        struct InsertQueryBuilder<T> {
+            static void apply(QString& query) {
+                if(QString(ColumnTraits<T>::name)
+                        != "id") {
+                    query += ColumnTraits<T>::name;
+                } else {
+                    query.chop(1);
+                }
+            }
+        };
+
+        template<typename T, typename... Ts>
+        struct InsertQueryBuilder {
+            static void apply(QString& query) {
+                if(QString(ColumnTraits<T>::name)
+                        != "id") {
+                    query += ColumnTraits<T>::name;
+                    query += ",";
+                }
+                InsertQueryBuilder<Ts...>::apply(query);
+            }
+        };
+
+        template<typename... Ts>
+        struct InsertQueryBuilder<Columns<Ts...>> {
+            static void apply(QString& query) {
+                InsertQueryBuilder<Ts...>::apply(query);
+            }
+        };
+        //--------------------------------------
+
+        //--------------------------------------
+        // Builds a list of strings to use as
+        // identifiers for QSqlQuery.bindValue
+        template<typename T, typename... Ts>
+        struct InsertValueBuilder;
+
+        template<typename T>
+        struct InsertValueBuilder<T> {
+            static void apply(QString& query) {
+                if(QString(ColumnTraits<T>::name)
+                        != "id") {
+                    query += ":";
+                    query += ColumnTraits<T>::name;
+                } else {
+                    query.chop(1);
+                }
+            }
+        };
+
+        template<typename T, typename... Ts>
+        struct InsertValueBuilder {
+            static void apply(QString& query) {
+                if(QString(ColumnTraits<T>::name)
+                        != "id") {
+                    query += ":";
+                    query += ColumnTraits<T>::name;
+                    query += ",";
+                }
+                InsertValueBuilder<Ts...>::apply(query);
+            }
+        };
+
+        template<typename... Ts>
+        struct InsertValueBuilder<Columns<Ts...>> {
+            static void apply(QString& query) {
+                InsertValueBuilder<Ts...>::apply(query);
+            }
+        };
+        //--------------------------------------
+
+        //--------------------------------------
+        // Bind values to an insert query
+        // Can't just use ValueBinder because we
+        // need to skip the id field
+        template<typename T, typename... Ts>
+        struct InsertBinder;
+
+        template<typename T>
+        struct InsertBinder<T> {
+            static void apply(QSqlQuery& query,
+                              const typename ColumnTraits<T>::belongs_to& v) {
+                if(QString(ColumnTraits<T>::name) != "id") {
+                    query.bindValue(QString(":") + ColumnTraits<T>::name,
+                                    v.property(ColumnTraits<T>::name).template value<typename ColumnTraits<T>::type>());
+                }
+            }
+        };
+
+        template<typename T, typename... Ts>
+        struct InsertBinder {
+            static void apply(QSqlQuery& query, const typename ColumnTraits<T>::belongs_to& v) {
+                if(QString(ColumnTraits<T>::name) != "id") {
+                    query.bindValue(QString(":") + ColumnTraits<T>::name,
+                                    v.property(ColumnTraits<T>::name).template value<typename ColumnTraits<T>::type>());
+                }
+                InsertBinder<Ts...>::apply(query, v);
+            }
+        };
+
+        template<typename... Ts>
+        struct InsertBinder<Columns<Ts...>> {
+            static void apply(QSqlQuery& query,
+                              const typename ColumnTraits<typename FirstOf<Ts...>::value>::belongs_to& value) {
+                InsertBinder<Ts...>::apply(query, value);
+            }
+        };
+
+        //--------------------------------------
+
+        //--------------------------------------
+        // Function frontend
+        template<typename T>
+        void map(QSqlQuery& q, T& item) {
+            Mapper<T, typename Table<T>::columns>::apply(q, item);
+        }
+        //--------------------------------------
     }
 
-    template<typename T>
-    struct Table {
-        static constexpr const char* name =
-                detail::name<T>::value;
-        using find = detail::query<T, queries::find>;
-        using create = detail::query<T, queries::create>;
-        using find_all = detail::query<T, queries::find_all>;
-        using exists = detail::query<T, queries::exists>;
-        using insert = detail::query<T, queries::insert>;
-        using mapper = typename detail::mapper<T>::value;
-    };
-
-    template<typename T>
-    T map(QSqlQuery& q) {
-        T item;
-        detail::result_binder<T> binder (q, item);
-        boost::mpl::for_each<typename Table<T>::mapper>(binder);
-        return item;
-    }
-
-    template<typename T>
-    void makeTable(QSqlDatabase& db) {
-        QSqlQuery create { Table<T>::create::value, db };
-    }
-
-    template<typename T>
-    auto findAll(QSqlDatabase& db)
-        -> QList<T> {
-        QList<T> items;
-        QSqlQuery q { Table<T>::find_all::value, db };
-        while(q.next()) {
-            items.push_back(map<T>(q));
+    //--------------------------------------
+    // Find a set of items in the database.
+    // Takes a list of tags that ColumnTraits
+    // is specialized for as parameters. The
+    // parameters specified what columns will
+    // be compared in the query. For example:
+    // find<artist::title>("..") will expand to
+    // SELECT * FROM Artists where title =
+    // "..", which then gets mapped
+    // back to a full Album object, which
+    // gets stuff in QList and returned to
+    // the caller.
+    template<typename... Ts>
+    auto find(QSqlDatabase& db, const typename ColumnTraits<Ts>::type&... values)
+        -> typename std::enable_if<
+            !std::is_destructible<typename detail::FirstOf<Ts...>::value>::value
+            ,QList<typename ColumnTraits<typename detail::FirstOf<Ts...>::value>::belongs_to>
+           >::type {
+        QList<typename ColumnTraits<typename detail::FirstOf<Ts...>::value>::belongs_to> items;
+        QSqlQuery query { db };
+        QString queryString = "SELECT * FROM ";
+        queryString += Table<typename ColumnTraits<typename detail::FirstOf<Ts...>::value>::belongs_to>::name;
+        queryString += " WHERE ";
+        detail::ComparisonClauseBuilder<Ts...>::apply(queryString);
+        query.prepare(queryString);
+        detail::ValueBinder<Ts...>::apply(query, values...);
+        query.exec();
+        while(query.next()) {
+            typename ColumnTraits<typename detail::FirstOf<Ts...>::value>::belongs_to item;
+            detail::map(query, item);
+            items.push_back(item);
         }
         return items;
     }
 
     template<typename T>
-    QList<T> find(QSqlDatabase& db, const T& item) {
+    auto find(QSqlDatabase& db)
+        -> typename std::enable_if<
+            std::is_destructible<T>::value,
+            QList<T>>::type
+    {
         QList<T> items;
-        QSqlQuery q { db };
-        q.prepare(Table<T>::find::value);
-        detail::query_binder<T> binder (q, item);
-        boost::mpl::for_each<typename Table<T>::find::params>(binder);
-
-        q.exec();
-        while(q.next()) {
-            items.push_back(map<T>(q));
+        QSqlQuery query { db };
+        QString queryString = "SELECT * FROM ";
+        queryString += Table<T>::name;
+        query.prepare(queryString);
+        query.exec();
+        while(query.next()) {
+            T item;
+            detail::map(query, item);
+            items.push_back(item);
         }
         return items;
-    }
-
-    template<typename T>
-    bool exists(QSqlDatabase& db, T item) {
-        QSqlQuery q;
-        q.prepare(Table<T>::exists::value);
-        detail::query_binder<T> binder { q, item };
-        boost::mpl::for_each<typename Table<T>::exists::params>(binder);
-        q.exec();
-        q.next();
-        if(q.value(0).toInt() != 0)
-            return true;
-        return false;
     }
 
     template<typename T>
     void insert(QSqlDatabase& db, const T& item) {
-        QSqlQuery q { db };
-        q.prepare(Table<T>::insert::value);
-        detail::query_binder<T> binder { q, item };
-        boost::mpl::for_each<typename Table<T>::insert::params>(binder);
-        q.exec();
+        QSqlQuery query { db };
+        QString queryString = "INSERT INTO ";
+        queryString += Table<T>::name;
+        queryString += "(";
+        detail::InsertQueryBuilder<typename Table<T>::columns>::apply(queryString);
+        queryString += ") VALUES (";
+        detail::InsertValueBuilder<typename Table<T>::columns>::apply(queryString);
+        queryString += ")";
+        query.prepare(queryString);
+        detail::InsertBinder<typename Table<T>::columns>::apply(query, item);
+        query.exec();
     }
 
+    //--------------------------------------
+    // Create a table in the database for a
+    // given type T
     template<typename T>
-    QList<typename database::detail::result_type<T>::value> find_by(QSqlDatabase& db, const typename database::detail::field_type<T>::value & value) {
-        QSqlQuery q { db };
-        q.prepare(QString("SELECT * FROM ") + database::detail::table_name<T>::value + " WHERE "
-                  + database::detail::field_name<T>::value + " = :value");
-        q.bindValue(":value", value);
-        q.exec();
-        QList<typename database::detail::result_type<T>::value> items;
-        while(q.next())
-            items.push_back(map<typename detail::result_type<T>::value>(q));
-        return items;
-    }
-
-    template<typename T>
-    void find_by_many_build_query(QString& query, const typename database::detail::field_type<T>::value& t) {
-        query += QString(" AND ") + database::detail::field_name<T>::value + " = :" + database::detail::field_name<T>::value;
-    }
-
-    template<typename T, typename... Ts>
-    void find_by_many_build_query(QString& query,
-                                  const typename database::detail::field_type<T>::value& t,
-                                  const typename database::detail::field_type<Ts>::value&... ts) {
-        query += QString(" AND ") + database::detail::field_name<T>::value + " = :" + database::detail::field_name<T>::value;
-        find_by_many_build_query<Ts...>(query, ts...);
-    }
-
-    template<typename T>
-    void find_by_many_bind_values(QSqlQuery& q, const typename database::detail::field_type<T>::value& t) {
-        q.bindValue(QString(":") + database::detail::field_name<T>::value, t);
-    }
-
-    template<typename T, typename... Ts>
-    void find_by_many_bind_values(QSqlQuery& q,
-                                  const typename database::detail::field_type<T>::value& t,
-                                  const typename database::detail::field_type<Ts>::value&... ts) {
-        q.bindValue(QString(":") + database::detail::field_name<T>::value, t);
-        find_by_many_bind_values<Ts...>(q, ts...);
-    }
-
-    template<typename T, typename... Ts>
-    QList<typename database::detail::result_type<T>::value>
-    find_by_many(QSqlDatabase& db,
-                 const typename database::detail::field_type<T>::value& value,
-                 const typename database::detail::field_type<Ts>::value&... ts) {
-        QSqlQuery q { db };
-        QString query = QString("SELECT * FROM ") + database::detail::table_name<T>::value + " WHERE "
-                + database::detail::field_name<T>::value + " = :" + database::detail::field_name<T>::value;
-        find_by_many_build_query<Ts...>(query, ts...);
-        q.prepare(query);
-        q.bindValue(QString(":") + database::detail::field_name<T>::value, value);
-        find_by_many_bind_values<Ts...>(q, ts...);
-        q.exec();
-        QList<typename database::detail::result_type<T>::value> items;
-        while(q.next())
-            items.push_back(map<typename detail::result_type<T>::value>(q));
-        return items;
-    }
-
-    template<typename Field>
-    void update_build_set(QString& query, const typename database::detail::field_type<Field>::value &field) {
-        query += QString(", ") + database::detail::field_name<Field>::value + " = :"
-                + database::detail::field_name<Field>::value;
-    }
-
-    template<typename Field, typename... Fields>
-    void update_build_set(QString& query, const typename database::detail::field_type<Field>::value &field,
-                          const typename database::detail::field_type<Fields>::value&... fields) {
-        query += QString(", ") + database::detail::field_name<Field>::value + " = :"
-                + database::detail::field_name<Field>::value;
-        update_build_set<Fields...>(query, fields...);
-    }
-
-    template<typename Item, typename Field, typename... Fields>
-    typename std::enable_if<
-        !std::is_same<
-            std::integral_constant<int, sizeof...(Fields)>,
-            std::integral_constant<int, 0>
-        >::value>::type update(QSqlDatabase& db, const Item& item,
-                const typename database::detail::field_type<Field>::value& field,
-                const typename database::detail::field_type<Fields>::value&... fields) {
-        QSqlQuery q { db };
-        QString query = QString("UPDATE ") + database::detail::name<Item>::value + " SET "
-                + database::detail::field_name<Field>::value + " = :"
-                + database::detail::field_name<Field>::value;
-        update_build_set<Fields...>(query, fields...);
-        query += " WHERE :id = id";
-        q.prepare(query);
-        q.bindValue(QString(":") + database::detail::field_name<Field>::value, field);
-        q.bindValue(":id", item.id());
-        // Looks wierd, but find_by_many_bind_values could just be called bind_values
-        find_by_many_bind_values<Fields...>(q, fields...);
-        q.exec();
-    }
-
-    template<typename Item, typename Field, typename... Fields>
-    typename std::enable_if<
-        std::is_same<
-            std::integral_constant<int, sizeof...(Fields)>,
-            std::integral_constant<int, 0>
-        >::value>::type update(QSqlDatabase& db, const Item& item,
-                               const typename database::detail::field_type<Field>::value& field,
-                               const typename database::detail::field_type<Fields>::value&... fields) {
-        QSqlQuery q { db };
-        QString query = QString("UPDATE ") + database::detail::name<Item>::value + " SET "
-                + database::detail::field_name<Field>::value + " = :"
-                + database::detail::field_name<Field>::value;
-        query += " WHERE :id = id";
-        q.prepare(query);
-        q.bindValue(QString(":") + database::detail::field_name<Field>::value, field);
-        q.bindValue(":id", item.id());
-        q.exec();
+    auto create(QSqlDatabase& db)
+        -> void {
+        QString queryString = "CREATE TABLE IF NOT EXISTS ";
+        queryString += Table<T>::name;
+        queryString += "(";
+        detail::TableQueryBuilder<typename Table<T>::columns>::apply(queryString);
+        queryString += ")";
+        QSqlQuery { queryString, db };
     }
 }
-
-/**
-  Here be dragons
-  */
-#define EXPAND_TAGS(r, data, elem) \
-    struct BOOST_PP_TUPLE_ELEM(0, elem) {};
-
-#define EXPAND_GETTERS(r, data, elem) \
-    template<> \
-    struct get<database :: BOOST_PP_TUPLE_ELEM(1, data) :: BOOST_PP_TUPLE_ELEM(0, elem)> {  \
-        static BOOST_PP_TUPLE_ELEM(1, elem) apply(const BOOST_PP_TUPLE_ELEM(0, data)& a) { \
-            return a.property(BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(0, elem))).value<BOOST_PP_TUPLE_ELEM(1, elem)>(); \
-        } \
-    };
-
-#define EXPAND_SETTERS(r, data, elem) \
-    template<> \
-    struct set<database :: BOOST_PP_TUPLE_ELEM(1, data) :: BOOST_PP_TUPLE_ELEM(0, elem)> { \
-        static BOOST_PP_TUPLE_ELEM(1, elem) apply(BOOST_PP_TUPLE_ELEM(0, data)& a, const BOOST_PP_TUPLE_ELEM(1, elem)& value) { \
-            a.setProperty(BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(0, elem)), value); \
-        } \
-    };
-
-#define EXPAND_FIELD_TYPES(r, data, elem) \
-    template<> \
-    struct field_type<database :: BOOST_PP_TUPLE_ELEM(1, data) :: BOOST_PP_TUPLE_ELEM(0, elem)> { \
-        using value = BOOST_PP_TUPLE_ELEM(1, elem); \
-    };
-
-#define EXPAND_TABLES(r, data, elem) \
-    template<> \
-    struct table_name<database :: BOOST_PP_TUPLE_ELEM(1, data) :: BOOST_PP_TUPLE_ELEM(0, elem)> { \
-        static constexpr const char* value = BOOST_PP_TUPLE_ELEM(2, data); \
-    };
-
-#define EXPAND_FIELD_NAMES(r, data, elem) \
-    template<> \
-    struct field_name<database :: BOOST_PP_TUPLE_ELEM(1, data) :: BOOST_PP_TUPLE_ELEM(0, elem)> { \
-        static constexpr const char* value = BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(0, elem)); \
-    };
-
-#define EXPAND_RESULT_TYPES(r, data, elem) \
-    template<> \
-    struct result_type<database :: BOOST_PP_TUPLE_ELEM(1, data) :: BOOST_PP_TUPLE_ELEM(0, elem)> { \
-        using value = BOOST_PP_TUPLE_ELEM(0, data); \
-    };
-
-#define EXPAND_MAPPINGS(index, count, mappings) \
-    boost::mpl::pair<database :: BOOST_PP_TUPLE_ELEM(0, mappings) :: BOOST_PP_TUPLE_ELEM(0, BOOST_PP_SEQ_ELEM(count, BOOST_PP_TUPLE_ELEM(1,mappings))), \
-        BOOST_PP_TUPLE_ELEM(1, BOOST_PP_SEQ_ELEM(count, BOOST_PP_TUPLE_ELEM(1, mappings)))>
-
-
-#define EQ_PRED(r, state) \
-    BOOST_PP_NOT_EQUAL ( \
-        BOOST_PP_TUPLE_ELEM(0, state), \
-        BOOST_PP_TUPLE_ELEM(1, state) \
-    ) \
-
-#define EQ_OP(r, state) \
-    ( \
-        BOOST_PP_INC(BOOST_PP_TUPLE_ELEM(0, state)), \
-        BOOST_PP_TUPLE_ELEM(1, state), \
-        BOOST_PP_TUPLE_ELEM(2, state), \
-        BOOST_PP_TUPLE_ELEM(3, state) \
-    ) \
-
-#define LIST_TRANSFORM(d, data, elem) \
-    data :: elem
-
-#define EXPAND_QUERIES(r, state) \
-    template<> \
-    struct query< BOOST_PP_TUPLE_ELEM(0, BOOST_PP_TUPLE_ELEM(3, state)), \
-                  queries :: BOOST_PP_TUPLE_ELEM(0, BOOST_PP_TUPLE_ELEM(BOOST_PP_TUPLE_ELEM(0, state), BOOST_PP_TUPLE_ELEM(2, state))) \
-                  > { \
-        static constexpr const char* value = BOOST_PP_TUPLE_ELEM(1, BOOST_PP_TUPLE_ELEM(BOOST_PP_TUPLE_ELEM(0, state), BOOST_PP_TUPLE_ELEM(2, state))); \
-        using params = boost::mpl::vector< BOOST_PP_LIST_ENUM( \
-            BOOST_PP_LIST_TRANSFORM( \
-                LIST_TRANSFORM, \
-                BOOST_PP_TUPLE_ELEM(1, BOOST_PP_TUPLE_ELEM(3, state)), \
-                BOOST_PP_TUPLE_TO_LIST(BOOST_PP_TUPLE_ELEM(2, BOOST_PP_TUPLE_ELEM(BOOST_PP_TUPLE_ELEM(0, state), BOOST_PP_TUPLE_ELEM(2, state)))) \
-            )\
-        ) >; \
-    };
-
-#define CREATE_TABLE(class_name, ns, title, queries, mappings) \
-    namespace database { \
-        namespace ns { \
-            BOOST_PP_SEQ_FOR_EACH(EXPAND_TAGS, _, mappings) \
-        } \
-        namespace detail { \
-            template<>	\
-            struct name<class_name> { \
-                static constexpr const char* value = title; \
-            }; \
-            BOOST_PP_SEQ_FOR_EACH(EXPAND_GETTERS, (class_name, ns), mappings) \
-            BOOST_PP_SEQ_FOR_EACH(EXPAND_SETTERS, (class_name, ns), mappings) \
-            BOOST_PP_SEQ_FOR_EACH(EXPAND_TABLES, (class_name, ns, title), mappings) \
-            BOOST_PP_SEQ_FOR_EACH(EXPAND_FIELD_TYPES, (class_name, ns), mappings) \
-            BOOST_PP_SEQ_FOR_EACH(EXPAND_FIELD_NAMES, (class_name, ns), mappings) \
-            BOOST_PP_SEQ_FOR_EACH(EXPAND_RESULT_TYPES, (class_name, ns), mappings) \
-            template<> \
-            struct mapper<class_name> { \
-                using value  = boost::mpl::map< \
-                    BOOST_PP_ENUM(BOOST_PP_SEQ_SIZE(mappings), EXPAND_MAPPINGS, (ns, mappings)) \
-                >; \
-            }; \
-            BOOST_PP_FOR((0, BOOST_PP_TUPLE_SIZE(queries), queries, (class_name, ns)), \
-                EQ_PRED, EQ_OP, EXPAND_QUERIES) \
-        } \
-    }
-
-CREATE_TABLE(
-    Album, albums, "Albums",
-    (
-        (create, "CREATE TABLE IF NOT EXISTS Albums(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, artist TEXT, image BLOB)"),
-        (find, "SELECT * FROM Albums WHERE title = :title AND artist = :artist", (title, artist)),
-        (find_all, "SELECT * FROM Albums"),
-        (exists, "SELECT COUNT(id) FROM Albums WHERE id = :id", (id)),
-        (insert, "INSERT INTO Albums(title, artist, image) VALUES(:title, :artist, :image)", (title, artist, art))
-    )
-    ,
-    ((id, quint64))
-    ((title, QString))
-    ((artist, QString))
-    ((art, QString))
-)
-
-CREATE_TABLE(
-    Song, songs, "Songs",
-    (
-        (create, "CREATE TABLE IF NOT EXISTS Songs(id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT, title TEXT, artist TEXT, album TEXT, art TEXT)"),
-        (find, "SELECT * FROM Songs WHERE title = :title AND artist = :artist AND album = :album", (title, artist, album)),
-        (find_all, "SELECT * FROM Songs"),
-        (exists, "SELECT COUNT(id) FROM Songs WHERE id = :id", (id)),
-        (insert, "INSERT INTO Songs(path, title, artist, album, art) VALUES(:path, :title, :artist, :album)", (path, title, artist, album))
-    ),
-    ((id, quint64))
-    ((path, QString))
-    ((title, QString))
-    ((artist, QString))
-    ((album, QString))
-)
-
-CREATE_TABLE(
-    Artist, artists, "Artists",
-    (
-        (create, "CREATE TABLE IF NOT EXISTS Artists(id INTEGER PRIMARY KEY AUTOINCREMENT, artist TEXT"),
-        (find, "SELECT * FROM Artists WHERE artist = :artist", (artist)),
-        (find_all, "SELECT * FROM Artists"),
-        (exists, "SELECT COUNT(id) FROM Artists WHERE id = :id", (id)),
-        (insert, "INSERT INTO Artists(artist) VALUES(:artist)", (artist))
-    ),
-    ((id, quint64))
-    ((artist, QString))
-)
-
-CREATE_TABLE(
-    Setting, settings, "Settings",
-    (
-        (create, "CREATE TABLE IF NOT EXISTS Settings(id INTEGER PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)"),
-        (find, "SELECT * FROM Settings WHERE setting = :setting AND value = :value", (setting, value)),
-        (find_all, "SELECT * FROM Settings"),
-        (exists, "SELECT COUNT(id) FROM Settings WHERE id = : id", (id)),
-        (insert, "INSERT INTO Settings(setting, value) VALUES(:setting, :value)", (setting, value))
-    ),
-    ((id, quint64))
-    ((setting, QString))
-    ((value, QString))
-)
 
 #endif

@@ -7,10 +7,10 @@
 class Artist : public QObject {
     Q_OBJECT
 
-    Q_PROPERTY(QString artist READ artist WRITE setArtist)
+    Q_PROPERTY(QString name READ name WRITE setName)
     Q_PROPERTY(quint64 id READ id WRITE setId)
 
-    QString m_artist;
+    QString m_name;
     quint64 m_id;
 public:
     Artist();
@@ -20,10 +20,10 @@ public:
     Artist& operator=(const Artist&);
 
     quint64 id() const;
-    QString artist() const;
+    QString name() const;
 
     void setId(quint64);
-    void setArtist(const QString&);
+    void setName(const QString&);
 };
 
 Q_DECLARE_METATYPE(Artist)

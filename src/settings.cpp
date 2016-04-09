@@ -8,20 +8,20 @@ Setting::Setting() :
 Setting::Setting(const Setting & setting) :
     QObject(),
     m_id(setting.m_id),
-    m_setting(setting.m_setting),
+    m_name(setting.m_name),
     m_value(setting.m_value) {
 }
 
-Setting::Setting(quint64 id, const QString& setting, const QString& value) :
+Setting::Setting(quint64 id, const QString& name, const QString& value) :
     QObject(),
     m_id(id),
-    m_setting(setting),
+    m_name(name),
     m_value(value) {
 }
 
 Setting& Setting::operator=(const Setting& other) {
     m_id = other.m_id;
-    m_setting = other.m_setting;
+    m_name = other.m_name;
     m_value = other.m_value;
     return *this;
 }
@@ -30,8 +30,8 @@ quint64 Setting::id() const {
     return m_id;
 }
 
-QString Setting::setting() const {
-    return m_setting;
+QString Setting::name() const {
+    return m_name;
 }
 
 QString Setting::value() const {
@@ -42,8 +42,8 @@ void Setting::setId(quint64 id) {
     m_id = id;
 }
 
-void Setting::setSetting(const QString& setting) {
-    m_setting = setting;
+void Setting::setName(const QString& name) {
+    m_name = name;
 }
 
 void Setting::setValue(const QString& value) {

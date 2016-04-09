@@ -5,8 +5,8 @@ Song::Song() :
     QObject() {
 }
 
-Song::Song(quint64 id, const QString& path, const QString& title, const QString& album,
-                       const QString& artist, const QString& art) :
+Song::Song(quint64 id, const QString& path, const QString& title, quint64 album,
+                       quint64 artist, const QString& art) :
     QObject(),
     m_path(path),
     m_title(title),
@@ -45,11 +45,11 @@ QString Song::title() const {
     return m_title;
 }
 
-QString Song::album() const {
+quint64 Song::album() const {
     return m_album;
 }
 
-QString Song::artist() const {
+quint64 Song::artist() const {
     return m_artist;
 }
 
@@ -69,11 +69,11 @@ void Song::setTitle(const QString& title) {
     m_title = title;
 }
 
-void Song::setAlbum(const QString& album) {
+void Song::setAlbum(quint64 album) {
     m_album = album;
 }
 
-void Song::setArtist(const QString& artist) {
+void Song::setArtist(quint64 artist) {
     m_artist = artist;
 }
 
