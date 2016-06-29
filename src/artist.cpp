@@ -11,46 +11,37 @@ Artist::Artist() :
     QObject() {
 }
 
-Artist::Artist(const QString& artist) :
+Artist::Artist(quint64 id, const QString& name) :
     QObject(),
-    m_artist(artist)
+    m_name(name),
+    m_id(id)
 {
 }
 
 Artist::Artist(const Artist& other) :
     QObject(),
-    m_artist(other.m_artist) {
+    m_name(other.m_name),
+    m_id(other.m_id) {
 }
 
 Artist& Artist::operator=(const Artist& other) {
-    m_artist = other.m_artist;
+    m_name = other.m_name;
+    m_id = other.m_id;
     return *this;
 }
 
-QList<QObject*> Artist::getSong() const {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setHostName("localhot");
-    db.setDatabaseName("vinylmusic");
-    QList<QObject*> songList;
-
-    if(db.open()) {
-        QSqlQuery getSongs;
-        getSongs.prepare("Select * FROM Songs where artist='"+ m_artist +"'");
-        if(getSongs.exec()) {
-            while(getSongs.next()) {
-                QString title = getSongs.value(2).toString();
-                QString path = getSongs.value(1).toString();
-                QString album = getSongs.value(4).toString();
-                QString artist = getSongs.value(3).toString();
-                QString art = getSongs.value(5).toString();
-
-                songList.append(new Song(path, title, album, artist, art));
-            }
-        }
-    }
-    return songList;
+quint64 Artist::id() const {
+    return m_id;
 }
 
-QString Artist::artist() const {
-    return m_artist;
+QString Artist::name() const {
+    return m_name;
+}
+
+void Artist::setId(quint64 id) {
+    m_id = id;
+}
+
+void Artist::setName(const QString& name) {
+    m_name = name;
 }

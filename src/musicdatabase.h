@@ -9,6 +9,7 @@
 #include "album.h"
 #include "artist.h"
 #include "song.h"
+#include "settings.h"
 
 class MusicDatabase : public QObject {
     Q_OBJECT
@@ -20,7 +21,7 @@ public:
 
         virtual const char* what() const noexcept {
             return "Unable to open database.";
-        };
+        }
     };
 
     static MusicDatabase& get();
@@ -37,8 +38,12 @@ public slots:
     void addArtist(const Artist&);
     void setMusicFolder(const QString&);
     void addArtworkToAlbum(const Album&, QByteArray);
+    void libraryItemFound(Artist, Song, Album, QByteArray);
 signals:
     void musicFolderChanged(const QString& path);
+    void addedNewArtist(Artist);
+    void addedNewAlbum(Album);
+    void addedNewSong(Song);
 protected:
     MusicDatabase();
 private:
