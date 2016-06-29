@@ -289,7 +289,6 @@ ApplicationWindow {
             }
         }
 
-
     }
 
     FolderListModel {
@@ -586,7 +585,7 @@ ApplicationWindow {
         id: page
         visible: true
 
-        title: "Liri Vinyl"
+        title: "Liri Music"
 
 
         actionBar.maxActionCount: navDrawer.enabled ? 3 : 4
@@ -997,7 +996,7 @@ ApplicationWindow {
 
         Rectangle {
 
-            anchors.bottomMargin: Units.dp(0)
+            anchors.bottomMargin: Units.dp(-10)
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             height:Units.dp(60)
@@ -1005,10 +1004,10 @@ ApplicationWindow {
 
             IconButton {
                 iconName: 'av/skip_previous'
-                height:Units.dp(50)
-                width:Units.dp(70)
+
                 id: prevButton
                 anchors.left: parent.left
+                anchors.rightMargin: Units.dp(50)
                 size: Units.dp(30)
                 onClicked: {
                     getPrevTrack()
@@ -1017,10 +1016,9 @@ ApplicationWindow {
 
             IconButton {
                 iconName: 'av/play_arrow'
-                height:Units.dp(50)
-                width:Units.dp(70)
                 id: playButton1
                 anchors.left: prevButton.right
+                                anchors.leftMargin: Units.dp(40)
                 size: Units.dp(30)
                 onClicked: {
                     playTriggerAction()
@@ -1030,10 +1028,9 @@ ApplicationWindow {
 
             IconButton {
                 iconName: 'av/skip_next'
-                height:Units.dp(50)
-                width:Units.dp(70)
                 id: nextButton
                 anchors.left: playButton1.right
+                anchors.leftMargin: Units.dp(40)
                 size: Units.dp(30)
 
                 onClicked: {
@@ -1068,10 +1065,10 @@ ApplicationWindow {
             iconName: {
                 return 'av/shuffle'
             }
-            height:Units.dp(40)
-            width:Units.dp(50)
-            anchors.topMargin: Units.dp(-50)
-            anchors.right: volumeIcon.left
+
+            anchors.topMargin: Units.dp(-60)
+            anchors.right: parent.left
+            anchors.rightMargin: Units.dp(20)
 
             color: {
                 if(Global.shuffle){
@@ -1148,11 +1145,8 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             id: volumeIcon
             iconName: 'av/volume_up'
-            height:Units.dp(36)
-            width:Units.dp(50)
-            anchors.topMargin: Units.dp(-50)
-            anchors.rightMargin: Units.dp(60)
-            anchors.left: parent.left
+            anchors.top: shuffleButton.top
+            anchors.topMargin: Units.dp(-16)
             color: index == 0 ? Theme.light.textColor : Theme.dark.textColor
             onClicked: {
                 if(volumeControl.value == 0.00){
@@ -1171,10 +1165,8 @@ ApplicationWindow {
 
         Slider {
             id: volumeControl
-            Layout.alignment: Qt.AlignCenter
             width: Units.dp(100)
-            anchors.bottom: parent.bottom
-            height:Units.dp(36)
+            anchors.topMargin: Units.dp(110)
             anchors.right: parent.right
             updateValueWhileDragging: true
             color:theme.primaryColor

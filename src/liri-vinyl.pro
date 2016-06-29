@@ -20,12 +20,13 @@ include(deployment.pri)
 DISTFILES += \
     liri-music.rc
 
-INCLUDEPATH += /usr/local/include/ \
+EXTERNAL_INCLUDES += /usr/local/include/ \
  /usr/include
 
 HEADERS += \
     main.h \
     albumobject.h \
+    songobject.h \
     artistobject.h \
     musicfolders.h \
     utilities.h

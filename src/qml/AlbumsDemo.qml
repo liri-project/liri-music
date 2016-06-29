@@ -18,6 +18,7 @@ Item {
             albumView.visible = true
             backButton.visible = false
             mainAlbumContainer.visible = false
+            page.title = "Liri Music"
         }
         anchors.margins: Units.dp(32)
         visible: false
@@ -107,6 +108,7 @@ Item {
                        Global.mode = allAlbumsModel.model
                        backButton.visible = true
                        mainAlbumContainer.visible = true
+                       page.title = title
 
                 }
             }
@@ -169,15 +171,10 @@ Item {
                    id: itemMouseArea2
                    anchors.fill: parent
                    onClicked: {
-
-                       demo.title = model.modelData.title
-                       playMusic.source = Qt.resolvedUrl(model.modelData.path)
-                       console.log(model.modelData.getSong)
-                       console.log(JSON.stringify(model.modelData))
+                       playMusic.source = "file://" + model.modelData.path
                        playMusic.play()
                        songPlaying.text = model.modelData.artist + ' - ' + model.modelData.title
                        page.title = model.modelData.artist + ' - ' + model.modelData.title
-                       demo.title = model.modelData.title
 
 
                 }
