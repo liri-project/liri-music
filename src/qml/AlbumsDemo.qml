@@ -19,7 +19,7 @@ Item {
             backButton.visible = false
             mainAlbumContainer.visible = false
         }
-        anchors.margins: Units.dp(32)
+        anchors.margins: dp(32)
         visible: false
     }
 
@@ -32,12 +32,12 @@ Item {
         }
         anchors {
             fill: parent
-            margins: Units.dp(32)
+            margins: dp(32)
 
         }
 
 
-        width: parent.width - Units.dp(64)
+        width: parent.width - dp(64)
         height: parent.height
         cellWidth: 180
         cellHeight: 180
@@ -52,7 +52,7 @@ Item {
                 id: wrapper
                 width: 160
                 height: 160
-                anchors.margins:Units.dp(32)
+                anchors.margins:dp(32)
                 elevation: 1
 
 
@@ -87,12 +87,12 @@ Item {
                     font.pixelSize: 12
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
-                    anchors.leftMargin: Units.dp(10)
+                    anchors.leftMargin: dp(10)
                     wrapMode: Text.WordWrap
-                    width: Units.dp(140)
+                    width: dp(140)
                     verticalAlignment: Text.AlignBottom
-                    height:Units.dp(50)
-                    anchors.margins:Units.dp(10)
+                    height:dp(50)
+                    anchors.margins:dp(10)
 
                 }
                 }
@@ -124,7 +124,7 @@ Item {
         id: mainAlbumContainer
         anchors {
             fill: parent
-            margins: Units.dp(32)
+            margins: dp(32)
 
         }
         visible:false

@@ -1,5 +1,5 @@
 import QtQuick 2.4
-import Material 0.1
+import Material 0.3
 import Material.ListItems 0.1 as ListItem
 import Material.Extras 0.1
 import Qt.labs.folderlistmodel 2.1
@@ -10,7 +10,7 @@ Item {
     View {
         anchors {
             fill: parent
-            margins: Units.dp(32)
+            margins: dp(32)
         }
 
         elevation: 1
@@ -28,8 +28,8 @@ Item {
 
                 action: Icon {
                     name: "social/person"
-                    height:Units.dp(32)
-                    width:Units.dp(32)
+                    height:dp(32)
+                    width:dp(32)
                     anchors.centerIn: parent
 
                 }

@@ -16,7 +16,7 @@ import "../js/musicId.js" as Global
                 action: Icon {
                     anchors.centerIn: parent
                     name: "image/color_lens"
-                    size: Units.dp(32)
+                    size: dp(32)
                 }
             }
 
@@ -29,7 +29,7 @@ import "../js/musicId.js" as Global
                 action: Icon {
                     anchors.centerIn: parent
                     name: "content/sort"
-                    size: Units.dp(32)
+                    size: dp(32)
                 }
             }
 
@@ -44,7 +44,7 @@ import "../js/musicId.js" as Global
                 action: Icon {
                     anchors.centerIn: parent
                     name: "social/public"
-                    size: Units.dp(32)
+                    size: dp(32)
                 }
             }
 
@@ -78,7 +78,7 @@ import "../js/musicId.js" as Global
                 action: Icon {
                     anchors.centerIn: parent
                     name: "av/shuffle"
-                    size: Units.dp(32)
+                    size: dp(32)
                 }
             }
         }
