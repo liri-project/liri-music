@@ -1,5 +1,5 @@
 import QtQuick 2.4
-import Material 0.2
+import Material 0.3
 import Material.ListItems 0.1 as ListItem
 import QtMultimedia 5.5
 import Qt.labs.folderlistmodel 2.1

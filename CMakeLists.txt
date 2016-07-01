@@ -7,6 +7,9 @@ find_package(Qt5 COMPONENTS Core Gui Sql Quick Qml Svg WebEngine REQUIRED)
 find_package(Taglib REQUIRED)
 find_package(Qt5GStreamer REQUIRED)
 
+add_definitions("-DQPM_INIT\\(E\\)=E.addImportPath\\(QStringLiteral\\(\\\"qrc:/\\\"\\)\\)\\;")
+include(material/vendor.cmake)
+
 include_directories(${TAGLIB_INCLUDE_DIRS})
 include_directories(${QTGSTREAMER_INCLUDE_DIR})
 

@@ -24,6 +24,7 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<Album>();
     app.setApplicationName("LiriMusic");
     QQmlApplicationEngine engine;
+    engine.addImportPath("qrc:/");
 
     QGst::init();
     if (app.arguments().size() > 1) {

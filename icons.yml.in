@@ -1,0 +1,13 @@
+out: ${ICONS_QRC}
+icons:
+  - av/volume_up
+  - av/shuffle
+  - av/skip_next
+  - av/play_arrow
+  - av/skip_previous
+  - navigation/arrow_drop_down
+  - av/album
+  - social/person
+  - av/queue_music
+  - social/public
+  - action/settings
