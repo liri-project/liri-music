@@ -60,7 +60,14 @@ void MusicScanner::scan(const QDir& dir, QGst::DiscovererPtr& discoverer) {
                 else
                   artist = Artist { 0, "Unknown Artist" };
 
-                Song song { 0, info->uri().toLocalFile(), info->tags().title(), 0, 0, "placeholder" };
+                Song song;
+                if(!info->tags().title().isEmpty())
+                  song = Song { 0, info->uri().toLocalFile(), info->tags().title(), 0, 0, "placeholder" };
+                else {
+                  QString path = MusicDatabase::get().getMusicFolder();
+                  QString title = info->uri().toLocalFile().right(info->uri().toLocalFile().size() - path.size());
+                  song = Song { 0, info->uri().toLocalFile(), title, 0, 0, "placeholder" };
+                }
 
                 Album album;
 
