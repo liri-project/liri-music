@@ -4,6 +4,7 @@ icons:
   - av/shuffle
   - av/skip_next
   - av/play_arrow
+  - av/pause
   - av/skip_previous
   - navigation/arrow_drop_down
   - av/album
