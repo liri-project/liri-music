@@ -1,5 +1,5 @@
 import QtQuick 2.4
-import Material 0.2
+import Material 0.3
 import Material.ListItems 0.1 as ListItem
 import QtMultimedia 5.5
 import Qt.labs.folderlistmodel 2.1
@@ -336,8 +336,8 @@ ApplicationWindow {
 
     id: demo
     title: "Liri Music"
-    height: Units.dp(600)
-    width: Units.dp(1200)
+    height: dp(600)
+    width: dp(1200)
 
     Timer {
         id: resetFolders
@@ -650,7 +650,7 @@ ApplicationWindow {
             id: navDrawer
             visible:true
 
-            enabled: selectedComponent == 'Activity' //page.width < Units.dp(600)
+            enabled: selectedComponent == 'Activity' //page.width < dp(600)
 
             Flickable {
                 anchors.fill: parent
@@ -701,14 +701,14 @@ ApplicationWindow {
                                                                             }
 
                                                                         }
-                                                                        anchors.topMargin: Units.dp(20)
-                                                                        height:Units.dp(36)
-                                                                        width:Units.dp(12)
+                                                                        anchors.topMargin: dp(20)
+                                                                        height: dp(36)
+                                                                        width: dp(12)
                                                                         anchors.horizontalCenter: parent.horizontalCenter
 
                                                                 }
 
-                                                                height:Units.dp(42)
+                                                                height: dp(42)
 
                                                                 onClicked: {
                                                                     Global.playedSongs = []
@@ -766,15 +766,15 @@ ApplicationWindow {
     Dialog {
         id: settingsDialog
         title: "Settings"
-        height:Units.dp(400)
-        width:Units.dp(600)
+        height: dp(400)
+        width: dp(600)
         positiveButtonText: "Save"
 
         Loader {
-            height:Units.dp(400)
-            width:Units.dp(600)
+            height: dp(400)
+            width: dp(600)
             anchors.fill: parent
-            //anchors.bottomMargin: Units.dp(100)
+            //anchors.bottomMargin: dp(100)
             asynchronous: true
             visible: true
             source: Qt.resolvedUrl("SettingsDemo.qml")
@@ -812,12 +812,12 @@ ApplicationWindow {
         MenuField {
             id: selection
             model: ["Primary color", "Accent color", "Background color"]
-            width: Units.dp(160)
+            width: dp(160)
         }
 
         Grid {
             columns: 7
-            spacing: Units.dp(8)
+            spacing: dp(8)
 
             Repeater {
                 model: [
@@ -829,11 +829,11 @@ ApplicationWindow {
                 ]
 
                 Rectangle {
-                    width: Units.dp(30)
-                    height: Units.dp(30)
-                    radius: Units.dp(2)
+                    width: dp(30)
+                    height: dp(30)
+                    radius: dp(2)
                     color: Palette.colors[modelData]["500"]
-                    border.width: modelData === "white" ? Units.dp(2) : 0
+                    border.width: modelData === "white" ? dp(2) : 0
                     border.color: Theme.alpha("#000", 0.26)
 
                     Ink {
@@ -919,14 +919,14 @@ ApplicationWindow {
                                         }
 
                                     }
-                                    anchors.topMargin: Units.dp(20)
-                                    height:Units.dp(36)
-                                    width:Units.dp(12)
+                                    anchors.topMargin: dp(20)
+                                    height:dp(36)
+                                    width:dp(12)
                                     anchors.horizontalCenter: parent.horizontalCenter
 
                             }
 
-                            height:Units.dp(42)
+                            height:dp(42)
 
                             onClicked: {
                                 Global.playedSongs = []
@@ -957,7 +957,7 @@ ApplicationWindow {
                 Loader {
                     id: example
                     anchors.fill: parent
-                    anchors.bottomMargin: Units.dp(100)
+                    anchors.bottomMargin: dp(100)
                     asynchronous: true
                     visible: status == Loader.Ready
                     // selectedComponent will always be valid, as it defaults to the first component
@@ -989,10 +989,10 @@ ApplicationWindow {
 
     Rectangle {
         color:'#fff'
-        height:Units.dp(100)
+        height:dp(100)
         width:parent.width
         anchors.bottom: parent.bottom
-        border.width: modelData === "white" ? Units.dp(2) : 0
+        border.width: modelData === "white" ? dp(2) : 0
         border.color: Theme.alpha("#aaa", 0.26)
 
         Rectangle {
@@ -1005,9 +1005,9 @@ ApplicationWindow {
             text: "Nothing playing"
             //anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
-            height:Units.dp(60)
+            height:dp(60)
             anchors.left: seeker.left
-            width:Units.dp(100)
+            width:dp(100)
             color: Theme.light.textColor
         }
 
@@ -1022,9 +1022,9 @@ ApplicationWindow {
             darkBackground: index == 1
             updateValueWhileDragging: true
             color:theme.primaryColor
-            anchors.rightMargin: Units.dp(50)
-            anchors.leftMargin:Units.dp(50)
-            anchors.bottomMargin:Units.dp(190)
+            anchors.rightMargin: dp(50)
+            anchors.leftMargin:dp(50)
+            anchors.bottomMargin:dp(190)
 
             onValueChanged: {
                 if(seeker.pressed){
@@ -1042,19 +1042,19 @@ ApplicationWindow {
 
         Rectangle {
 
-            anchors.bottomMargin: Units.dp(0)
+            anchors.bottomMargin: dp(0)
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
-            height:Units.dp(60)
-            width:Units.dp(210)
+            height:dp(60)
+            width:dp(210)
 
             IconButton {
                 iconName: 'av/skip_previous'
-                height:Units.dp(50)
-                width:Units.dp(70)
+                height:dp(50)
+                width:dp(70)
                 id: prevButton
                 anchors.left: parent.left
-                size: Units.dp(30)
+                size: dp(30)
                 onClicked: {
                     getPrevTrack()
                 }
@@ -1062,11 +1062,11 @@ ApplicationWindow {
 
             IconButton {
                 iconName: 'av/play_arrow'
-                height:Units.dp(50)
-                width:Units.dp(70)
+                height:dp(50)
+                width:dp(70)
                 id: playButton1
                 anchors.left: prevButton.right
-                size: Units.dp(30)
+                size: dp(30)
                 onClicked: {
                     playTriggerAction()
                 }
@@ -1075,11 +1075,11 @@ ApplicationWindow {
 
             IconButton {
                 iconName: 'av/skip_next'
-                height:Units.dp(50)
-                width:Units.dp(70)
+                height:dp(50)
+                width:dp(70)
                 id: nextButton
                 anchors.left: playButton1.right
-                size: Units.dp(30)
+                size: dp(30)
 
                 onClicked: {
                         getNextTrack()
@@ -1094,11 +1094,11 @@ ApplicationWindow {
 
     Rectangle {
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: Units.dp(10)
+        anchors.bottomMargin: dp(10)
         anchors.right: parent.right
-        anchors.rightMargin:Units.dp(30)
-        height:Units.dp(40)
-        width:Units.dp(150)
+        anchors.rightMargin:dp(30)
+        height:dp(40)
+        width:dp(150)
         Component.onCompleted: {
             if(filePathName){
                 folderModel.folder = loadedFileFolder.toString()
@@ -1113,9 +1113,9 @@ ApplicationWindow {
             iconName: {
                 return 'av/shuffle'
             }
-            height:Units.dp(40)
-            width:Units.dp(50)
-            anchors.topMargin: Units.dp(-50)
+            height:dp(40)
+            width:dp(50)
+            anchors.topMargin: dp(-50)
             anchors.right: volumeIcon.left
 
             color: {
@@ -1193,10 +1193,10 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             id: volumeIcon
             iconName: 'av/volume_up'
-            height:Units.dp(36)
-            width:Units.dp(50)
-            anchors.topMargin: Units.dp(-50)
-            anchors.rightMargin: Units.dp(60)
+            height:dp(36)
+            width:dp(50)
+            anchors.topMargin: dp(-50)
+            anchors.rightMargin: dp(60)
             anchors.left: parent.left
             color: index == 0 ? Theme.light.textColor : Theme.dark.textColor
             onClicked: {
@@ -1217,9 +1217,9 @@ ApplicationWindow {
         Slider {
             id: volumeControl
             Layout.alignment: Qt.AlignCenter
-            width: Units.dp(100)
+            width: dp(100)
             anchors.bottom: parent.bottom
-            height:Units.dp(36)
+            height:dp(36)
             anchors.right: parent.right
             updateValueWhileDragging: true
             color:theme.primaryColor
