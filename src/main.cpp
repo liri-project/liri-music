@@ -17,6 +17,7 @@
 #include "musicdatabase.h"
 #include "musicscanner.h"
 #include "albumartprovider.h"
+#include "../material/src/plugin.h"
 
 int main(int argc, char *argv[]){
     QApplication app(argc, argv);
@@ -24,6 +25,8 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<Album>();
     app.setApplicationName("LiriMusic");
     QQmlApplicationEngine engine;
+    MaterialPlugin qmlMaterial;
+    qmlMaterial.registerTypes("Material");
     engine.addImportPath("qrc:/");
 
     QGst::init();
