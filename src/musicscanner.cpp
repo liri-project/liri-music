@@ -53,9 +53,29 @@ void MusicScanner::scan(const QDir& dir, QGst::DiscovererPtr& discoverer) {
             }
 
             if(info->audioStreams().count() != 0){
-                Artist artist { 0, info->tags().artist() };
-                Song song { 0, info->uri().toLocalFile(), info->tags().title(), 0, 0, "placeholder" };
-                Album album { 0, info->tags().tagValue("album").toString(), 0, "placeholder" };
+
+                Artist artist;
+                if(!info->tags().artist().isEmpty())
+                  artist = Artist { 0, info->tags().artist() };
+                else
+                  artist = Artist { 0, "Unknown Artist" };
+
+                Song song;
+                if(!info->tags().title().isEmpty())
+                  song = Song { 0, info->uri().toLocalFile(), info->tags().title(), 0, 0, "placeholder" };
+                else {
+                  QString path = MusicDatabase::get().getMusicFolder();
+                  QString title = info->uri().toLocalFile().right(info->uri().toLocalFile().size() - path.size() - 1);
+                  song = Song { 0, info->uri().toLocalFile(), title, 0, 0, "placeholder" };
+                }
+
+                Album album;
+
+                if(!info->tags().tagValue("album").toString().isEmpty())
+                  album = Album { 0, info->tags().tagValue("album").toString(), 0, "placeholder" };
+                else
+                  album = Album { 0, "Unknown Album", 0, "placeholder" };
+
                 //emit foundSong(song);
                 //emit foundAlbum(album);
 
