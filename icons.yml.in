@@ -8,11 +8,14 @@ icons:
   - av/play_arrow
   - av/pause
   - av/skip_previous
-  - navigation/arrow_drop_down
   - av/album
-  - social/person
   - av/queue_music
+  - navigation/arrow_drop_down
+  - social/person
   - social/public
+  - communication/chat
   - action/settings
+  - action/dashboard
+  - action/language
   - content/sort
   - image/color_lens
