@@ -8,6 +8,9 @@ import "../js/musicId.js" as Global
 
 Item {
 
+    property string currentAlbum: "Unknown Album"
+    property string currentArtist: "Unknown Artist"
+
 
     Button {
         id: backButton
@@ -102,9 +105,16 @@ Item {
                    anchors.fill: parent
                    onClicked: {
                        albumView.visible = false
+                       mainAlbumContainer.visible = true
                        albumDetailView.visible = true
-                       albumDetailView.model = getSong
-                       currentAlbum.model = getSong
+                       albumDetailView.model = songModel.getSongsByAlbum(id)
+                       demo.title = title
+                       page.title = title
+                       currentAlbum = title
+                       //songListModel.model = songModel.getSingleAlbum(id)
+                       console.log("single album", JSON.stringify(albumDetailView.model))
+
+
                        Global.mode = allAlbumsModel.model
                        backButton.visible = true
                        mainAlbumContainer.visible = true
@@ -138,26 +148,23 @@ Item {
         ListView{
             id: albumDetailView
             anchors.fill: parent
-            model: albumModel
+            model: songListModel.model
             visible: false
             delegate: ListItem.Subtitled{
-                text: title
+                text: {
+                    return modelData.title
+                }
+
                 visible: true
                 subText: {
-                    if(artist && title){
-                        return artist + ' - ' + title
-                    }else if(title){
-                        return title;
-                    }else {
-                        return 'Unknown Album'
-                    }
+                    return currentAlbum
                 }
 
                 action: Image {
 
                     source: {
-                        if(art != 'placeholder'){
-                        return "file://" + art
+                        if(model.modelData.art != 'placeholder'){
+                        return "file://" + model.modelData.art
                         }else{
                             return "qrc:/images/placeholder.png"
                         }
@@ -172,12 +179,10 @@ Item {
                    onClicked: {
 
                        demo.title = model.modelData.title
-                       playMusic.source = Qt.resolvedUrl(model.modelData.path)
-                       console.log(model.modelData.getSong)
-                       console.log(JSON.stringify(model.modelData))
+                       playMusic.source = "file://" + model.modelData.path
                        playMusic.play()
-                       songPlaying.text = model.modelData.artist + ' - ' + model.modelData.title
-                       page.title = model.modelData.artist + ' - ' + model.modelData.title
+                       songPlaying.text = currentAlbum + ' - ' + model.modelData.title
+                       page.title = currentAlbum + ' - ' + model.modelData.title
                        demo.title = model.modelData.title
 
 

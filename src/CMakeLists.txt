@@ -42,6 +42,7 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/icons.qrc
 set(liri_vinyl_SOURCES
   main.cpp
   song.cpp
+  songmodel.cpp
   album.cpp
   albummodel.cpp
   artist.cpp
@@ -61,6 +62,7 @@ set(liri_vinyl_HEADERS
     musicdatabase.h
     musicscanner.h
     song.h
+    songmodel.h
     settings.h
     schema.h
 )

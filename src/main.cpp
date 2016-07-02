@@ -14,6 +14,8 @@
 #include <QtWebEngine/QtWebEngine>
 #include "album.h"
 #include "albummodel.h"
+#include "song.h"
+#include "songmodel.h"
 #include "musicdatabase.h"
 #include "musicscanner.h"
 #include "albumartprovider.h"
@@ -23,6 +25,7 @@ int main(int argc, char *argv[]){
     QApplication app(argc, argv);
     QtWebEngine::initialize();
     qRegisterMetaType<Album>();
+    qRegisterMetaType<Song>();
     app.setApplicationName("LiriMusic");
     QQmlApplicationEngine engine;
     MaterialPlugin qmlMaterial;
@@ -46,9 +49,11 @@ int main(int argc, char *argv[]){
     engine.rootContext()->setContextProperty("streamDirectory", stream_directory);
 
     AlbumModel albumModel;
+    SongModel songModel;
     engine.rootContext()->setContextProperty("allSongObjects", QVariant::fromValue(MusicDatabase::get().getAllSongs()));
     engine.rootContext()->setContextProperty("allArtists", QVariant::fromValue(MusicDatabase::get().getAllArtists()));
     engine.rootContext()->setContextProperty("albumModel", &albumModel);
+    engine.rootContext()->setContextProperty("songModel", &songModel);
     engine.addImageProvider("art", new AlbumArtProvider());
 
     MusicScanner scanner {};

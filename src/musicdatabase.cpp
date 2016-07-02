@@ -38,6 +38,10 @@ QList<Album> MusicDatabase::getAllAlbums() {
     return database::find<Album>(db);
 }
 
+QList<Song> MusicDatabase::getSongsByAlbum(int id){
+    return database::find<song::album>(db, id);
+}
+
 QList<Artist> MusicDatabase::getAllArtists() {
     return database::find<Artist>(db);
 }

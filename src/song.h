@@ -2,6 +2,12 @@
 #define LIRI_MUSIC_SONG_H
 
 #include <QObject>
+#include <QtSql/QSql>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
+#include <QList>
+#include "song.h"
+#include <QVariant>
 
 class Song : public QObject
 {
@@ -9,10 +15,11 @@ class Song : public QObject
 
     Q_PROPERTY(quint64 id READ id WRITE setId)
     Q_PROPERTY(QString path READ path WRITE setPath)
-    Q_PROPERTY(QString title READ title WRITE setTitle)
-    Q_PROPERTY(quint64 album READ album WRITE setAlbum)
+    Q_PROPERTY(QString title READ title WRITE setTitle CONSTANT)
+    Q_PROPERTY(quint64 album READ album WRITE setAlbum CONSTANT)
     Q_PROPERTY(quint64 artist READ artist WRITE setArtist)
-    Q_PROPERTY(QString art READ art WRITE setArt)
+    Q_PROPERTY(QString art READ art CONSTANT)
+
 
     QString m_path;
     QString m_title;
@@ -43,6 +50,7 @@ public:
     void setArt(const QString& art);
 };
 
-Q_DECLARE_METATYPE(Song)
+Q_DECLARE_METATYPE(Song);
+
 
 #endif // SONG_OBJECT_MAIN

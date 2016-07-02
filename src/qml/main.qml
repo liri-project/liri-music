@@ -20,10 +20,12 @@ ApplicationWindow {
         id:initScan
         interval:2000; running: false; repeat: false
         onTriggered: {
+            //console.log(JSON.stringify(albumModel.getSingleAlbum(1)));
             //musicFolder.initialMusicScan = "Do this";
             //console.log(musicFolder.initialMusicScan);
         }
     }
+
 
     Timer {
         id: setSeekTimer
@@ -327,6 +329,16 @@ ApplicationWindow {
         model: {
                 return albumModel
         }
+        visible: true
+    }
+
+    ListView {
+        id: songListModel
+        model: {
+
+
+        }
+
         visible: true
     }
 

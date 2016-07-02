@@ -1,31 +1,30 @@
-#ifndef ALBUMMODEL_H
-#define ALBUMMODEL_H
+#ifndef SONGMODEL_H
+#define SONGMODEL_H
 
 #include <QAbstractListModel>
 #include <QModelIndex>
 #include <QList>
 
-#include "album.h"
+#include "song.h"
 
-class AlbumModel : public QAbstractListModel
+class SongModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    enum AlbumRoles {
+    enum SongRoles {
         TitleRole = Qt::UserRole + 1,
-        ArtRole,
-        ArtistRole,
+        AlbumRole,
+        PathRole,
         IdRole
     };
 
-    AlbumModel(QObject *parent = 0);
+    SongModel(QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    Q_INVOKABLE QList<Song> getSingleAlbum(int id, int role) const;
+    Q_INVOKABLE QList<QObject*> getSongsByAlbum(int id) const;
 
 public slots:
-    void addAlbum(const Album &album);
 
 protected:
     QHash<int, QByteArray> roleNames() const;

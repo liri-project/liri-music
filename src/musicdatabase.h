@@ -29,6 +29,7 @@ public:
     QList<Album> getAllAlbums();
     QList<Artist> getAllArtists();
     QList<Song> getAllSongs();
+    QList<Song> getSongsByAlbum(int id);
 
     QString getMusicFolder();
     QByteArray getArt(const QString&);
