@@ -1,6 +1,8 @@
 out: ${ICONS_QRC}
 icons:
   - av/volume_up
+  - av/volume_down
+  - av/volume_off
   - av/shuffle
   - av/skip_next
   - av/play_arrow
