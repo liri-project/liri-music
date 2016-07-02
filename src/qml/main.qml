@@ -211,6 +211,20 @@ ApplicationWindow {
     }
 
     ListView {
+        id: allSongsModel
+        model: songModel.getAllSongs()
+        visible: true
+    }
+
+    ListView {
+        id: artistSongsModel
+        model: {
+
+        }
+        visible: true
+    }
+
+    ListView {
         id: songListModel
         model: {
 
@@ -275,22 +289,36 @@ ApplicationWindow {
     property string selectedComponent: sidebar[0][0]
 
     function getTrack(){
-        if(Global.songId >= songListModel.model.length){
-            Global.songId = 0
-        }else if(Global.songId < 0){
-            Global.songId = 0
-        }
+        var item;
 
-        var item = songListModel.model[Global.songId]
-        console.log("current song id", Global.songId)
-        console.log("album", Global.currentAlbum)
-        console.log("current song", songListModel.model[Global.songId].title)
+        if(Global.mode == "album"){
+            item = songListModel.model[Global.songId]
+            if(Global.songId >= songListModel.model.length){
+                Global.songId = 0
+            }else if(Global.songId < 0){
+                Global.songId = 0
+            }
+        }else if(Global.mode == "all songs"){
+            item = allSongsModel.model[Global.songId]
+            if(Global.songId >= allSongsModel.model.length){
+                Global.songId = 0
+            }else if(Global.songId < 0){
+                Global.songId = 0
+            }
+        }else if(Global.mode == "artist"){
+            item = artistSongsModel.model[Global.songId]
+            if(Global.songId >= artistSongsModel.model.length){
+                Global.songId = 0
+            }else if(Global.songId < 0){
+                Global.songId = 0
+            }
+        }
 
         demo.title = item.title
         playMusic.source = "file://" + item.path
         playMusic.play()
-        songPlaying.text = Global.currentAlbum + ' - ' + item.title
-        page.title = Global.currentAlbum + ' - ' + item.title
+        songPlaying.text = songModel.getAlbum(item.album) + ' - ' + item.title
+        page.title = songModel.getAlbum(item.album)  + ' - ' + item.title
         demo.title = item.title
     }
 

@@ -43,36 +43,40 @@ QList<QObject*> SongModel::getSongsByAlbum(int id) const {
     QList<Song> current = MusicDatabase::get().getSongsByAlbum(id);
 
     for(const auto& song : current){
-        std::cout << song.title().toStdString() << std::endl;
         songList.append(new Song(song.id(), song.path(), song.title(), song.album(), song.artist(), "placeholder"));
     }
-    /*
-
-        if(db.open()){
-            QSqlQuery getAllAlbums;
-            getAllAlbums.prepare("select * FROM Albums");
-            if(getAllAlbums.exec()){
-                while(getAllAlbums.next()){
-                    QString album = getAllAlbums.value(1).toString();
-                    QString artist = getAllAlbums.value(2).toString();
-                    QString art = getAllAlbums.value(3).toString();
-                    albumList.append(new AlbumObject(album, artist, art));
-
-                }
-            }
-        }
-        if(albumList.count() > 0){
-            return albumList;
-        }else{
-            albumList.append(new AlbumObject("undefined", "undefined", "undefined"));
-            return albumList;
-        }
-
-    QList<Song> songList = current;
     return songList;
-    */
-    return songList;
+}
 
+QList<QObject*> SongModel::getAllSongs() const {
+    QList<QObject*> songList;
+    QList<Song> current = MusicDatabase::get().getAllSongs();
+
+    for(const auto& song : current){
+        songList.append(new Song(song.id(), song.path(), song.title(), song.album(), song.artist(), "placeholder"));
+    }
+    return songList;
+}
+
+QList<QObject*> SongModel::getSongsByArtist(int id) const {
+    QList<QObject*> songList;
+    QList<Song> current = MusicDatabase::get().getSongsByArtist(id);
+
+    for(const auto& song : current){
+        songList.append(new Song(song.id(), song.path(), song.title(), song.album(), song.artist(), "placeholder"));
+    }
+    return songList;
+}
+
+QString SongModel::getArtist(int id) const {
+    QString artist = MusicDatabase::get().getArtist(id);
+    std::cout << "Artist " << artist.toStdString() << std::endl;
+    return artist;
+}
+
+QString SongModel::getAlbum(int id) const {
+    QString album = MusicDatabase::get().getAlbum(id);
+    return album;
 }
 
 QHash<int, QByteArray> SongModel::roleNames() const

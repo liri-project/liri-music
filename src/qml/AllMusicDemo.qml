@@ -20,15 +20,17 @@ Item {
 
         ListView {
             anchors.fill: parent
-            model: allSongObjects
+            model: allSongsModel.model //songModel.getAllSongs()
             delegate: ListItem.Subtitled{
                 text: model.modelData.title
                 visible: true
                 subText: {
-                    if(model.modelData.artist && model.modelData.album){
-                        return model.modelData.artist + ' - ' + model.modelData.album
-                    }else if(model.modelData.album){
-                        return model.modelData.album;
+                    var artist = songModel.getArtist(model.modelData.artist)
+                    var album = songModel.getAlbum(model.modelData.album)
+                    if(artist && album){
+                        return artist + ' - ' + album
+                    }else if(album){
+                        return album;
                     }else {
                         return 'Unknown Album'
                     }
@@ -54,12 +56,23 @@ Item {
                    anchors.fill: parent
                    onClicked: {
                        Global.playedSongs.push(model.index)
+                       var id = model.modelData
+
+                       Global.songId = model.index
+                       Global.currentAlbum = currentAlbum
+                       console.log("index? ", model.index)
+                       Global.mode = "all songs"
+                       var album = songModel.getAlbum(id.album)
+                       var artist = songModel.getArtist(id.artist)
+
+
                        demo.title = model.modelData.title
                        playMusic.source = "file://" + model.modelData.path
                        playMusic.play()
-                       songPlaying.text = model.modelData.artist + ' - ' + model.modelData.title
-                       page.title = model.modelData.artist + ' - ' + model.modelData.title
+                       songPlaying.text = album + ' - ' + model.modelData.title
+                       page.title = album + ' - ' + model.modelData.title
                        demo.title = model.modelData.title
+
 
                 }
             }

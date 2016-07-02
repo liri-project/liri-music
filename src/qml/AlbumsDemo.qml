@@ -12,7 +12,6 @@ Item {
     property string currentAlbum: "Unknown Album"
     property string currentArtist: "Unknown Artist"
 
-
     Button {
         id: backButton
         text: "Back to All Albums"
@@ -113,6 +112,8 @@ Item {
                        page.title = title
                        currentAlbum = title
                        songListModel.model = songModel.getSongsByAlbum(id)
+                       Global.currentArtist = songModel.getArtist(id)
+                       currentArtist = (Global.currentArtist) ? Global.currentArtist : "Unknown Artist"
 
 
                        Global.mode = allAlbumsModel.model
@@ -181,6 +182,7 @@ Item {
                        Global.songId = model.index
                        Global.currentAlbum = currentAlbum
                        console.log("index? ", model.index)
+                       Global.mode = "album"
 
 
                        demo.title = model.modelData.title

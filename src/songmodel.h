@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 #include <QModelIndex>
 #include <QList>
+#include <QString>
 
 #include "song.h"
 
@@ -23,6 +24,10 @@ public:
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     Q_INVOKABLE QList<QObject*> getSongsByAlbum(int id) const;
+    Q_INVOKABLE QList<QObject*> getSongsByArtist(int id) const;
+    Q_INVOKABLE QString getArtist(int id) const;
+    Q_INVOKABLE QString getAlbum(int id) const;
+    Q_INVOKABLE QList<QObject*> getAllSongs() const;
 
 public slots:
 

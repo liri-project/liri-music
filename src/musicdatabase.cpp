@@ -42,8 +42,32 @@ QList<Song> MusicDatabase::getSongsByAlbum(int id){
     return database::find<song::album>(db, id);
 }
 
+QList<Song> MusicDatabase::getSongsByArtist(int id){
+    return database::find<song::artist>(db, id);
+}
+
 QList<Artist> MusicDatabase::getAllArtists() {
     return database::find<Artist>(db);
+}
+
+QString MusicDatabase::getArtist(int id){
+    QList<Artist> artists = database::find<artist::id>(db, id);
+    QString currentArtist;
+
+    for(const auto& artist : artists){
+        currentArtist = artist.name();
+
+    }
+    return currentArtist;
+
+}
+
+QString MusicDatabase::getAlbum(int id){
+    QList<Album> albums = database::find<album::id>(db, id);
+    QString currentAlbum = albums[0].title();
+    return currentAlbum;
+
+
 }
 
 QList<Song> MusicDatabase::getAllSongs() {
