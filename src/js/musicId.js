@@ -3,6 +3,8 @@
 .pragma library
 var songId = 0;
 var currentFolder = 'file:///home';
+var currentAlbum = "";
+var currentArtist = "";
 var i = 0;
 var playedSongs = [];
 var shuffle = false;

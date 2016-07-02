@@ -342,6 +342,7 @@ ApplicationWindow {
         visible: true
     }
 
+
     ListView {
         id: currentAlbum
     }
@@ -376,6 +377,7 @@ ApplicationWindow {
         tabHighlightColor: "white"
     }
 
+
     property var sidebar: [
             "Albums", "Artists", "All Music", "Streams"
     ]
@@ -394,170 +396,34 @@ ApplicationWindow {
 
     property string selectedComponent: sidebar[0][0]
 
-    function getNextTrack(){
-
-        if(Global.mode[0].objectName == "allSongObjects"){
-            if(Global.shuffle){
-                var objects = Global.mode
-                if(Global.playedSongs.length == allSongObjects.length){
-                    Global.playedSongs = [];
-                }
-                function getRand() {
-                    var rand = Math.floor(Math.random() * parseInt(objects.length))
-                    if (Global.playedSongs.indexOf(rand) === -1) {
-                        return rand;
-                    } else {
-                        return getRand();
-                    }
-                }
-
-                var rand = getRand();
-                Global.songId = rand;
-                var newSongId = Global.songId
-                folderModel.folder = Global.currentFolder
-                var currentSong = playMusic.source
-                var nextFile = objects[newSongId].path
-                playMusic.source = "file://" + nextFile
-                playMusic.play()
-
-                demo.title = objects[newSongId].title
-                songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
-                page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
-                demo.title = objects[newSongId].title
-            }else{
-            if(Global.songId == allSongObjects.length){
-                var folder = folderModel.folder
-                folderModel.folder = Global.currentFolder
-                var currentSong = playMusic.source
-                var nextFile = Global.currentFolder + '/' + folderModel.get(1, 'fileName')
-                playMusic.source = nextFile
-                playMusic.play()
-                Global.songId = 1;
-
-            }else{
-                var objects = Global.mode
-                if(Global.mode == allSongObjects){
-                    var mode = allSongObjects;
-                }
-
-                if(Global.playedSongs.length == allSongObjects.length){
-                    Global.playedSongs = [];
-                }
-
-
-                Global.songId = Global.songId + 1;
-                var newSongId = Global.songId
-                var currentSong = playMusic.source
-                var nextFile = allSongObjects[newSongId].path
-
-                playMusic.source = "file://" + nextFile
-                playMusic.play()
-
-                demo.title = allSongObjects[newSongId].title
-                songPlaying.text = allSongObjects[newSongId].artist + ' - ' + allSongObjects[newSongId].title
-                page.title = allSongObjects[newSongId].artist + ' - ' + allSongObjects[newSongId].title
-                demo.title = allSongObjects[newSongId].title
-            }
-            }
-        }else{
-            if(Global.shuffle){
-                objects = currentAlbum.model
-                if(Global.playedSongs.length == objects.length){
-                    Global.playedSongs = [];
-                }
-                function getRand() {
-                    var rand = Math.floor(Math.random() * parseInt(objects.length))
-                    if (Global.playedSongs.indexOf(rand) === -1) {
-                        return rand;
-                    } else {
-                        return getRand();
-                    }
-                }
-
-                rand = getRand();
-                Global.songId = rand;
-                newSongId = Global.songId
-                folderModel.folder = Global.currentFolder
-                currentSong = playMusic.source
-                nextFile = objects[newSongId].path
-                playMusic.source = "file://" + nextFile
-                playMusic.play()
-
-                demo.title = objects[newSongId].title
-                songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
-                page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
-                demo.title = objects[newSongId].title
-            }else{
-                objects = currentAlbum.model
-            if(Global.songId == objects.length){
-                var folder = folderModel.folder
-                folderModel.folder = Global.currentFolder
-                var currentSong = playMusic.source
-                var nextFile = Global.currentFolder + '/' + folderModel.get(1, 'fileName')
-                playMusic.source = nextFile
-                playMusic.play()
-                Global.songId = 1;
-
-            }else{
-                objects = currentAlbum.model
-
-                if(Global.playedSongs.length == objects.length){
-                    Global.playedSongs = [];
-                }
-
-
-                Global.songId = Global.songId + 1;
-                newSongId = Global.songId
-                currentSong = playMusic.source
-                nextFile = objects[newSongId].path
-                playMusic.source = "file://" + nextFile
-                playMusic.play()
-
-                demo.title = objects[newSongId].title
-                songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
-                page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
-                demo.title = objects[newSongId].title
+    function getTrack(){
+        if(Global.songId >= songListModel.model.length){
+            Global.songId = 0
+        }else if(Global.songId < 0){
+            Global.songId = 0
         }
+
+        var item = songListModel.model[Global.songId]
+        console.log("current song id", Global.songId)
+        console.log("album", Global.currentAlbum)
+        console.log("current song", songListModel.model[Global.songId].title)
+
+        demo.title = item.title
+        playMusic.source = "file://" + item.path
+        playMusic.play()
+        songPlaying.text = Global.currentAlbum + ' - ' + item.title
+        page.title = Global.currentAlbum + ' - ' + item.title
+        demo.title = item.title
     }
-        }
+
+    function getNextTrack(){
+        Global.songId = Global.songId + 1
+        getTrack()
     }
 
     function getPrevTrack(){
-        if(Global.mode[0].objectName == "allSongObjects"){
-            // Remove last item in songsplayed
-            Global.playedSongs.splice(-1,1)
-            Global.songId = Global.playedSongs[Global.playedSongs.length - 1];
-            if(!Global.playedSongs[Global.playedSongs.length]){
-                Global.songId = 0
-            }
-
-            // get new song id
-            var newSongId = Global.songId;
-            var nextFile = allSongObjects[Global.songId].path
-            Global.prevTrack = true
-            playMusic.source = "file://" + nextFile
-            playMusic.play()
-            demo.title = allSongObjects[newSongId].title
-            songPlaying.text = allSongObjects[newSongId].artist + ' - ' + allSongObjects[newSongId].title
-            page.title = allSongObjects[newSongId].artist + ' - ' + allSongObjects[newSongId].title
-            demo.title = allSongObjects[newSongId].title
-        }else{
-            var objects = currentAlbum.model
-            Global.playedSongs.splice(-1,1)
-            Global.songId = Global.playedSongs[Global.playedSongs.length - 1]
-            newSongId = Global.songId
-            nextFile = objects[newSongId].path
-            Global.prevTrack = true
-            playMusic.source = "file://" + nextFile
-            playMusic.play()
-            demo.title = objects[newSongId].title
-            songPlaying.text = objects[newSongId].artist + ' - ' + objects[newSongId].title
-            page.title = objects[newSongId].artist + ' - ' + objects[newSongId].title
-            demo.title = objects[newSongId].title
-
-        }
-
-
+        Global.songId = Global.songId - 1
+        getTrack()
     }
 
     function playTriggerAction(){
@@ -1054,7 +920,7 @@ ApplicationWindow {
 
         Rectangle {
 
-            anchors.bottomMargin: dp(0)
+            anchors.bottomMargin: dp(-5)
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             height:dp(60)
@@ -1062,35 +928,43 @@ ApplicationWindow {
 
             IconButton {
                 iconName: 'av/skip_previous'
-                height:dp(50)
-                width:dp(70)
+
                 id: prevButton
                 anchors.left: parent.left
+                anchors.rightMargin: dp(60)
                 size: dp(30)
                 onClicked: {
                     getPrevTrack()
+                }
+                color: {
+                    return Theme.light.textColor
                 }
             }
 
             IconButton {
                 iconName: 'av/play_arrow'
-                height:dp(50)
-                width:dp(70)
                 id: playButton1
                 anchors.left: prevButton.right
+                anchors.leftMargin: dp(30)
                 size: dp(30)
                 onClicked: {
                     playTriggerAction()
+                }
+                color: {
+                    return Theme.light.textColor
                 }
 
             }
 
             IconButton {
                 iconName: 'av/skip_next'
-                height:dp(50)
-                width:dp(70)
+                color: {
+                    return Theme.light.textColor
+                }
+
                 id: nextButton
                 anchors.left: playButton1.right
+                anchors.leftMargin: dp(30)
                 size: dp(30)
 
                 onClicked: {
@@ -1105,163 +979,154 @@ ApplicationWindow {
     }
 
     Rectangle {
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(10)
-        anchors.right: parent.right
-        anchors.rightMargin:dp(30)
-        height:dp(40)
-        width:dp(150)
-        Component.onCompleted: {
-            if(filePathName){
-                folderModel.folder = loadedFileFolder.toString()
-                albumFolder.folder = loadedFileFolder.toString()
-                playMusic.source = 'file://' + filePathName
-                playMusic.play()
-            }
-        }
-
-        IconButton {
-            id: shuffleButton
-            iconName: {
-                return 'av/shuffle'
-            }
-            height:dp(40)
-            width:dp(50)
-            anchors.topMargin: dp(-50)
-            anchors.right: volumeIcon.left
-
-            color: {
-                if(Global.shuffle){
-                    return theme.primaryColor;
-                }else{
-                    return Theme.light.textColor
-                }
-            }
-            Component.onCompleted: {
-                msg.author = "Nick"
-                aa.getAlbums = "New Album"
-                console.log(aa.getAlbums);
-
-                Global.mode = allSongObjects
-                var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
-                db.transaction(
-                    function(tx) {
-                        // Create the database if it doesn't already exist
-                        tx.executeSql('CREATE TABLE IF NOT EXISTS Settings(id INTEGER PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)');
-                        // Show all added greetings
-                        var rs = tx.executeSql('SELECT * FROM Settings WHERE setting="shuffle"');
-                        var r = ""
-
-                        if(rs.rows.length > 0){
-                            for(var i = 0; i < rs.rows.length; i++) {
-                                r += rs.rows.item(i).setting + ", " + rs.rows.item(i).value + "\n"
-                            }
-                            console.log(r)
-                            console.log(rs.rows.item(0).value)
-                            Global.shuffle = rs.rows.item(0).value
-                            if( rs.rows.item(0).value){
-                                shuffleButton.color = theme.primaryColor;
-                            }else{
-                                shuffleButton.color = Theme.light.textColor
-                            }
-                        }else{
-                            Global.shuffle = false;
-                        }
-
-
-
-                    })
-            }
-
-
-            onClicked: {
-                Global.shuffle = !Global.shuffle
-                if(Global.shuffle){
-                    this.color = theme.primaryColor;
-                }else{
-                    this.color = Theme.light.textColor
-                }
-
-                var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
-                db.transaction(
-                    function(tx) {
-                        // Create the database if it doesn't aGlobal.shufflelready exist
-                        tx.executeSql('CREATE TABLE IF NOT EXISTS Settings(id INT PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)');
-
-                        var rs = tx.executeSql('SELECT * FROM Settings WHERE setting="shuffle"')
-                        if(rs.rows.length > 0){
-                            tx.executeSql('UPDATE Settings SET value="' + Global.shuffle + '" WHERE id=' + rs.rows.item(0).id);
-
-                        }else{
-                            tx.executeSql('INSERT INTO Settings VALUES (NULL, ?, ?)',  [ 'shuffle', Global.shuffle ]);
-                        }
-
-                    })
-            }
-
-        }
-
-        IconButton {
             anchors.bottom: parent.bottom
-            id: volumeIcon
-            iconName: 'av/volume_up'
-            height:dp(36)
-            width:dp(50)
-            anchors.topMargin: dp(-50)
-            anchors.rightMargin: dp(60)
-            anchors.left: parent.left
-            color: index == 0 ? Theme.light.textColor : Theme.dark.textColor
-            onClicked: {
-                if(volumeControl.value == 0.00){
-                    volumeControl.value = 1
-                    this.iconName = 'av/volume_up'
-                    this.color = Theme.light.textColor
-
-                }else{
-                    volumeControl.value = 0.00
-                    this.iconName = 'av/volume_off'
-                    this.color = theme.primaryColor //Theme.alpha('#f33', .9)
-                }
-            }
-        }
-
-
-        Slider {
-            id: volumeControl
-            Layout.alignment: Qt.AlignCenter
-            width: dp(100)
-            anchors.bottom: parent.bottom
-            height:dp(36)
+            anchors.bottomMargin: dp(10)
             anchors.right: parent.right
-            updateValueWhileDragging: true
-            color:theme.primaryColor
-            value: 1.0
-            onValueChanged: {
-                if(this.value == 0.00){
-                    volumeIcon.iconName = 'av/volume_off'
-                    volumeIcon.color = theme.primaryColor //Theme.alpha('#f33', .9)
-
-                }else if(this.value > 0.00 && this.value <= 0.60){
-                    volumeIcon.iconName = 'av/volume_down'
-                    volumeIcon.color = Theme.light.textColor
-                }else{
-                    volumeIcon.iconName = 'av/volume_up'
-                    volumeIcon.color = Theme.light.textColor
-                }
-                playMusic.volume = this.value
-            }
+            anchors.rightMargin:dp(30)
+            height:dp(40)
+            width:dp(150)
             Component.onCompleted: {
-
-                    initScan.start();
+                if(filePathName){
+                    folderModel.folder = loadedFileFolder.toString()
+                    albumFolder.folder = loadedFileFolder.toString()
+                    playMusic.source = 'file://' + filePathName
+                    playMusic.play()
+                }
             }
+
+            IconButton {
+                id: shuffleButton
+                iconName: {
+                    return 'av/shuffle'
+                }
+
+                anchors.topMargin: dp(-60)
+                anchors.right: parent.left
+                anchors.rightMargin: dp(20)
+
+                color: {
+                    if(Global.shuffle){
+                        return theme.primaryColor;
+                    }else{
+                        return Theme.light.textColor
+                    }
+                }
+                Component.onCompleted: {
+                    msg.author = "Nick"
+                    aa.getAlbums = "New Album"
+                    console.log(aa.getAlbums);
+
+                    Global.mode = allSongObjects
+                    var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
+                    db.transaction(
+                        function(tx) {
+                            // Create the database if it doesn't already exist
+                            tx.executeSql('CREATE TABLE IF NOT EXISTS Settings(id INTEGER PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)');
+                            // Show all added greetings
+                            var rs = tx.executeSql('SELECT * FROM Settings WHERE setting="shuffle"');
+                            var r = ""
+
+                            if(rs.rows.length > 0){
+                                for(var i = 0; i < rs.rows.length; i++) {
+                                    r += rs.rows.item(i).setting + ", " + rs.rows.item(i).value + "\n"
+                                }
+                                console.log(r)
+                                console.log(rs.rows.item(0).value)
+                                Global.shuffle = rs.rows.item(0).value
+                                if( rs.rows.item(0).value){
+                                    shuffleButton.color = theme.primaryColor;
+                                }else{
+                                    shuffleButton.color = Theme.light.textColor
+                                }
+                            }else{
+                                Global.shuffle = false;
+                            }
+
+
+
+                        })
+                }
+
+
+                onClicked: {
+                    Global.shuffle = !Global.shuffle
+                    if(Global.shuffle){
+                        this.color = theme.primaryColor;
+                    }else{
+                        this.color = Theme.light.textColor
+                    }
+
+                    var db = LocalStorage.openDatabaseSync("vinylmusic", "1.0", "The Example QML SQL!", 1000000);
+                    db.transaction(
+                        function(tx) {
+                            // Create the database if it doesn't aGlobal.shufflelready exist
+                            tx.executeSql('CREATE TABLE IF NOT EXISTS Settings(id INT PRIMARY KEY AUTOINCREMENT, setting TEXT, value TEXT)');
+
+                            var rs = tx.executeSql('SELECT * FROM Settings WHERE setting="shuffle"')
+                            if(rs.rows.length > 0){
+                                tx.executeSql('UPDATE Settings SET value="' + Global.shuffle + '" WHERE id=' + rs.rows.item(0).id);
+
+                            }else{
+                                tx.executeSql('INSERT INTO Settings VALUES (NULL, ?, ?)',  [ 'shuffle', Global.shuffle ]);
+                            }
+
+                        })
+                }
+
+            }
+
+            IconButton {
+                anchors.bottom: parent.bottom
+                id: volumeIcon
+                iconName: 'av/volume_up'
+                anchors.top: shuffleButton.top
+                anchors.topMargin: dp(-16)
+                color: index == 0 ? Theme.light.textColor : Theme.dark.textColor
+                onClicked: {
+                    if(volumeControl.value == 0.00){
+                        volumeControl.value = 1
+                        this.iconName = 'av/volume_up'
+                        this.color = Theme.light.textColor
+
+                    }else{
+                        volumeControl.value = 0.00
+                        this.iconName = 'av/volume_off'
+                        this.color = theme.primaryColor //Theme.alpha('#f33', .9)
+                    }
+                }
+            }
+
+
+            Slider {
+                id: volumeControl
+                width: dp(100)
+                anchors.topMargin: dp(110)
+                anchors.right: parent.right
+                updateValueWhileDragging: true
+                color:theme.primaryColor
+                value: 1.0
+                onValueChanged: {
+                    if(this.value == 0.00){
+                        volumeIcon.iconName = 'av/volume_off'
+                        volumeIcon.color = theme.primaryColor //Theme.alpha('#f33', .9)
+
+                    }else if(this.value > 0.00 && this.value <= 0.60){
+                        volumeIcon.iconName = 'av/volume_down'
+                        volumeIcon.color = Theme.light.textColor
+                    }else{
+                        volumeIcon.iconName = 'av/volume_up'
+                        volumeIcon.color = Theme.light.textColor
+                    }
+                    playMusic.volume = this.value
+                }
+                Component.onCompleted: {
+
+                        initScan.start();
+                }
+            }
+
+
+
+
         }
-
-
-
-
-    }
-
-
-
 }
-

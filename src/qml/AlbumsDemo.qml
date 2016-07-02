@@ -8,6 +8,7 @@ import "../js/musicId.js" as Global
 
 Item {
 
+
     property string currentAlbum: "Unknown Album"
     property string currentArtist: "Unknown Artist"
 
@@ -111,8 +112,7 @@ Item {
                        demo.title = title
                        page.title = title
                        currentAlbum = title
-                       //songListModel.model = songModel.getSingleAlbum(id)
-                       console.log("single album", JSON.stringify(albumDetailView.model))
+                       songListModel.model = songModel.getSongsByAlbum(id)
 
 
                        Global.mode = allAlbumsModel.model
@@ -157,6 +157,7 @@ Item {
 
                 visible: true
                 subText: {
+
                     return currentAlbum
                 }
 
@@ -177,6 +178,10 @@ Item {
                    id: itemMouseArea2
                    anchors.fill: parent
                    onClicked: {
+                       Global.songId = model.index
+                       Global.currentAlbum = currentAlbum
+                       console.log("index? ", model.index)
+
 
                        demo.title = model.modelData.title
                        playMusic.source = "file://" + model.modelData.path
