@@ -2,7 +2,7 @@
 The official repo for Liri Music (previously called Vinyl Music).  The idea is to provide the first cross-platform, material-design-inspired music player, full of awesome features (and all the stuff you'd expect out of a music player).
 
 ![Image of liri vinyl]
-(https://github.com/liri-project/liri-vinyl/blob/master/images/liriworking.png)
+(https://github.com/liri-project/liri-vinyl/blob/develop/images/liriworking.png)
 
 ### Dependencies
 	Basic:
@@ -30,7 +30,7 @@ We don't have binaries yet, but feel free to try it out by building from source.
 	up/down = volume up/down
 	
 ##### Local Music
-Just drop your music folders into ~/Music, and Liri Vinyl will find them
+Just drop your music folders into ~/Music, and we'll find them
 	
 ##### Online Streams
 Download online streams in m3u format, and save them to ~/Music/streams
