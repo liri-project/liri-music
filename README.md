@@ -2,10 +2,7 @@
 The official repo for Liri Music (previously called Vinyl Music).  The idea is to provide the first cross-platform, material-design-inspired music player, full of awesome features (and all the stuff you'd expect out of a music player).
 
 ![Image of liri vinyl]
-(https://github.com/liri-project/liri-vinyl/blob/master/images/liri-music-03-2016.png)
-
-For current functionality, see the "Features" section below.
-
+(https://github.com/liri-project/liri-vinyl/blob/master/images/liriworking.png)
 
 ### Dependencies
 	Basic:
@@ -13,16 +10,16 @@ For current functionality, see the "Features" section below.
 	c++:
 		TagLib (http://taglib.github.io/)
 	Qt:
-		Qt5.5 (Tested using 5.5.1)
+		Qt5.7
 		qml-material (https://github.com/papyros/qml-material)
 
-Liri Music is still early in development, however, if you'd like to give it a try, just install the dependencies, and then Qt Creator, and open the .pro file.  Then run it from Qt Creator.
+We don't have binaries yet, but feel free to try it out by building from source.  Once all of the requirements are met, clone this repository, update the submodules, and then run the following (from the root of the project):
 
-Or you could build it by running the following (from the liri-vinyl subdirectory containing the .pro file):
-
-	qmake
+	mkdir build && cd build
+	cmake ../
+	cd src
 	make
-	make install
+	./liri-vinyl
 
 
 ### Features
@@ -39,27 +36,28 @@ Just drop your music folders into ~/Music, and Liri Vinyl will find them
 Download online streams in m3u format, and save them to ~/Music/streams
 
 ##### Shuffle
-This feature is implemented, but can be a bit buggy at times.  The shuffle feature works flawlessy to generate the next track, but when using the previous button, it can sometimes not find the previous track, and so reverts to track 0.
+Shuffle got broken recently due to changes.  It should be working again soon.
 
 ##### Database Integration
 Currently the database gets built during the initial opening of the application, but no way to refresh the database from within the app yet.  The built database is then used to generate song lists (All Songs, Albums, and Artists)
 
 
 ### Screenshots
-Version 0.6
+#### A look back on the dev process
+
 ![Image of liri vinyl]
 (https://github.com/liri-project/liri-vinyl/blob/master/images/screen5.png)
 
-Version 0.5
+
 ![Image of liri vinyl]
 (https://github.com/liri-project/liri-vinyl/blob/master/images/screen4.png)
 
 
-Version 0.2: Prior to December 11 (couldn't decide where to put the audio controls)
+Prior to December 11 (couldn't decide where to put the audio controls)
 ![Image of liri vinyl]
 (https://github.com/liri-project/liri-vinyl/blob/master/images/screen3.png)
 
-Version 0.1: Prior to volume, online streams, settings, and bottom controls:
+Prior to volume, online streams, settings, and bottom controls:
 ![Image of Material Music 1]
 (https://github.com/liri-project/liri-vinyl/blob/master/images/screen2.png)
 
